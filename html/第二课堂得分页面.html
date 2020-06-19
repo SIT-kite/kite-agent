@@ -1,0 +1,1831 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>第二课堂-我的得分</title> 
+<link rel="stylesheet" type="text/css" href="/css/secondclass/common.css"/>
+<link rel="stylesheet" type="text/css" href="/css/secondclass/secondclass.css"/>
+
+<script type="text/javascript" src="/js/jquery-1.4.1.js"></script>
+<script type="text/javascript" src="/js/artDialog4.1.7/artDialog.js?skin=aero"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/system.js"></script>
+<script type="text/javascript" src="/js/page.js"></script>
+
+
+<script type="text/javascript">
+function showDetail(contentId){
+	art.dialog({
+		title:"订单详情",
+		content: document.getElementById('txt_content_'+contentId),
+	    cancelVal: '关闭',
+	    cancel: true,
+	    lock:true
+	});
+}
+function cancelOrder(orderNo){
+	art.dialog({
+	    content: "确认撤销该订单？",
+	    ok: function () {
+	        location.href="/public/pcenter/cancelOrder.action?orderNo="+orderNo;
+	    },
+	    cancelVal: '关闭',
+	    cancel: true,
+	    lock:true
+	});
+}  
+ 
+	var HKEY_Root,HKEY_Path,HKEY_Key; 
+	HKEY_Root="HKEY_CURRENT_USER"; 
+	HKEY_Path="\\Software\\Microsoft\\Internet Explorer\\PageSetup\\"; 
+	//设置网页打印的页眉页脚为空 
+	function PageSetup_Null() 
+	{ 
+	try 
+	{  
+		var Wsh=new ActiveXObject("WScript.Shell"); 
+		HKEY_Key="header"; 
+		Wsh.RegWrite(HKEY_Root+HKEY_Path+HKEY_Key,""); 
+		HKEY_Key="footer"; 
+		Wsh.RegWrite(HKEY_Root+HKEY_Path+HKEY_Key,"");  
+	}catch(e) 
+	{
+		 alert("请允许activeX控件和插件的运行。");
+	} 
+
+	}  
+
+function printme()
+{
+document.getElementById("title").style.display="block";
+document.getElementById("title2").style.display="block";
+document.getElementById("right").style.display="none";
+document.getElementById("fenye").style.display="none";
+PageSetup_Null(); 
+ 
+document.body.innerHTML=document.getElementById('div1').innerHTML;
+window.print();
+}  
+
+</script>
+</head>
+  
+<body>
+   
+	<div id="content-box">
+<div style="">
+        <img src="/images/logo.png" width="400" height="50" /> 
+        <label style="color:#188AFB;blue; font-size: 35px;font-weight:900;font-family: '黑体';">第二课堂教育管理系统</label>
+        <!-- 
+    <div style="color:#188AFB;blue; font-size: 28px;font-weight:900;font-family: '黑体';float:right;">上海应用技术学院第二课堂学分系统</div>-->      
+</div>
+<div id="dekt-nav" style="background:rgb(45,147,222);" >
+        	<a href="/public/init/index.action" class="hover-a" ><span>首页</span></a>
+        	<a href="/public/pcenter/activityOrderList.action" > <span>个人中心</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=001"><span>讲座报告</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=ff808081674ec4720167ce60dda77cea"><span>主题教育</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=ff8080814e241104014eb867e1481dc3"><span>创新创业创意</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f543fe626a8013fe6278a880001"><span>社团社区易班、学院活动</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f543fe62d5d013fe62efd3a0002"><span>社会实践</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f543fe62d5d013fe62e6dc70001"><span>志愿公益</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=402881de5d62ba57015d6320f1a7000c"><span>校园安全文明</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f2a3fe6585e013fe6596c300001"><span>校园文化竞赛活动</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f533ff05c27013ff06d10bf0001"><span>论文专利</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8F963F2A04013A66E0540021287E4866"><span>校园文明</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=ff8080814e241104014fedbbf7fd329d"><span>会议（无学分）</span></a>
+</div>     	<div class="BlankLine1"></div>
+
+<script src="/js/jquery-1.7.1.min.js"></script>
+
+<script src="/js/marquee.js"></script>
+<script type="text/javascript">
+function showSynopsis(){
+	$("#span_score").css("display","block");
+}
+function closeSynopsis(){
+	$("#span_score").css("display","none");
+}
+
+ 
+</script>
+
+<div id="wrap7" class="scroll-news">
+    <ul>     
+     <li >【通知公告】<a href="/public/news/detail.action?news.id=ff8080815dbb8eae015dca1535e9000e" >关于第二课堂教育管理系统学分显示调整的通知</a></li>
+     <li >【通知公告】<a href="/public/news/detail.action?news.id=ff808081582e1fae015ab207aed80cd9" >关于开展个人社会实践的通知</a></li>
+    </ul>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#wrap7').marquee({
+            auto: true,
+            interval: 5000,
+            showNum: 3,
+            stepLen: 3,
+            type: 'vertical'
+        });
+    })
+</script>
+ <div class="user-info" style="padding-right:10px;"> 
+ 			
+        	<div>欢迎您：宋安邦 &nbsp;&nbsp;
+        	<!-- &nbsp;|&nbsp;<a href="/j_spring_security_logout">注销</a> -->
+        	&nbsp;|&nbsp;<a href="/caslogout.jsp">注销</a>
+		&nbsp;|&nbsp;<a href="http://myportal.sit.edu.cn">返回门户</a>
+        	</div>
+			<div onmouseover="showSynopsis()">
+			第二课堂学分：<font color="red">6.96</font> &nbsp;
+			累计得分：<font color="red">10.62</font>&nbsp;
+			诚信积分：<font color="red">9.8</font>
+			</div>
+			<div>
+ 				<form method="post" action="/public/activity/activityList.action">
+ 				  <input name="activityName" style="height:22px;width:120px;"/>&nbsp;
+ 				  <input type="submit" style="border:1px;" value="搜索活动"/>
+ 				</form> 
+ 			</div>
+			
+			<span id="span_score" style="display:none;position:absolute;border: 1px solid #fec3a8;background-color: #fff;color:#f40;padding: 2px 5px;webkit-border-radius: 2px;width:550px;z-index:100;right:220px;-webkit-border-radius: 2px;">
+     		 <b style="color:#fec3a8;position:relative;top:-15px;right:0px">◆</b>
+     		 <b style="color:#fff;position:relative;top:-14px;right:16px">◆</b>
+     		 学分=1.5(主题报告)+0.96(社会实践)+1.5(创新创业创意)+1.0(校园安全文明)+0.0(公益志愿)+2.0(校园文化)
+     		 <iframe src="/public/pcenter/scoreSynopsis.action" width="550"  frameborder="no" border="0" marginwidth="0" marginheight="0"  allowtransparency="yes"></iframe>
+      		 <br />
+      		 <a href="/public/pcenter/scoreDetail.action">进入明细</a>&nbsp;&nbsp;&nbsp;
+      		 <a href="javascript:void(0)" onclick="closeSynopsis()">关闭</a>
+   		   </span>
+</div>
+        <div class="BlankLine1"></div>
+       
+      
+      <div class="dekt-nav-2">
+      <h2>个人中心</h2>
+      	<ul>
+        	 
+      	<li><a href="/public/pcenter/activityOrderList.action" class="ico-2">我的活动</a></li>
+      	<li><a href="/public/pcenter/scoreDetail.action" class="ico-3">我的得分</a></li>
+      	<li><a href="/public/pcenter/index.action" class="ico-1">个人信息</a></li>
+      	<li><a href="/public/pcenter/noteList.action" class="ico-4">站内信</a></li>
+       </ul>
+      </div>
+      
+      <!--startprint-->
+      
+      <div id="div1" style="float: left; width:830px; padding-left:10px;">
+      
+      <div id="title" style="display:none; text-align:center;"><h3>上海应用技术学院第二课堂学分系统</h3></div>
+    
+       <div id="title2" style="display:none; text-align:right;"><h3> 活动人： 宋安邦</h3></div>
+      <div id="right" align="right">
+      <a href="javascript:printme()" target="_self">打印</a>   |
+      <a href="/public/pcenter/exportExcel.action" style="font-weight:bold">得分下载</a>&nbsp;&nbsp;&nbsp;
+      </div>
+      <div class="table_style_4">
+      <form action="/public/pcenter/scoreDetail.action"  class="pageForm">
+      <input type="hidden" id="pageNo" name="pageNo" value="1"/>
+      <input type="hidden" id="pageSize" name="pageSize" value="200"/>
+          <table width="100%">
+           <thead>
+            
+            <tr>
+              <td>活动名称 </td>
+              <td style="width:100px;">活动类型 </td>
+              <td style="width:80px;">申请编号 </td>
+              <td style="width:120px;">申请日期</td>
+              <td style="width:35px;">得分</td>
+              <td style="width:35px;">诚信</td>
+              <td style="width:100px;">备注</td>
+            </tr>
+           </thead>
+           <tbody>
+            <tr>
+              <td>【机械学院】【智能机器实验室】第一次新生大会</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100879592 </td>
+              <td>2018-9-26 19:22:05</td>
+              <td>
+			  <span style="color:green">+0.07</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【校红十字会】人文学院新生入学预防艾滋与应急救护宣传讲座（仅限人文学院新生申请）</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>100874446 </td>
+              <td>2018-9-16 23:32:35</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>如何防范校园贷</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>100887790 </td>
+              <td>2018-9-26 18:57:12</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>数学建模社第一次社员大会</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100893770 </td>
+              <td>2018-10-31 20:57:06</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>数学建模社第一次社员大会</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100893770 </td>
+              <td>2018-10-31 20:57:06</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【易班】特邀交大讲座 — VR虚拟现实的前世今生</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>100889696 </td>
+              <td>2018-9-27 17:12:50</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+-0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>数学建模社第一次常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100905250 </td>
+              <td>2018-11-1 0:30:39</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>数学建模社第一次常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100905250 </td>
+              <td>2018-11-1 0:30:39</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【易班】上应易班发展中心团建</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>100909730 </td>
+              <td>2018-10-15 12:05:13</td>
+              <td>
+			  <span style="color:green">+0.05</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【易班】上应易班发展中心团建</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>100909730 </td>
+              <td>2018-10-15 12:05:13</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【机械学院】【智能机器实验室】第二次新社员培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100908778 </td>
+              <td>2018-10-15 18:03:50</td>
+              <td>
+			  <span style="color:green">+0.07</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>2018无人机社团第一次全体成员大会</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100923737 </td>
+              <td>2018-11-8 19:30:15</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>理学院数学建模社第七周常规社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100925846 </td>
+              <td>2018-10-31 20:14:11</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>理学院数学建模社第七周常规社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100925846 </td>
+              <td>2018-10-31 20:14:11</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】无人机社团剪辑知识讲座</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100945862 </td>
+              <td>2018-11-8 19:40:23</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【鲁班书院】2018-2019学年秋季日常化社会实践宣讲会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>100938205 </td>
+              <td>2018-10-24 15:58:34</td>
+              <td>
+			  <span style="color:green">+0.16</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">宣讲会</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】无人机社团航模讲座</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100944413 </td>
+              <td>2018-11-8 19:46:38</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】无人机社团剪辑课程第一次常规教学</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100944070 </td>
+              <td>2018-11-8 19:52:12</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【机械学院】无人机社团剪辑课程第二次常规教学</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100965987 </td>
+              <td>2018-11-8 19:05:16</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>理学院数学建模社第八周常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100969870 </td>
+              <td>2018-11-11 21:39:19</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>理学院数学建模社第八周常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100969870 </td>
+              <td>2018-11-11 21:39:19</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【机械学院】【智能机器实验室】第三次社员培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101001804 </td>
+              <td>2018-11-23 20:04:26</td>
+              <td>
+			  <span style="color:green">+0.07</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【机械学院】【智能机器实验室】第四次新社员培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101001828 </td>
+              <td>2018-11-23 20:29:42</td>
+              <td>
+			  <span style="color:green">+0.07</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】无人机社团剪辑课程第三次常规教学</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100997004 </td>
+              <td>2019-4-1 17:13:13</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】固定翼制作第一次培训会（补录）</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>100997186 </td>
+              <td>2018-11-21 20:33:08</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社】无人机社飞创杯第二次培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101021583 </td>
+              <td>2018-12-4 21:06:25</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【人文学院】上海应用技术大学第二届诗词文化节闭幕式暨经典诵读优秀作品展演</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101040203 </td>
+              <td>2018-12-18 11:37:14</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【人文学院】上海应用技术大学第二届诗词文化节闭幕式暨经典诵读优秀作品展演</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101040203 </td>
+              <td>2018-12-18 11:37:14</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>计算机学院软件设计大赛获奖</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101042177 </td>
+              <td>2018-12-19 22:49:27</td>
+              <td>
+			  <span style="color:green">+0.3</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">分数变更</td>
+            </tr>
+            <tr>
+              <td>计算机学院软件设计大赛获奖</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101042177 </td>
+              <td>2018-12-19 22:49:27</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【无人机社】无人机社飞创杯第一次培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101021689 </td>
+              <td>2018-12-4 21:20:00</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社】无人机社飞创杯第三次培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101021812 </td>
+              <td>2018-12-4 21:25:15</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>理学院数学建模社第12周常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101051826 </td>
+              <td>2019-1-3 10:01:00</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>理学院数学建模社第12周常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101051826 </td>
+              <td>2019-1-3 10:01:00</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【社团活动】03月04机器人爱好者社团赛前培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101058597 </td>
+              <td>2019-3-10 11:42:40</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>【社团活动】03月05日机器人爱好者社团寒假作业展示及讲解比赛</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101068478 </td>
+              <td>2019-3-10 12:07:49</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【社团活动】03月12日机器人爱好者社团寒假作业交流</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101084163 </td>
+              <td>2019-3-19 16:56:33</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>【明学沙龙】第八期：传承雷锋精神 践行社会主义核心价值观</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101088568 </td>
+              <td>2019-3-21 8:02:43</td>
+              <td>
+			  <span style="color:green">+0.16</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">现场为保证人数，采用只签退不签到的方式。</td>
+            </tr>
+            <tr>
+              <td>【社团活动】03月14日机器人爱好者社团寒假作业展示</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101084341 </td>
+              <td>2019-3-19 17:05:45</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【无人机社团】2019年无人机操作第一次培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101110688 </td>
+              <td>2019-4-1 16:49:20</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【社团活动】03月19日机器人爱好社团机器人调试</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101135889 </td>
+              <td>2019-4-14 21:23:02</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】2019年无人机操作第二次培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101110539 </td>
+              <td>2019-4-1 16:40:46</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【社团活动】03月21日机器人爱好社团机器人调试</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101136009 </td>
+              <td>2019-4-14 21:30:06</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【学工部】明学沙龙“七一”专题：“不忘初心 牢记使命”听老兵讲革命故事</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101224753 </td>
+              <td>2019-6-29 20:07:09</td>
+              <td>
+			  <span style="color:green">+0.16</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【社团活动】04月18日机器人爱好社团赛前调试（仅限本社成员申请！）</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101159308 </td>
+              <td>2019-4-26 20:57:19</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【机械学院】【智能机器实验室】第一次社课</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101243720 </td>
+              <td>2019-9-20 12:59:22</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101202976 </td>
+              <td>2019-5-28 18:09:26</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101202976 </td>
+              <td>2019-5-28 18:09:26</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101203274 </td>
+              <td>2019-5-28 18:27:35</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101203274 </td>
+              <td>2019-5-28 18:27:35</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101203121 </td>
+              <td>2019-5-28 18:21:41</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101203121 </td>
+              <td>2019-5-28 18:21:41</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101203412 </td>
+              <td>2019-5-28 18:33:57</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【理学院】数学建模设常规活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101203412 </td>
+              <td>2019-5-28 18:33:57</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【无人机社团】无人机操控培训</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101111041 </td>
+              <td>2019-4-1 17:48:51</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【无人机社团】2019年无人机操作第三次培训</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101110850 </td>
+              <td>2019-4-1 17:00:09</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【人文学院】上海应用技术大学第十届中华母亲节开幕式</td>
+              <td>
+              	主题教育
+                
+              
+              </td>
+              <td>101166343 </td>
+              <td>2019-5-6 7:31:35</td>
+              <td>
+			  <span style="color:green">+0.16</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">手动签到</td>
+            </tr>
+            <tr>
+              <td>【社团活动】04月02日机器人爱好社团赛前调试（仅限本社成员申请！）</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101125536 </td>
+              <td>2019-4-9 14:39:37</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>【工创学院】04月04日机器人爱好社团赛前调试（仅限本社成员申请！）</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101125684 </td>
+              <td>2019-4-9 14:45:54</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团 </td>
+            </tr>
+            <tr>
+              <td>【社团活动】04月16日机器人爱好社团赛前调试（仅限本社成员申请！）</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101159026 </td>
+              <td>2019-4-26 17:49:12</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第六次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101312016 </td>
+              <td>2019-10-30 18:06:17</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第九次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101347751 </td>
+              <td>2019-11-21 14:00:28</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十一次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101360274 </td>
+              <td>2019-11-27 22:40:24</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第七次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101315994 </td>
+              <td>2019-11-2 19:36:36</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>【学科性社团活动】10月22日（周二）机器人爱好者社团</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101298578 </td>
+              <td>2019-10-24 20:20:15</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【人文学院】2018级安全教育网络教学活动学分录入</td>
+              <td>
+              	校园安全文明
+                
+              
+              </td>
+              <td>101343056 </td>
+              <td>2019-11-20 16:03:41</td>
+              <td>
+			  <span style="color:green">+1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【鲁班书院】2019年（下）社会实践宣讲会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>101310842 </td>
+              <td>2019-10-30 10:41:30</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【鲁班书院】2019年（下）社会实践宣讲会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>101310842 </td>
+              <td>2019-10-30 10:41:30</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">1</td>
+            </tr>
+            <tr>
+              <td>【计算机学院】人工智能社第八次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101357948 </td>
+              <td>2019-11-26 22:15:40</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第一次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101279429 </td>
+              <td>2019-10-16 19:21:50</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">加分</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第八次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101340761 </td>
+              <td>2019-11-19 18:05:14</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十四次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101379004 </td>
+              <td>2019-12-11 23:16:15</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101351176 </td>
+              <td>2019-11-22 21:00:43</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十二次社团</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101363114 </td>
+              <td>2019-11-29 21:16:31</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>疫情期间如何把握创业机遇</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101394157 </td>
+              <td>2020-3-16 12:59:29</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+-0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十六次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101385591 </td>
+              <td>2019-12-22 19:08:37</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团活动</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第五次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101301638 </td>
+              <td>2019-10-26 21:28:55</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团活动</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十三次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101370214 </td>
+              <td>2019-12-4 15:20:58</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团活动</td>
+            </tr>
+            <tr>
+              <td>机器人爱好者社团第十五次社团活动</td>
+              <td>
+              	创新创业创意
+                
+              
+              </td>
+              <td>101379050 </td>
+              <td>2019-12-11 23:20:49</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">学科型社团</td>
+            </tr>
+            <tr>
+              <td>【经管学院】2020年寒假社会实践线上答辩、指导及分享交流会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>101457999 </td>
+              <td>2020-5-17 8:57:07</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">2020年寒假社会实践线上答辩会</td>
+            </tr>
+            <tr>
+              <td>鲁班书院“筑防疫长城，担青春使命”主题团日活动（3）</td>
+              <td>
+              	主题教育
+                
+              
+              </td>
+              <td>101409675 </td>
+              <td>2020-3-29 20:12:32</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【人文学院】2020年暑期社会实践宣讲会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>101494123 </td>
+              <td>2020-6-14 21:19:07</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">宣讲会</td>
+            </tr>
+            <tr>
+              <td>【团委】“365青年成长计划”假期专项赛之晨读（第二批加分）</td>
+              <td>
+              <a title=-"社团社区易班、学院活动">
+                 社团社区易班、...
+              </a>
+                
+              
+              </td>
+              <td>101438369 </td>
+              <td>2020-4-30 13:59:17</td>
+              <td>
+			  <span style="color:green">+1.4</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">手动签到 </td>
+            </tr>
+            <tr>
+              <td>【城建学院】从火场伤亡看火场逃生</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101424315 </td>
+              <td>2020-4-21 13:12:35</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red">参加活动</td>
+            </tr>
+            <tr>
+              <td>【城建学院】从火场伤亡看火场逃生</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101424315 </td>
+              <td>2020-4-21 13:12:35</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>计算机学院普法社会实践小组分享会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>101448674 </td>
+              <td>2020-5-12 17:37:26</td>
+              <td>
+			  <span style="color:green">+0.4</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【经管学院】2020年大学生暑假社会实践宣讲会</td>
+              <td>
+              	社会实践
+                
+              
+              </td>
+              <td>101498686 </td>
+              <td>2020-6-16 10:23:14</td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">2020暑假社会实践宣讲会</td>
+            </tr>
+            <tr>
+              <td>鲁班书院“筑防疫长城，担青春使命”主题团日活动（1）</td>
+              <td>
+              	主题教育
+                
+              
+              </td>
+              <td>101409670 </td>
+              <td>2020-3-29 20:12:16</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>鲁班书院“筑防疫长城，担青春使命”主题团日活动（5）</td>
+              <td>
+              	主题教育
+                
+              
+              </td>
+              <td>101409671 </td>
+              <td>2020-3-29 20:12:21</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>鲁班书院“筑防疫长城，担青春使命”主题团日活动（4）</td>
+              <td>
+              	主题教育
+                
+              
+              </td>
+              <td>101409673 </td>
+              <td>2020-3-29 20:12:26</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>【城建学院】见“历”如晤——从HR角度看简历</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101423210 </td>
+              <td>2020-4-22 10:55:34</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+			  <td style="color:red">参加活动</td>
+            </tr>
+            <tr>
+              <td>【城建学院】见“历”如晤——从HR角度看简历</td>
+              <td>
+              	讲座报告
+                
+              
+              </td>
+              <td>101423210 </td>
+              <td>2020-4-22 10:55:34</td>
+              <td>
+			  <span style="color:green">+0</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.1</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+            <tr>
+              <td>鲁班书院“筑防疫长城，担青春使命”主题团日活动（2）</td>
+              <td>
+              	主题教育
+                
+              
+              </td>
+              <td>101409667 </td>
+              <td>2020-3-29 20:12:09</td>
+              <td>
+			  <span style="color:green">+0.15</span>
+			  </td>
+              <td>
+			  <span style="color:green">+0.2</span>
+			  </td>
+			  <td style="color:red"></td>
+            </tr>
+           </tbody> 
+          </table>
+        </form>  
+        </div>
+        <!--endprint-->
+        <div id="fenye">
+<div id="page" class="page">
+
+		<div align="right" style="position: relative;left: -10px;margin: 8px 0px;">
+				总条数：<b style="color: red" id="count">93</b>　
+				当前
+				<b class="fontred"><font class="pageNo" color="red">1</font>/<span class="totalPages">1</span>页&nbsp;&nbsp;&nbsp;&nbsp;</b>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('first','');">首页</a>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('pre','');">上一页</a>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('next','');">下一页</a>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('last','');">尾页</a>
+				
+		</div>
+</div>
+        </div>
+      </div>
+       
+    </div> 
+
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>第二课堂-活动列表</title>
+<link rel="stylesheet" type="text/css" href="/css/secondclass/common.css"/>
+<link rel="stylesheet" type="text/css" href="/css/secondclass/secondclass.css"/>
+
+<script type="text/javascript" src="/js/jquery-1.4.1.js"></script>
+<script type="text/javascript" src="/js/artDialog4.1.7/artDialog.js?skin=aero"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/system.js"></script>
+<script type="text/javascript" src="/js/page.js"></script>
+
+
+</head>
+
+<body>
+
+	<div id="content-box">
+<div style="">
+        <img src="/images/logo.png" width="400" height="50" /> 
+        <label style="color:#188AFB;blue; font-size: 35px;font-weight:900;font-family: '黑体';">第二课堂教育管理系统</label>
+        <!-- 
+    <div style="color:#188AFB;blue; font-size: 28px;font-weight:900;font-family: '黑体';float:right;">上海应用技术学院第二课堂学分系统</div>-->      
+</div>
+<div id="dekt-nav" style="background:rgb(45,147,222);" >
+        	<a href="/public/init/index.action" class="hover-a" ><span>首页</span></a>
+        	<a href="/public/pcenter/activityOrderList.action" > <span>个人中心</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=001"><span>讲座报告</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=ff808081674ec4720167ce60dda77cea"><span>主题教育</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=ff8080814e241104014eb867e1481dc3"><span>创新创业创意</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f543fe626a8013fe6278a880001"><span>社团社区易班、学院活动</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f543fe62d5d013fe62efd3a0002"><span>社会实践</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f543fe62d5d013fe62e6dc70001"><span>志愿公益</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=402881de5d62ba57015d6320f1a7000c"><span>校园安全文明</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f2a3fe6585e013fe6596c300001"><span>校园文化竞赛活动</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8ab17f533ff05c27013ff06d10bf0001"><span>论文专利</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=8F963F2A04013A66E0540021287E4866"><span>校园文明</span></a>
+        	<a  href="/public/activity/activityList.action?categoryId=ff8080814e241104014fedbbf7fd329d"><span>会议（无学分）</span></a>
+</div>         
+         <div class="BlankLine1"></div>
+
+<script src="/js/jquery-1.7.1.min.js"></script>
+
+<script src="/js/marquee.js"></script>
+<script type="text/javascript">
+function showSynopsis(){
+	$("#span_score").css("display","block");
+}
+function closeSynopsis(){
+	$("#span_score").css("display","none");
+}
+
+ 
+</script>
+
+<div id="wrap7" class="scroll-news">
+    <ul>     
+     <li >【通知公告】<a href="/public/news/detail.action?news.id=ff8080815dbb8eae015dca1535e9000e" >关于第二课堂教育管理系统学分显示调整的通知</a></li>
+     <li >【通知公告】<a href="/public/news/detail.action?news.id=ff808081582e1fae015ab207aed80cd9" >关于开展个人社会实践的通知</a></li>
+    </ul>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $('#wrap7').marquee({
+            auto: true,
+            interval: 5000,
+            showNum: 3,
+            stepLen: 3,
+            type: 'vertical'
+        });
+    })
+</script>
+ <div class="user-info" style="padding-right:10px;"> 
+ 			
+        	<div>欢迎您：宋安邦 &nbsp;&nbsp;
+        	<!-- &nbsp;|&nbsp;<a href="/j_spring_security_logout">注销</a> -->
+        	&nbsp;|&nbsp;<a href="/caslogout.jsp">注销</a>
+		&nbsp;|&nbsp;<a href="http://myportal.sit.edu.cn">返回门户</a>
+        	</div>
+			<div onmouseover="showSynopsis()">
+			第二课堂学分：<font color="red">6.96</font> &nbsp;
+			累计得分：<font color="red">10.62</font>&nbsp;
+			诚信积分：<font color="red">9.8</font>
+			</div>
+			<div>
+ 				<form method="post" action="/public/activity/activityList.action">
+ 				  <input name="activityName" style="height:22px;width:120px;"/>&nbsp;
+ 				  <input type="submit" style="border:1px;" value="搜索活动"/>
+ 				</form> 
+ 			</div>
+			
+			<span id="span_score" style="display:none;position:absolute;border: 1px solid #fec3a8;background-color: #fff;color:#f40;padding: 2px 5px;webkit-border-radius: 2px;width:550px;z-index:100;right:220px;-webkit-border-radius: 2px;">
+     		 <b style="color:#fec3a8;position:relative;top:-15px;right:0px">◆</b>
+     		 <b style="color:#fff;position:relative;top:-14px;right:16px">◆</b>
+     		 学分=1.5(主题报告)+0.96(社会实践)+1.5(创新创业创意)+1.0(校园安全文明)+0.0(公益志愿)+2.0(校园文化)
+     		 <iframe src="/public/pcenter/scoreSynopsis.action" width="550"  frameborder="no" border="0" marginwidth="0" marginheight="0"  allowtransparency="yes"></iframe>
+      		 <br />
+      		 <a href="/public/pcenter/scoreDetail.action">进入明细</a>&nbsp;&nbsp;&nbsp;
+      		 <a href="javascript:void(0)" onclick="closeSynopsis()">关闭</a>
+   		   </span>
+</div>
+
+        <div class="BlankLine1"></div>
+       
+       <div class="box-1">
+     <form action="/public/activity/activityList.action?categoryId="  class="pageForm">
+      <input type="hidden" id="pageNo" name="pageNo" value="1"/>
+      <input type="hidden" id="pageSize" name="pageSize" value="200"/>
+       <input type="hidden" name="categoryId" value=""/>
+        <ul class="ul_7">
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062079">·
+【天天讲】【经管学院】“四史”学习教育专题辅导报告（二）</a> <span>2020-6-18 13:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062210">·
+【社团活动】【材料学院】金相社6.17常规活动</a> <span>2020-6-17 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062212">·
+【社会实践宣讲会】【团委】2020年暑期社会实践宣讲会</a> <span>2020-6-17 18:00:09</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062211">·
+【其他】【勤·公益讲座】2020年事业单位备考指南</a> <span>2020-6-17 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062209">·
+【学科型社团活动】【材料学院】金相社6.16三创活动</a> <span>2020-6-16 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062197">·
+【社会实践宣讲会】【生态学院】2020（上）大学生社会实践活动宣讲会</a> <span>2020-6-16 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062185">·
+【社会实践宣讲会】【城建学院】2020(上)大学生社会实践宣讲会</a> <span>2020-6-15 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062213">·
+【社区活动】【经管学院】社区微讲堂： 守候初心，静待花开---2020年考研经验分享会</a> <span>2020-6-15 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062156">·
+【社会实践宣讲会】【经管学院】2020年大学生暑假社会实践宣讲会</a> <span>2020-6-15 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062152">·
+【团队社会实践】机械工程学院2020社会实践宣讲会</a> <span>2020-6-15 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062188">·
+【社会实践宣讲会】【计算机学院】2020年大学生暑期社会实践宣讲会活动</a> <span>2020-6-15 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062161">·
+【社会实践宣讲会】【轨交学院】2020暑期社会实践宣讲会</a> <span>2020-6-15 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062208">·
+【社会实践宣讲会】【艺术学院】2020年暑假社会实践宣讲会</a> <span>2020-6-15 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062132">·
+【社会实践宣讲会】【电气学院】2020暑假大学生社会实践活动宣讲会</a> <span>2020-6-15 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062163">·
+【社会实践宣讲会】【材料学院】材料学院2020暑期社会实践宣讲会</a> <span>2020-6-15 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062157">·
+【天天讲】【计算机学院】稳定情绪，规划人生，与最好的自己相遇</a> <span>2020-6-15 17:50:20</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062206">·
+【团队社会实践】【城建学院】2019年（下）社会实践校级获奖</a> <span>2020-6-15 15:08:30</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062205">·
+【团队社会实践】【城建学院】2019年（下）社会实践校级合格</a> <span>2020-6-15 14:55:59</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062203">·
+【团队社会实践】【城建学院】2019年（下）社会实践院级合格</a> <span>2020-6-15 13:12:43</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062202">·
+【学科型社团活动】【城建学院】第二期危险化学品安全知识云竞赛</a> <span>2020-6-15 9:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062199">·
+【个人社会实践】【轨交学院】2016级学生个人社会实践补录2</a> <span>2020-6-15 8:20:09</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062198">·
+【晨读365】【团委】“365青年成长计划”假期专项赛之晨读（第六批加分）</a> <span>2020-6-15 8:00:37</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062110">·
+【社团活动】SIT美食文化社社团常规活动</a> <span>2020-6-14 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062184">·
+【学院活动】鲁班书院社会实践宣讲会2020（上）</a> <span>2020-6-14 18:00:01</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062190">·
+【学科型社团活动】【理学院】数学建模社社团课程4</a> <span>2020-6-14 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062131">·
+【社团活动】【电气学院】SIT科技创新社-科协成立五周年纪念云庆典</a> <span>2020-6-14 14:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062193">·
+【团队社会实践】【理学院】团体社会实践加分（请勿申请）</a> <span>2020-6-14 13:49:14</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062153">·
+【社会实践宣讲会】【人文学院】2020年暑期社会实践宣讲会</a> <span>2020-6-14 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062186">·
+【个人社会实践】【香料学院】个人社会实践补录</a> <span>2020-6-14 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062187">·
+【三创活动】【香料学院】易班活动加分补录</a> <span>2020-6-14 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062093">·
+【社团活动】棣棠汉服社常规活动</a> <span>2020-6-13 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062189">·
+【学科型社团活动】【理学院】数学建模社社团课程3</a> <span>2020-6-13 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062089">·
+【其他讲座】【电气学院】高数辅导讲座</a> <span>2020-6-13 17:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062162">·
+【学院活动】【材料学院】2020年上海应用技术大学材料科学与工程学院 线上综合招聘宣讲会</a> <span>2020-6-13 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062194">·
+【社会实践宣讲会】【理学院】社会实践宣讲会</a> <span>2020-6-13 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062200">·
+【主题活动】2020中国上海萱草文化节活动</a> <span>2020-6-13 10:00:48</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062094">·
+【社团活动】棣棠汉服社常规活动</a> <span>2020-6-12 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062046">·
+【社团活动】【城建学院】6月12号应创校园纪念品社社常规活动</a> <span>2020-6-12 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062087">·
+【学科型社团活动】【化工学院】环境科学社常规活动</a> <span>2020-6-12 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062151">·
+【社会实践宣讲会】【化工学院】化工学院2020年暑期团队社会实践宣讲会</a> <span>2020-6-12 18:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062164">·
+【学科型社团活动】【理学院】数学建模社社团课程2</a> <span>2020-6-12 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061986">·
+【其他讲座】【城建学院】学生选课流程介绍讲座</a> <span>2020-6-12 13:00:08</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062207">·
+【学院活动】【艺术学院】2020年“梦系青春，艺路远航”毕业系列活动</a> <span>2020-6-12 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062201">·
+【团队社会实践】【经管学院】2019年寒假团队社会实践</a> <span>2020-6-12 8:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062159">·
+【学科型社团活动】【理学院】物理竞赛社第七次常规活动</a> <span>2020-6-11 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062080">·
+【学科型社团活动】【生态学院】【学科型社团】园林之墙里的花园</a> <span>2020-6-11 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062149">·
+【学科型社团活动】【生态物语社】【纪录片赏析⑤】蔚蓝之境——湿地的竞争</a> <span>2020-6-11 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062069">·
+【学科型社团活动】【香料学院】Winner青创社第八次常规活动</a> <span>2020-6-11 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062098">·
+【学科型社团活动】【材料学院】我的陶乐享创新创意社6.11三创活动</a> <span>2020-6-11 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062099">·
+【学科型社团活动】【材料学院】金相社6.11三创活动</a> <span>2020-6-11 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062078">·
+【学科型社团活动】【生态学院】【学科型社团】园林之遥远的归处</a> <span>2020-6-11 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062124">·
+【天天讲】【化工学院】考取研究生需要准备什么？</a> <span>2020-6-11 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062104">·
+【学科型社团活动】【化工学院】制药工程社第十次常规活动</a> <span>2020-6-11 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062006">·
+【其他讲座】【学工部】【明学沙龙第22期】新中国70年与实现中国梦</a> <span>2020-6-11 14:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061725">·
+【其他讲座】【人文学院】毕业班就业辅导活动补录</a> <span>2020-6-11 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062154">·
+【个人社会实践】【人文学院】2020年个人社会实践补录2</a> <span>2020-6-11 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062192">·
+【学院活动】【理学院】线上晨读活动6</a> <span>2020-6-11 7:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062133">·
+【学科型社团活动】3D打印社常规活动</a> <span>2020-6-10 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062112">·
+【社团活动】6月10日印迹文学社日常活动</a> <span>2020-6-10 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062108">·
+【学科型社团活动】6月10日（周三）D&M越障小车（仅限本社团成员申请）</a> <span>2020-6-10 20:00:38</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062077">·
+【学科型社团活动】【生态学院】【学科型社团】园林之不朽的林泉</a> <span>2020-6-10 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062148">·
+【学科竞赛】【生态物语社】【纪录片赏析④】《湿地的力量》</a> <span>2020-6-10 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062076">·
+【学科型社团活动】【生态学院】【学科型社团】园林之汴京艮岳梦</a> <span>2020-6-10 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062150">·
+【学长讲坛】思想先锋学长云讲坛10</a> <span>2020-6-10 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062103">·
+【其他】【勤·公益讲座】2021上海公务员备考指导</a> <span>2020-6-10 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062128">·
+【学科型社团活动】【无人机社团】第三次线上活动</a> <span>2020-6-10 17:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062065">·
+【社团活动】【化工学院】考研社—2021考研数学导数的概念及应用（2）</a> <span>2020-6-10 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062026">·
+【学科型社团活动】【化工学院】化工竞赛社—Aspen基础学习(四)</a> <span>2020-6-10 16:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062102">·
+【院级公益志愿】【白玉兰志愿者服务队】小”膳“大爱线上志愿活动</a> <span>2020-6-10 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062107">·
+【学科型社团活动】6月9日（周二）D&M越障小车（仅限本社团成员申请）</a> <span>2020-6-9 20:00:06</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062075">·
+【学科型社团活动】【生态学院】【学科型社团】园林之写在大地上的诗</a> <span>2020-6-9 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062100">·
+【社团活动】【材料学院】我的陶乐享创新创意社6.9日常活动</a> <span>2020-6-9 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062129">·
+【个人社会实践】【计算机学院】社会实践补录</a> <span>2020-6-9 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062101">·
+【社团活动】【材料学院】金相社6.9常规活动</a> <span>2020-6-9 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062074">·
+【学科型社团活动】【生态学院】【学科型社团】园林之桃花源有多远</a> <span>2020-6-9 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062064">·
+【社团活动】【化工学院】考研社—2021考研数学导数的概念及应用（1）</a> <span>2020-6-9 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062106">·
+【晨读365】【团委】“365青年成长计划”假期专项赛之晨读（第五批加分）</a> <span>2020-6-9 10:00:41</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062105">·
+【主题活动】【团委】普法365专题学习之校园疫情防控学习</a> <span>2020-6-9 10:00:32</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062109">·
+【社团活动】SIT美食文化社社团活动</a> <span>2020-6-9 10:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062191">·
+【学院活动】【理学院】线上晨读活动5</a> <span>2020-6-9 7:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062081">·
+【社团活动】【城建学院】6月8日Showtime韩艺社常规活动</a> <span>2020-6-8 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062073">·
+【学科型社团活动】【生态学院】【学科型社团】园林之村庄里的上林苑</a> <span>2020-6-8 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062015">·
+【社团活动】【城建学院】6月8号尘兴墨韵社常规活动</a> <span>2020-6-8 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062047">·
+【社团活动】【城建学院】6月8号应创校园纪念品社社常规活动</a> <span>2020-6-8 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062147">·
+【学科型社团活动】【化工学院】绿色未来同盟社—环保知识竞赛策划</a> <span>2020-6-8 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062204">·
+【文艺类竞赛】鲁班书院“艺”起青春视频制作大赛（补录）</a> <span>2020-6-8 18:00:02</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062071">·
+【学科型社团活动】【生态学院】【学科型社团】园林之仙境在人间</a> <span>2020-6-8 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061974">·
+【天天讲】语言素养与思辨能力</a> <span>2020-6-8 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1060722">·
+【个人社会实践】【机械学院】2020个人社会实践加分补录</a> <span>2020-6-8 15:18:51</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062090">·
+【个人社会实践】【电气学院】社会实践加分补录</a> <span>2020-6-8 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061931">·
+【其他竞赛】【保卫处】国家安全教育主题微视频征集</a> <span>2020-6-8 9:26:11</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062092">·
+【学科竞赛】【人文学院】第十一届中华母亲节系列活动之“周边文创设计大赛”活动补录</a> <span>2020-6-8 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062146">·
+【学科型社团活动】【化工学院】绿色未来同盟社—环保主题辩论赛</a> <span>2020-6-7 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062010">·
+【学院活动】【轨道交通学院】时事研究社第八次常规活动</a> <span>2020-6-7 18:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062066">·
+【社团活动】SIT美食文化社常规活动——小零食里的大乐趣</a> <span>2020-6-7 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062068">·
+【学科型社团活动】【无人机社团】第二次线上活动</a> <span>2020-6-7 17:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062097">·
+【学科竞赛】【城建学院】学科竞赛加分</a> <span>2020-6-7 15:05:30</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062011">·
+【学科型社团活动】【香料学院】芳香社 芳香社活动</a> <span>2020-6-7 13:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061988">·
+【三创活动宣讲会】【电气学院】SIT科技创新社宣讲会——新形式下西门子杯大赛解读分析宣讲</a> <span>2020-6-6 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061906">·
+【月月演】【团委】2020上海应用技术大学主持人大赛决赛</a> <span>2020-6-6 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062145">·
+【学科型社团活动】【化工学院】绿色未来同盟社—“绿色演说家”演讲比赛</a> <span>2020-6-6 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061971">·
+【天天讲】当代大学生如何在疫情期利用健身气功增强免疫力</a> <span>2020-6-6 12:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062045">·
+【社团活动】军魂社常规活动6.6-6.7</a> <span>2020-6-6 8:00:47</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061984">·
+【学科型社团活动】【轨道交通学院】维创电子社第二学期第十一次活动</a> <span>2020-6-5 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062009">·
+【学科型社团活动】【计算机学院】ppl软件工作社线上第七次活动</a> <span>2020-6-5 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062091">·
+【学长讲坛】体育先锋学长云讲坛9</a> <span>2020-6-5 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062024">·
+【学科型社团活动】【理学院】数学建模社社团课</a> <span>2020-6-5 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062008">·
+【学院活动】【理学院】理学院征兵宣讲</a> <span>2020-6-5 17:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062127">·
+【其他讲座】【学工部】班级心理委员战疫专题继续教育培训第三场（补录）</a> <span>2020-6-5 17:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062022">·
+【社团活动】【计算机学院】笑源相声社线上观看视频活动</a> <span>2020-6-5 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062044">·
+【社团活动】军魂社常规活动6.5</a> <span>2020-6-5 13:00:26</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062072">·
+【学院活动】【化工学院】化工学院绿色环保青春行</a> <span>2020-6-5 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062144">·
+【学科型社团活动】【化工学院】绿色未来同盟社—环保公益短片制作比赛</a> <span>2020-6-5 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062014">·
+【学科型社团活动】【城建学院】6月5号  宁静城市模型社常规活动</a> <span>2020-6-5 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062048">·
+【个人社会实践】【材料学院】疫情志愿者</a> <span>2020-6-5 10:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061969">·
+【社团活动】弈林棋社常规活动</a> <span>2020-6-4 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061989">·
+【学科型社团活动】【理学院】物理竞赛第六次常规活动</a> <span>2020-6-4 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062012">·
+【学科型社团活动】【城建学院】6月4号砼筑钢芯社第七次线上常规活动</a> <span>2020-6-4 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061937">·
+【学科型社团活动】【香料学院】Winner青创社第七次常规活动</a> <span>2020-6-4 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062013">·
+【学科型社团活动】【城建学院】06月04日工程管理创新社第九次常规活动</a> <span>2020-6-4 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062025">·
+【学科型社团活动】【机械学院】【智能机器实验室】第七次线上社课 </a> <span>2020-6-4 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061973">·
+【社团活动】【材料学院】我的陶乐享创新创意社6.4日常活动</a> <span>2020-6-4 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061968">·
+【社团活动】圈角匡叉动漫社常规活动</a> <span>2020-6-4 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061873">·
+【社团活动】【城建学院】6月4号MI shine礼仪社常规活动</a> <span>2020-6-4 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061967">·
+【学科型社团活动】【化工学院】制药工程社第九次常规活动</a> <span>2020-6-4 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061965">·
+【天天讲】【城建学院】物种与人口——从气候脉动规律看中国历史上的农业革命</a> <span>2020-6-4 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062023">·
+【学科型社团活动】【理学院】数学建模社常规课程</a> <span>2020-6-4 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062126">·
+【其他讲座】【学工部】班级心理委员战疫专题继续教育培训第二场（补录）</a> <span>2020-6-4 17:00:38</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062019">·
+【学科型社团活动】【无人机社团】第一次线上授课</a> <span>2020-6-4 17:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061948">·
+【学科型社团活动】【化工学院】化工竞赛社—Aspen基础学习(三)</a> <span>2020-6-4 16:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062021">·
+【团队社会实践】【香料学院】秋季实践团队补录</a> <span>2020-6-4 13:18:26</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061977">·
+【天天讲】【经管学院】“四史”学习教育动员大会暨专题辅导报告（一）</a> <span>2020-6-4 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062070">·
+【学院活动】  【理学院】线上晨读活动4</a> <span>2020-6-4 7:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061992">·
+【社团活动】6月3日印迹文学社日常活动</a> <span>2020-6-3 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061964">·
+【其他讲座】【城建学院】从气候变化看中国南部边疆开发</a> <span>2020-6-3 18:00:15</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061985">·
+【其他】【勤·公益讲座】上海警察学员备考</a> <span>2020-6-3 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062088">·
+【学长讲坛】艺术先锋学长云讲坛8</a> <span>2020-6-3 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061872">·
+【社团活动】【城建学院】6月3日中国舞社常规活动</a> <span>2020-6-3 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061730">·
+【其他讲座】【学工部】2020届毕业生参加防疫、防诈骗讲座</a> <span>2020-6-3 10:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061983">·
+【学科型社团活动】6月2日（周二）D&M越障小车（仅限本社团成员申请）</a> <span>2020-6-2 20:00:02</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061975">·
+【社团活动】【材料学院】海湾听涛读书社6.2常规活动</a> <span>2020-6-2 19:45:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061966">·
+【社团活动】【理学院】夕凪日语社第十三次社团活动</a> <span>2020-6-2 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061946">·
+【学科型社团活动】【化工学院】环境科学社常规活动</a> <span>2020-6-2 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061972">·
+【学科型社团活动】【材料学院】我的陶乐享创新创意社6.2三创活动</a> <span>2020-6-2 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062049">·
+【天天讲】就业创业讲座：疫情挑战与就业机会</a> <span>2020-6-2 18:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061947">·
+【社团活动】【化工学院】2021考研数学基础知识解析</a> <span>2020-6-2 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062125">·
+【其他讲座】【学工部】班级心理委员战疫专题继续教育培训第一场（补录）</a> <span>2020-6-2 15:00:28</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061990">·
+【个人社会实践】【化工学院】化工学院个人社会实践补加</a> <span>2020-6-2 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062067">·
+【学院活动】【理学院】线上晨读活动3</a> <span>2020-6-2 7:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061870">·
+【社团活动】【城建学院】6月1日Showtime韩艺社常规活动</a> <span>2020-6-1 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061982">·
+【学科型社团活动】6月1日（周一）D&M越障小车（仅限本社团成员申请）</a> <span>2020-6-1 20:10:38</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061970">·
+【社团活动】棣棠汉服社常规活动</a> <span>2020-6-1 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061871">·
+【社团活动】【城建学院】6月1号尘兴墨韵社常规活动</a> <span>2020-6-1 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062018">·
+【社区活动】【材料学院】二十二号社区我想对你说活动</a> <span>2020-6-1 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062196">·
+【学院活动】【电气学院】我的梦——换种方式看世界</a> <span>2020-6-1 12:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062195">·
+【学院活动】【电气学院】被“嫌弃”的居家生活——说出你的故事，学习生活“笑”创作</a> <span>2020-6-1 12:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061978">·
+【团日活动】【化工学院】化工学院青年大学习活动加分（3）</a> <span>2020-6-1 9:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061976">·
+【晨读365】【香料学院】院365计划16级补录加分</a> <span>2020-6-1 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061945">·
+【社团活动】SIT美食文化社第六次社团常规活动——冰凉的感觉夏日饮品</a> <span>2020-5-31 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061737">·
+【学院活动】【轨道交通学院】时事研究社第七次常规活动</a> <span>2020-5-31 18:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061916">·
+【学科型社团活动】【香料学院】芳香社 芳香社活动</a> <span>2020-5-31 13:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062007">·
+【校级活动】【艺术学院】诚信月活动补加分（2020年上半年）</a> <span>2020-5-31 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061926">·
+【团日活动】【机械学院】线上特别主题团日活动（3）</a> <span>2020-5-31 12:40:10</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061733">·
+【社团活动】文博书画社常规活动</a> <span>2020-5-30 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061868">·
+【社团活动】【城建学院】5月30号   应创校园纪念品社社常规活动</a> <span>2020-5-30 19:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061521">·
+【天天讲】【城建学院】我们的青春之歌：西藏时光</a> <span>2020-5-30 19:00:06</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061908">·
+【三创活动宣讲会】【理学院】就业指导会议</a> <span>2020-5-30 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062004">·
+【学科型社团活动】【艺术学院】第三届“心灵影像”摄影大赛活动补加分</a> <span>2020-5-30 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1062017">·
+【团日活动】【经管学院】六月云团日加分补录</a> <span>2020-5-30 8:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061928">·
+【社团活动】军魂社常规活动5.30-5.31</a> <span>2020-5-30 8:00:48</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061936">·
+【学科型社团活动】【计算机学院】PPTracker社第七次线上活动</a> <span>2020-5-29 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061876">·
+【学科型社团活动】【计算机学院】人工智能社2020年第八次社团活动</a> <span>2020-5-29 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061864">·
+【学科型社团活动】【轨道交通学院】维创电子社第十次社团活动</a> <span>2020-5-29 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061912">·
+【其他讲座】疫情下出国留学怎么办？</a> <span>2020-5-29 19:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061886">·
+【学科型社团活动】生态学院【自然科普社】水箱里的微景观</a> <span>2020-5-29 18:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061987">·
+【学长讲坛】自强先锋学长云讲坛7</a> <span>2020-5-29 18:00:27</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061879">·
+【学科型社团活动】【计算机学院】ppl软件工作社线上第六次活动</a> <span>2020-5-29 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061805">·
+【学科型社团活动】2019-2020学年德语社第十五次社团活动</a> <span>2020-5-29 18:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061866">·
+【社团活动】【化工学院】考研社—考研英语阅读与翻译技巧</a> <span>2020-5-29 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061934">·
+【社团活动】【计算机学院】笑源相声社线上观看视频活动</a> <span>2020-5-29 16:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061944">·
+【学院活动】【城建学院】2020年网络教学座谈会</a> <span>2020-5-29 15:00:56</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061605">·
+【学科型社团活动】【城建学院】2020年5月29日BIM社团常规活动</a> <span>2020-5-29 14:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061929">·
+【个人社会实践】【生态学院】2020寒假个人社会实践录入2</a> <span>2020-5-29 14:03:09</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061927">·
+【社团活动】军魂社常规活动5.29</a> <span>2020-5-29 13:30:40</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061884">·
+【学科型社团活动】【生态物语社】【社团活动】嗨，我的植物朋友！</a> <span>2020-5-29 13:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061869">·
+【学科型社团活动】【城建学院】05月29日  工程管理创新社第七次常规活动</a> <span>2020-5-29 13:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061925">·
+【三创活动】【机械学院】学院三创活动补录加分</a> <span>2020-5-29 10:40:18</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061909">·
+【人文素养类竞赛】鲁班书院“艺”起青春视频制作大赛</a> <span>2020-5-29 10:19:48</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1060727">·
+【学院活动】【机械学院】365主题学习</a> <span>2020-5-29 9:58:35</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061924">·
+【团队社会实践】【团委】2020年寒假学工部、团委社会实践项目加分</a> <span>2020-5-29 9:30:11</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061980">·
+【个人社会实践】【经管学院】个人社会实践加分补录（第二批）</a> <span>2020-5-29 8:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061045">·
+【个人社会实践】【人文学院】2020年寒假个人社会实践补录</a> <span>2020-5-29 8:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061874">·
+【社团活动】【城建学院】5月28号   经典话剧欣赏活动</a> <span>2020-5-28 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061744">·
+【学科型社团活动】【香料学院】SIT.中草药专研社之皮肤与美容（六）(仅限社员参加)</a> <span>2020-5-28 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061930">·
+【社区活动】【生态学院】推理社常规活动</a> <span>2020-5-28 20:30:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061731">·
+【学科型社团活动】文创百工坊常规活动</a> <span>2020-5-28 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061735">·
+【社团活动】弈林棋社常规活动</a> <span>2020-5-28 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061880">·
+【学科型社团活动】【计算机学院】星云特效社第七次线上活动</a> <span>2020-5-28 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061905">·
+【学科型社团活动】【理学院】物理竞赛第五次常规活动</a> <span>2020-5-28 20:00:00</span> </li>
+      		 <li><a href="/public/activity/activityDetail.action?activityId=1061904">·
+【社团活动】【理学院】夕凪日语社第十二次社团活动</a> <span>2020-5-28 19:40:00</span> </li>
+    	</ul>
+<div id="page" class="page">
+
+		<div align="right" style="position: relative;left: -10px;margin: 8px 0px;">
+				总条数：<b style="color: red" id="count">15,920</b>　
+				当前
+				<b class="fontred"><font class="pageNo" color="red">1</font>/<span class="totalPages">80</span>页&nbsp;&nbsp;&nbsp;&nbsp;</b>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('first','');">首页</a>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('pre','');">上一页</a>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('next','');">下一页</a>
+				<a href="javascript:void(0);" onclick="_pageUI.queryPage('last','');">尾页</a>
+				
+		</div>
+</div>
+     </form>	
+    	
+        </div>
+        
+        
+        
+    </div>
+
+</body>
+</html>
