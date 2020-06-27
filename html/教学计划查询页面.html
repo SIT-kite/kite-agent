@@ -1,0 +1,1249 @@
+<html>
+<head>
+    <link href="../main.css" rel="stylesheet">
+    <style type="text/css">
+    .spanT {
+        width: auto;
+        height: 26px;
+        border: 1 solid black;
+        border-bottom: 0px;
+        padding-top: 7px;
+        padding-left: 2px;
+        cursor: pointer;
+        background-color: #b2cceb;
+    }
+    .spanT1 {
+        width: auto;
+        height: 24px;
+        border: 1 solid black;
+        border-bottom: 0px;
+        padding-top: 3px;
+        padding-left: 2px;
+        cursor: pointer;
+        background-color: #e1edf8;
+    }
+    body {
+        margin: 0px 0px 0px 0px;
+        font-size: 9pt;
+        background: white;
+    }
+    td, th {
+        font-size: 9pt;
+    }
+
+    </style>
+    <script type="text/javascript">
+var oTR;
+function doDblClick() {
+}
+function dolink(obj) {
+}
+function doClick(obj) {
+    if (oTR) {
+        oTR.style.background = "white";
+    }
+    obj.style.background = "#f3ffe4";
+    oTR = obj;
+}
+function seeInfo() {
+    var Id = courseId.value;
+    if (Id == "") {
+        alert("请选择要查看的课程！");
+        return;
+    }
+    location.href = "seecourseinfo.jsp?courseId=" + Id;
+}
+function sync(obj) {
+    var s = obj.value.toLowerCase();
+    if (s.length == 0)return;
+    for (var i = 0; i < courseId.options.length; i++) {
+        var s2 = courseId.options[i].text.toLowerCase();
+        if (s2.indexOf(s) >= 0) {
+            courseId.selectedIndex = i;
+            return;
+        }
+    }
+}
+function doChange() {
+    location.href = "course.jsp?majorId=" + majorId.value + "&enterYear=" + enterYear.value
+            + "&courseBigSortId=1";
+}
+function doLocation(obj) {
+	if (event.keyCode!=13)
+	{
+		return;
+	}
+    location.href = "course.jsp?majorId=" + majorId.value + "&enterYear=" + enterYear.value
+            + "&courseBigSortId=1&major_key=" + obj.value;
+}
+
+    </script>
+</head>
+<body>
+<br>
+<div align="center"><b>上海应用技术大学教学计划管理&nbsp;</b><br>请选择专业
+    <select name="majorId" onchange="doChange();" style="width:450px;">
+        <option value="">-请选择专业-</option>
+        <option value="B0100">B0100&nbsp;材料学院大类</option>
+        <option value="B010000">B010000&nbsp;材料类</option>
+        <option value="B010101">B010101&nbsp;冶金工程</option>
+        <option value="B010102">B010102&nbsp;金属成型</option>
+        <option value="B0102">B0102&nbsp;材料科学与工程</option>
+        <option value="B010201">B010201&nbsp;材料科学与工程</option>
+        <option value="B010202">B010202&nbsp;金属材料热处理</option>
+        <option value="B010203">B010203&nbsp;无机非金属材料</option>
+        <option value="B010204">B010204&nbsp;材料成形与控制</option>
+        <option value="B010205">B010205&nbsp;高分子材料与工程</option>
+        <option value="B010206">B010206&nbsp;建筑材料</option>
+        <option value="B010207">B010207&nbsp;冶金工程</option>
+        <option value="B010208">B010208&nbsp;无机功能材料</option>
+        <option value="B010209">B010209&nbsp;金属压力加工技术</option>
+        <option value="B010210">B010210&nbsp;高分子材料加工</option>
+        <option value="B010211">B010211&nbsp;冶金新技术</option>
+        <option value="B010212">B010212&nbsp;材料制备与加工</option>
+        <option value="B010213">B010213&nbsp;高分子材料</option>
+        <option value="B010214">B010214&nbsp;冶金技术</option>
+        <option value="B010215">B010215&nbsp;金属材料</option>
+        <option value="B010216">B010216&nbsp;建筑节能材料</option>
+        <option value="B010217">B010217&nbsp;材料科学与工程（中本贯通）</option>
+        <option value="B0102Y0">B0102Y0&nbsp;无机非金属材料（卓越）</option>
+        <option value="B0103">B0103&nbsp;复合材料与工程</option>
+        <option value="B010301">B010301&nbsp;复合材料与工程</option>
+        <option value="B0104">B0104&nbsp;材料物理</option>
+        <option value="B010401">B010401&nbsp;材料物理</option>
+        <option value="B0105">B0105&nbsp;包装材料（微专业）</option>
+        <option value="B0200">B0200&nbsp;机械学院大类</option>
+        <option value="B020000">B020000&nbsp;机械类</option>
+        <option value="B0201">B0201&nbsp;机械设计制造及其自动化</option>
+        <option value="B020101">B020101&nbsp;机械设计制造及其自动化</option>
+        <option value="B020102">B020102&nbsp;机电一体化</option>
+        <option value="B020103">B020103&nbsp;模具设计与制造</option>
+        <option value="B020104">B020104&nbsp;液压技术应用</option>
+        <option value="B020105">B020105&nbsp;数控技术应用</option>
+        <option value="B020106">B020106&nbsp;机械设备及自动化</option>
+        <option value="B020107">B020107&nbsp;机械设计与制造</option>
+        <option value="B020108">B020108&nbsp;数控技术应用（中美合作）</option>
+        <option value="B020109">B020109&nbsp;机械设计制造及其自动化（过程装备及控制工程）</option>
+        <option value="B020110">B020110&nbsp;机械设计制造及其自动化（专升本）</option>
+        <option value="B020111">B020111&nbsp;机械电子工程</option>
+        <option value="B020112">B020112&nbsp;机械制造工艺及设备</option>
+        <option value="B020113">B020113&nbsp;数字化设计与制造</option>
+        <option value="B0201Y0">B0201Y0&nbsp;机械设计制造及其自动化（卓越）</option>
+        <option value="B0202">B0202&nbsp;过程装备与控制工程</option>
+        <option value="B020201">B020201&nbsp;过程装备与控制工程</option>
+        <option value="B0203">B0203&nbsp;材料成型及控制工程</option>
+        <option value="B020301">B020301&nbsp;材料成型及控制工程</option>
+        <option value="B020302">B020302&nbsp;模具设计与制造</option>
+        <option value="B0204">B0204&nbsp;智能制造（微专业）</option>
+        <option value="B0300">B0300&nbsp;电气学院大类</option>
+        <option value="B030000">B030000&nbsp;电气学院(电气信息类)</option>
+        <option value="B0301">B0301&nbsp;自动化</option>
+        <option value="B030100">B030100&nbsp;自动化</option>
+        <option value="B030101">B030101&nbsp;生产过程自动化</option>
+        <option value="B030102">B030102&nbsp;工业自动化技术</option>
+        <option value="B030103">B030103&nbsp;管控一体化</option>
+        <option value="B030104">B030104&nbsp;电子信息技术</option>
+        <option value="B030105">B030105&nbsp;工业电气自动化技术</option>
+        <option value="B030106">B030106&nbsp;过程控制</option>
+        <option value="B030107">B030107&nbsp;智能机器人</option>
+        <option value="B0302">B0302&nbsp;电气工程及其自动化</option>
+        <option value="B030201">B030201&nbsp;电气工程及其自动化</option>
+        <option value="B030202">B030202&nbsp;工业自动化(中美合作）</option>
+        <option value="B030203">B030203&nbsp;电气工程及其自动化（自动化）</option>
+        <option value="B030204">B030204&nbsp;电气工程应用</option>
+        <option value="B030205">B030205&nbsp;电气传动与控制技术开发</option>
+        <option value="B030206">B030206&nbsp;电力系统及其自动化</option>
+        <option value="B030207">B030207&nbsp;电力电子与电力传动</option>
+        <option value="B0302Y0">B0302Y0&nbsp;电气工程及其自动化（卓越）</option>
+        <option value="B0302Y1">B0302Y1&nbsp;电气工程及其自动化（卓越A）</option>
+        <option value="B0302Y2">B0302Y2&nbsp;电气工程及其自动化（卓越B）</option>
+        <option value="B0302Y3">B0302Y3&nbsp;电力系统及其自动化（卓越）</option>
+        <option value="B0302Y4">B0302Y4&nbsp;电力电子与电力传动（卓越）</option>
+        <option value="B0303">B0303&nbsp;电子信息工程</option>
+        <option value="B030301">B030301&nbsp;电子信息工程</option>
+        <option value="B030302">B030302&nbsp;应用电子技术</option>
+        <option value="B030303">B030303&nbsp;信息与控制技术</option>
+        <option value="B030304">B030304&nbsp;电子工程</option>
+        <option value="B030305">B030305&nbsp;信息工程</option>
+        <option value="B030306">B030306&nbsp;物联网技术与应用</option>
+        <option value="B030307">B030307&nbsp;嵌入式技术与应用</option>
+        <option value="B0304">B0304&nbsp;机器人工程</option>
+        <option value="B030401">B030401&nbsp;机器人工程</option>
+        <option value="B0400">B0400&nbsp;计算机学院大类</option>
+        <option value="B040000">B040000&nbsp;计算机学院大类(电气信息类)</option>
+        <option value="B0401">B0401&nbsp;计算机科学与技术</option>
+        <option value="B040101">B040101&nbsp;计算机科学与技术</option>
+        <option value="B040102">B040102&nbsp;计算机图文信息技术</option>
+        <option value="B040103">B040103&nbsp;计算机网络技术</option>
+        <option value="B040104">B040104&nbsp;信息安全技术</option>
+        <option value="B040105">B040105&nbsp;计算机科学与技术(软件工程)</option>
+        <option value="B040106">B040106&nbsp;图形图像处理</option>
+        <option value="B040107">B040107&nbsp;通信技术及网络工程</option>
+        <option value="B040108">B040108&nbsp;游戏软件制作开发</option>
+        <option value="B040109">B040109&nbsp;计算机科学与技术（专升本）</option>
+        <option value="B040110">B040110&nbsp;计算机科学与技术(网络工程)</option>
+        <option value="B040111">B040111&nbsp;计算机工程</option>
+        <option value="B040112">B040112&nbsp;数字媒体技术</option>
+        <option value="B040113">B040113&nbsp;计算机应用技术</option>
+        <option value="B040114">B040114&nbsp;信息系统与数据处理</option>
+        <option value="B040115">B040115&nbsp;人工智能技术</option>
+        <option value="B040116">B040116&nbsp;计算机科学与技术（数据应用安全）高本贯通</option>
+        <option value="B0402">B0402&nbsp;软件工程</option>
+        <option value="B040201">B040201&nbsp;软件工程</option>
+        <option value="B040202">B040202&nbsp;项目管理与开发</option>
+        <option value="B040203">B040203&nbsp;数字媒体技术</option>
+        <option value="B040204">B040204&nbsp;游戏软件制作与开发</option>
+        <option value="B0402Y0">B0402Y0&nbsp;软件工程（卓越）</option>
+        <option value="B0403">B0403&nbsp;网络工程</option>
+        <option value="B040301">B040301&nbsp;网络工程</option>
+        <option value="B040302">B040302&nbsp;网络工程（专升本）</option>
+        <option value="B040303">B040303&nbsp;网络与信息安全</option>
+        <option value="B040304">B040304&nbsp;物联网技术</option>
+        <option value="B040305">B040305&nbsp;网络工程技术</option>
+        <option value="B0404">B0404&nbsp;大数据与软件开发技术（微专业）</option>
+        <option value="B0405">B0405&nbsp;人工智能</option>
+        <option value="B040500">B040500&nbsp;人工智能</option>
+        <option value="B040501">B040501&nbsp;人工智能（人工智能技术与应用）</option>
+        <option value="B040502">B040502&nbsp;人工智能（智能物联技术与应用）</option>
+        <option value="B0500">B0500&nbsp;城建学院大类</option>
+        <option value="B050000">B050000&nbsp;工程管理(管理类、土建类)</option>
+        <option value="B0501">B0501&nbsp;土木工程</option>
+        <option value="B050101">B050101&nbsp;土木工程</option>
+        <option value="B050102">B050102&nbsp;交通土建</option>
+        <option value="B050104">B050104&nbsp;建筑环境与设备工程</option>
+        <option value="B050105">B050105&nbsp;建筑装饰工程</option>
+        <option value="B050106">B050106&nbsp;交通土建工程</option>
+        <option value="B050107">B050107&nbsp;土木工程（高本贯通）</option>
+        <option value="B050111">B050111&nbsp;建筑工程</option>
+        <option value="B050112">B050112&nbsp;建筑经济与管理</option>
+        <option value="B0502">B0502&nbsp;建筑学</option>
+        <option value="B050201">B050201&nbsp;建筑学</option>
+        <option value="B050202">B050202&nbsp;建筑学（专升本）</option>
+        <option value="B0505">B0505&nbsp;建筑环境与设备工程</option>
+        <option value="B050501">B050501&nbsp;建筑环境与设备工程</option>
+        <option value="B0506">B0506&nbsp;工程管理</option>
+        <option value="B050601">B050601&nbsp;工程管理</option>
+        <option value="B050602">B050602&nbsp;工业工程与生产管理</option>
+        <option value="B0507">B0507&nbsp;建筑环境与能源应用工程</option>
+        <option value="B050701">B050701&nbsp;建筑环境与能源应用工程</option>
+        <option value="B0509">B0509&nbsp;园林</option>
+        <option value="B050900">B050900&nbsp;园林</option>
+        <option value="B050901">B050901&nbsp;园林植物与工程</option>
+        <option value="B050902">B050902&nbsp;园林规划设计</option>
+        <option value="B0603">B0603&nbsp;安全工程</option>
+        <option value="B060301">B060301&nbsp;安全工程</option>
+        <option value="B060302">B060302&nbsp;城市安全与防灾</option>
+        <option value="B060303">B060303&nbsp;城市安全与环境</option>
+        <option value="B060304">B060304&nbsp;安全工程（专升本）</option>
+        <option value="B0604">B0604&nbsp;环境工程</option>
+        <option value="B060401">B060401&nbsp;环境工程</option>
+        <option value="B0605">B0605&nbsp;热能与动力工程</option>
+        <option value="B060500">B060500&nbsp;热能与动力工程</option>
+        <option value="B060501">B060501&nbsp;建筑节能方向</option>
+        <option value="B060502">B060502&nbsp;工业节能方向</option>
+        <option value="B0606">B0606&nbsp;能源与动力工程</option>
+        <option value="B060600">B060600&nbsp;能源与动力工程</option>
+        <option value="B060601">B060601&nbsp;建筑节能</option>
+        <option value="B060602">B060602&nbsp;工业节能</option>
+        <option value="B0700">B0700&nbsp;化工学院大类</option>
+        <option value="B070000">B070000&nbsp;化工学院大类(化工与制药类)</option>
+        <option value="B0701">B0701&nbsp;化学工程与工艺</option>
+        <option value="B070101">B070101&nbsp;化学工程与工艺</option>
+        <option value="B070106">B070106&nbsp;化学工程与工艺(化工工艺及计算机应用)</option>
+        <option value="B070107">B070107&nbsp;化学工程与工艺（化学工艺）</option>
+        <option value="B070108">B070108&nbsp;化学工程与工艺（中本贯通）</option>
+        <option value="B0701Y0">B0701Y0&nbsp;化学工程与工艺（卓越）</option>
+        <option value="B0702">B0702&nbsp;制药工程</option>
+        <option value="B070200">B070200&nbsp;制药工程</option>
+        <option value="B070201">B070201&nbsp;制药工程(化学制药)</option>
+        <option value="B070202">B070202&nbsp;制药工程(药物制剂)</option>
+        <option value="B070203">B070203&nbsp;制药工程（专升本）</option>
+        <option value="B070204">B070204&nbsp;制药工程（中本贯通）</option>
+        <option value="B0703">B0703&nbsp;应用化学</option>
+        <option value="B070301">B070301&nbsp;应用化学</option>
+        <option value="B070302">B070302&nbsp;应用化学（分析与监测，中新合作）</option>
+        <option value="B070304">B070304&nbsp;精细化工</option>
+        <option value="B070305">B070305&nbsp;表面精饰工艺</option>
+        <option value="B070306">B070306&nbsp;化学制药</option>
+        <option value="B070307">B070307&nbsp;应用化学(质量控制与保证,中新合作)</option>
+        <option value="B0705">B0705&nbsp;给水排水工程</option>
+        <option value="B070501">B070501&nbsp;给水排水工程</option>
+        <option value="B0706">B0706&nbsp;给排水科学与工程</option>
+        <option value="B070601">B070601&nbsp;给排水科学与工程</option>
+        <option value="B0707">B0707&nbsp;精细化学品制造及分析（微专业）</option>
+        <option value="B0801">B0801&nbsp;轻化工程</option>
+        <option value="B080101">B080101&nbsp;轻化工程</option>
+        <option value="B080102">B080102&nbsp;香料香精工艺</option>
+        <option value="B080103">B080103&nbsp;化妆品工艺</option>
+        <option value="B080104">B080104&nbsp;食用香精</option>
+        <option value="B080105">B080105&nbsp;日化香精</option>
+        <option value="B0801Y0">B0801Y0&nbsp;轻化工程（卓越）</option>
+        <option value="B0801Y2">B0801Y2&nbsp;香料香精工艺（卓越）</option>
+        <option value="B0801Y3">B0801Y3&nbsp;化妆品工艺（卓越）</option>
+        <option value="B0802">B0802&nbsp;食品科学与工程</option>
+        <option value="B080201">B080201&nbsp;食品科学与工程</option>
+        <option value="B080202">B080202&nbsp;产品研发与品质管理</option>
+        <option value="B080203">B080203&nbsp;食品加工工艺</option>
+        <option value="B080204">B080204&nbsp;食品质量与安全</option>
+        <option value="B080205">B080205&nbsp;食品加工与产品开发</option>
+        <option value="B080206">B080206&nbsp;食品安全与品质控制</option>
+        <option value="B080207">B080207&nbsp;食品科学与工程（中本贯通）</option>
+        <option value="B0803">B0803&nbsp;生物工程</option>
+        <option value="B080301">B080301&nbsp;生物工程</option>
+        <option value="B080302">B080302&nbsp;生物工程（专升本）</option>
+        <option value="B080303">B080303&nbsp;生物制药</option>
+        <option value="B080304">B080304&nbsp;发酵工程</option>
+        <option value="B0804">B0804&nbsp;香料香精技术与工程</option>
+        <option value="B080400">B080400&nbsp;香料香精技术与工程</option>
+        <option value="B080401">B080401&nbsp;香料香精技术与工程（卓越）</option>
+        <option value="B0805">B0805&nbsp;化妆品技术与工程</option>
+        <option value="B080500">B080500&nbsp;化妆品技术与工程</option>
+        <option value="B080501">B080501&nbsp;化妆品技术与工程（卓越）</option>
+        <option value="B0806">B0806&nbsp;香精制备技术（微专业）</option>
+        <option value="B080601">B080601&nbsp;日用香精制备技术（微专业）</option>
+        <option value="B080602">B080602&nbsp;食用香精制备技术（微专业）</option>
+        <option value="B0901">B0901&nbsp;艺术设计</option>
+        <option value="B090100">B090100&nbsp;艺术设计</option>
+        <option value="B090101">B090101&nbsp;视觉传达设计</option>
+        <option value="B090102">B090102&nbsp;室内设计</option>
+        <option value="B090103">B090103&nbsp;装饰艺术设计</option>
+        <option value="B090104">B090104&nbsp;首饰设计</option>
+        <option value="B090105">B090105&nbsp;工业设计</option>
+        <option value="B090106">B090106&nbsp;会展设计</option>
+        <option value="B090107">B090107&nbsp;室内设计（专升本）</option>
+        <option value="B090108">B090108&nbsp;装潢设计</option>
+        <option value="B090109">B090109&nbsp;多媒体设计</option>
+        <option value="B090110">B090110&nbsp;景观设计</option>
+        <option value="B090111">B090111&nbsp;建筑设计(专升本)</option>
+        <option value="B0902">B0902&nbsp;绘画</option>
+        <option value="B090201">B090201&nbsp;绘画</option>
+        <option value="B090202">B090202&nbsp;油画</option>
+        <option value="B090203">B090203&nbsp;水彩</option>
+        <option value="B0903">B0903&nbsp;视觉传达设计</option>
+        <option value="B090300">B090300&nbsp;视觉传达设计</option>
+        <option value="B090301">B090301&nbsp;平面设计</option>
+        <option value="B090302">B090302&nbsp;多媒体设计</option>
+        <option value="B090303">B090303&nbsp;装潢设计</option>
+        <option value="B090304">B090304&nbsp;视觉传达设计（专升本）</option>
+        <option value="B090305">B090305&nbsp;会展设计（专升本）</option>
+        <option value="B090306">B090306&nbsp;会展设计</option>
+        <option value="B0904">B0904&nbsp;环境设计</option>
+        <option value="B090400">B090400&nbsp;环境设计</option>
+        <option value="B090401">B090401&nbsp;室内设计</option>
+        <option value="B090402">B090402&nbsp;景观设计</option>
+        <option value="B090403">B090403&nbsp;会展设计</option>
+        <option value="B0905">B0905&nbsp;产品设计</option>
+        <option value="B090500">B090500&nbsp;产品设计</option>
+        <option value="B090502">B090502&nbsp;时尚产品设计</option>
+        <option value="B090503">B090503&nbsp;工业产品设计</option>
+        <option value="B090504">B090504&nbsp;装饰艺术设计</option>
+        <option value="B1000">B1000&nbsp;经管学院大类</option>
+        <option value="B100000">B100000&nbsp;经管学院大类(经济类、管理类)</option>
+        <option value="B1001">B1001&nbsp;会计学</option>
+        <option value="B100101">B100101&nbsp;注册会计师</option>
+        <option value="B100102">B100102&nbsp;会计电算化</option>
+        <option value="B100103">B100103&nbsp;会计学</option>
+        <option value="B100104">B100104&nbsp;资产评估</option>
+        <option value="B100105">B100105&nbsp;会计学（专升本）</option>
+        <option value="B100106">B100106&nbsp;国际会计</option>
+        <option value="B1002">B1002&nbsp;大数据管理与应用</option>
+        <option value="B100201">B100201&nbsp;大数据管理与应用</option>
+        <option value="B1003">B1003&nbsp;市场营销</option>
+        <option value="B100301">B100301&nbsp;市场营销（中加合作）</option>
+        <option value="B100302">B100302&nbsp;国际营销</option>
+        <option value="B100303">B100303&nbsp;营销工程师</option>
+        <option value="B100304">B100304&nbsp;市场营销</option>
+        <option value="B100305">B100305&nbsp;物流管理</option>
+        <option value="B100306">B100306&nbsp;市场营销（专升本）</option>
+        <option value="B100307">B100307&nbsp;市场营销1（专升本）</option>
+        <option value="B100308">B100308&nbsp;市场营销2（专升本）</option>
+        <option value="B100309">B100309&nbsp;会展营销</option>
+        <option value="B1006">B1006&nbsp;信息管理与信息系统</option>
+        <option value="B100601">B100601&nbsp;信息管理与信息系统</option>
+        <option value="B100602">B100602&nbsp;电子商务</option>
+        <option value="B100603">B100603&nbsp;信息管理</option>
+        <option value="B1008">B1008&nbsp;国际经济与贸易</option>
+        <option value="B100801">B100801&nbsp;国际经济与贸易</option>
+        <option value="B100802">B100802&nbsp;国际经济与贸易（专升本1）</option>
+        <option value="B100803">B100803&nbsp;国际经济与贸易（专升本2）</option>
+        <option value="B100804">B100804&nbsp;国际经济与贸易（航空物流）专升本</option>
+        <option value="B100805">B100805&nbsp;国际经济与贸易（国际知识产权贸易）</option>
+        <option value="B1009">B1009&nbsp;会展经济与管理</option>
+        <option value="B100901">B100901&nbsp;会展经济与管理</option>
+        <option value="B1010">B1010&nbsp;营销工程师（微专业）</option>
+        <option value="B1101">B1101&nbsp;英语</option>
+        <option selected value="B110101">B110101&nbsp;英语</option>
+        <option value="B110102">B110102&nbsp;国际贸易（春季）</option>
+        <option value="B110103">B110103&nbsp;涉外文秘（春季）</option>
+        <option value="B110104">B110104&nbsp;国际贸易</option>
+        <option value="B110105">B110105&nbsp;涉外文秘</option>
+        <option value="B110106">B110106&nbsp;国际会议会务</option>
+        <option value="B110107">B110107&nbsp;跨国公司人力资源管理</option>
+        <option value="B110108">B110108&nbsp;国际贸易（专升本）</option>
+        <option value="B1102">B1102&nbsp;德语</option>
+        <option value="B110201">B110201&nbsp;德语</option>
+        <option value="B1402">B1402&nbsp;园艺</option>
+        <option value="B140201">B140201&nbsp;园艺</option>
+        <option value="B140202">B140202&nbsp;园艺(方向2)</option>
+        <option value="B1403">B1403&nbsp;风景园林</option>
+        <option value="B140301">B140301&nbsp;风景园林</option>
+        <option value="B140302">B140302&nbsp;风景园林（中本贯通）</option>
+        <option value="B1404">B1404&nbsp;生态学</option>
+        <option value="B140401">B140401&nbsp;生态学</option>
+        <option value="B1405">B1405&nbsp;芳疗园艺（微专业）</option>
+        <option value="B1501">B1501&nbsp;电子信息工程（轨道通号技术）</option>
+        <option value="B150101">B150101&nbsp;轨道通号技术</option>
+        <option value="B150102">B150102&nbsp;轨道通号技术（专升本）</option>
+        <option value="B1502">B1502&nbsp;机械设计制造及其自动化（机辆工程）</option>
+        <option value="B150201">B150201&nbsp;机辆工程</option>
+        <option value="B150202">B150202&nbsp;机辆工程(专升本)</option>
+        <option value="B1503">B1503&nbsp;土木工程（轨道工程）</option>
+        <option value="B150301">B150301&nbsp;轨道工程</option>
+        <option value="B150302">B150302&nbsp;轨道工程(专升本)</option>
+        <option value="B1504">B1504&nbsp;交通工程</option>
+        <option value="B150401">B150401&nbsp;交通工程（轨道工程）</option>
+        <option value="B150402">B150402&nbsp;交通工程（铁路运输管理）</option>
+        <option value="B1505">B1505&nbsp;通信工程</option>
+        <option value="B150501">B150501&nbsp;通信工程（轨道通号技术）</option>
+        <option value="B1506">B1506&nbsp;电气工程及其自动化（电力牵引与供电）</option>
+        <option value="B150601">B150601&nbsp;电气工程及其自动化（电力牵引与供电）</option>
+        <option value="B1507">B1507&nbsp;电气工程及其自动化（轨道供电牵引）</option>
+        <option value="B150701">B150701&nbsp;电气工程及其自动化（轨道供电牵引）</option>
+        <option value="B1508">B1508&nbsp;铁道工程</option>
+        <option value="B150801">B150801&nbsp;铁道工程</option>
+        <option value="B150802">B150802&nbsp;铁道工程（中外合作）</option>
+        <option value="B2100">B2100&nbsp;人文学院大类</option>
+        <option value="B210000">B210000&nbsp;人文学院大类(公共管理类、社会学类)</option>
+        <option value="B2101">B2101&nbsp;社会工作</option>
+        <option value="B210101">B210101&nbsp;社会工作</option>
+        <option value="B210102">B210102&nbsp;社会体育</option>
+        <option value="B2102">B2102&nbsp;劳动与社会保障</option>
+        <option value="B210201">B210201&nbsp;劳动与社会保障</option>
+        <option value="B2103">B2103&nbsp;文化产业管理</option>
+        <option value="B210301">B210301&nbsp;文化产业管理</option>
+        <option value="B2201">B2201&nbsp;数学与应用数学</option>
+        <option value="B220101">B220101&nbsp;数学与应用数学</option>
+        <option value="B2202">B2202&nbsp;信息显示与光电技术</option>
+        <option value="B220201">B220201&nbsp;信息显示与光电技术</option>
+        <option value="B2203">B2203&nbsp;光电信息科学与工程</option>
+        <option value="B220301">B220301&nbsp;光电信息科学与工程</option>
+        <option value="B2401">B2401&nbsp;电气工程及其自动化(实验)</option>
+        <option value="B240101">B240101&nbsp;电气工程及其自动化(实验班)</option>
+        <option value="B2402">B2402&nbsp;自动化</option>
+        <option value="B240201">B240201&nbsp;自动化</option>
+        <option value="Y2401">Y2401&nbsp;本科预科班</option>
+        <option value="Y240101">Y240101&nbsp;本科预科班</option>
+        <option value="Z100203">Z100203&nbsp;商务管理（中加合作）</option>
+    </select>
+    <input name="major_key" onkeydown="doLocation(this);" style="border:0;border-bottom:1px solid black;" type="text">
+    请选择入校年
+    <select name="enterYear" onchange="doChange();">
+        <option value="2020">2020</option>
+        <option selected value="2019">2019</option>
+        <option value="2018">2018</option>
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="2015">2015</option>
+        <option value="2014">2014</option>
+        <option value="2013">2013</option>
+        <option value="2012">2012</option>
+        <option value="2011">2011</option>
+        <option value="2010">2010</option>
+        <option value="2009">2009</option>
+        <option value="2008">2008</option>
+        <option value="2007">2007</option>
+        <option value="2006">2006</option>
+        <option value="2005">2005</option>
+        <option value="2004">2004</option>
+    </select>
+    <table border="1" bordercolor="#000000" style="border-collapse:collapse" width="800">
+        <tr>
+            <td rowspan="2" valign="bottom">
+                <div>
+                    <span class="spant"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=1'">公共基础课</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=2'">通识课</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=3'">学科大类课</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=4'">学科专业基础课</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=5'">专业必修课</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=6'">专业选修课</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=7'">综合实践</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=8'">实践教学</span>
+                    <span class="spant1"
+                          onclick="location.href='course.jsp?majorId=B110101&enterYear=2019&courseBigSortId=9'">跨专业选修课</span>
+                </div>
+            </td>
+            <td width="150px">
+        <tr>
+            <td>
+</div>
+</td></tr>
+<tr>
+    <td valign="top">
+        <table border="1" bordercolor="#000000" cellpadding="2" cellspacing="0" style="border-collapse:collapse"
+               width="800">
+            <tr align="center" bgcolor="aliceblue">
+                <td>性质</td>
+                <td>课程代码</td>
+                <td width="20">主干课程</td>
+                <td>课程名称</td>
+                <td width="20">考试</td>
+                <td>学分</td>
+                <td width="20">理论教学</td>
+                <td width="20">课内实践</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+                <td>8</td>
+                <td>9</td>
+                <td>10</td>
+                <td>开课院系</td>
+                <td>课程小类</td>
+                <td width="20">备注</td>
+            </tr>
+            <tr id="338915" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1040123</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">计算机基础</td>
+                <td></td>
+                <td>2</td>
+                <td>24</td>
+                <td>16</td>
+                <td style="background:#CCFF33">
+                    4*10<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="计算机科学与信息工程学院">04</span></td>
+                <td>计算机</td>
+                <td></td>
+            </tr>
+            <tr id="338869" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B123001</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">体育1</td>
+                <td>√</td>
+                <td>1</td>
+                <td>32</td>
+                <td>0</td>
+                <td style="background:#CCFF33">
+                    2*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="体育教育部">23</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338874" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280001</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">形势与政策（1）</td>
+                <td></td>
+                <td>0.5</td>
+                <td>8</td>
+                <td>0</td>
+                <td style="background:#CCFF33">
+                    2*4<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338825" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280008</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">思想道德修养与法律基础</td>
+                <td>√</td>
+                <td>3</td>
+                <td>40</td>
+                <td>8</td>
+                <td style="background:#CCFF33">
+                    3*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338851" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1310001</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">大学生职业生涯发展与规划</td>
+                <td></td>
+                <td>1</td>
+                <td>16</td>
+                <td>0</td>
+                <td style="background:#CCFF33">
+                    2*8<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="学生工作部（学生处）">31</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338870" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B209003</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">大学语文</td>
+                <td>√</td>
+                <td>2</td>
+                <td>32</td>
+                <td>0</td>
+                <td style="background:#CCFF33">
+                    2*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="人文学院">21</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338843" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1040125</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">Office高级应用及数据库技术</td>
+                <td></td>
+                <td>3</td>
+                <td>32</td>
+                <td>32</td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    4*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="计算机科学与信息工程学院">04</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338862" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B123002</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">体育2</td>
+                <td></td>
+                <td>1</td>
+                <td>32</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="体育教育部">23</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338849" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280002</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">形势与政策（2）</td>
+                <td></td>
+                <td>0.5</td>
+                <td>8</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*4<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338822" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280009</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">中国近现代史纲要</td>
+                <td>√</td>
+                <td>3</td>
+                <td>40</td>
+                <td>8</td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    3*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338891" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td><font color="red">选修</font></td>
+                <td>B1230003</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">体育3</td>
+                <td></td>
+                <td>0.5</td>
+                <td>32</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="体育教育部">23</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338850" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280003</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">形势与政策（3）</td>
+                <td></td>
+                <td>0.5</td>
+                <td>8</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*4<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338819" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280005</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">马克思主义基本原理概论</td>
+                <td>√</td>
+                <td>3</td>
+                <td>40</td>
+                <td>8</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    3*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338892" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td><font color="red">选修</font></td>
+                <td>B1230004</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">体育4</td>
+                <td></td>
+                <td>0.5</td>
+                <td>32</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="体育教育部">23</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338898" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280004</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">形势与政策（4）</td>
+                <td></td>
+                <td>0.5</td>
+                <td>8</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*4<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338820" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280006</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">毛泽东思想和中国特色社会主义理论体系概论(上)</td>
+                <td>√</td>
+                <td>2</td>
+                <td>26</td>
+                <td>6</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338897" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1230001</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">大学生体育测试（一）</td>
+                <td></td>
+                <td>0.5</td>
+                <td>0</td>
+                <td>8</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*4<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="体育教育部">23</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338821" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1280007</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">毛泽东思想和中国特色社会主义理论体系概论(下)</td>
+                <td>√</td>
+                <td>3</td>
+                <td>40</td>
+                <td>8</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    3*16<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="马克思主义学院">28</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338873" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1310002</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">大学生就业与创业指导</td>
+                <td></td>
+                <td>1</td>
+                <td>16</td>
+                <td>0</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*8<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="学生工作部（学生处）">31</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr id="338896" onclick="doClick(this);" ondblclick="dolink('prop')"
+                style="cursor:pointer;text-align:center;">
+                <td>必修</td>
+                <td>B1230002</td>
+                <td></td>
+                <td style="text-align:left;padding-left:2px;">大学生体育测试（二）</td>
+                <td></td>
+                <td>0.5</td>
+                <td>0</td>
+                <td>8</td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td style="background:#CCFF33">
+                    2*4<br>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td><span title="体育教育部">23</span></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr style="background:#eaf1f1;text-align:center">
+                <td colspan="8">学期总学分</td>
+                <td>9.5</td>
+                <td>7.5</td>
+                <td>4.0</td>
+                <td>1.0</td>
+                <td>2.0</td>
+                <td>4.5</td>
+                <td>0.5</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td colspan="3">29.0</td>
+            </tr>
+            <tr style="background:#eaf1f1;text-align:center">
+                <td colspan="8">学期总周学时</td>
+                <td>15.0</td>
+                <td>11.0</td>
+                <td>7.0</td>
+                <td>4.0</td>
+                <td>2.0</td>
+                <td>7.0</td>
+                <td>2.0</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td colspan="3">48.0</td>
+            </tr>
+        </table>
+    </td>
+</tr>
+</TABLE>
+</div>
+</body>
+</HTML>

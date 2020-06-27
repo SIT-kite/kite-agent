@@ -1,0 +1,433 @@
+<script language="javascript">
+	function newwin(url) {
+		var newwin = window
+				.open(
+						url,
+						"newwin",
+						"toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=450");
+		newwin.focus();
+		return false;
+	}
+
+</script>
+<script LANGUAGE="javascript">
+	function submit10() {
+		self.location.replace("personalxiaofei.jsp")
+	}
+
+</script>
+<script>
+  function Numbers(){
+   var key = window.event.keyCode;
+   if(key<48 || key>57){
+    window.event.keyCode = 0;
+   }
+  } 
+
+</script>
+
+
+<html>
+<head>
+    <meta content="text/html; charset=gb2312" http-equiv="Content-Type">
+    <title>消费查询</title>
+    <LINK href="images/css.css" rel=stylesheet type=text/css>
+    <META content="MSHTML 6.金额位置金额位置03" name=GENERATOR>
+</head>
+
+<body>
+<FORM action="personalxiaofei.jsp" method="POST" name=notifyForm><INPUT
+        name=actionType type=hidden value=init> <INPUT name=selectstate
+                                                       type=hidden value=on>
+    <DIV class=maintitle>消费查询，由于数据传输到系统存在一定延时， 所查出的交易流水仅作参考</DIV>
+    <DIV class=mainbg>
+        <DIV align=center id=headtitle>
+            <div class=bottom_left>
+                <TABLE align=center border=0 cellPadding=0 cellSpacing=0 width="95%">
+                    <TBODY>
+                    <TR>
+                        <td align="center" id=table1>
+                            <TABLE align=center border=0 cellPadding=0 cellSpacing=0 width="95%">
+                                <TBODY>
+                                <TR>
+                                    <td id=table2 style="padding-top: 2px;" width="75%">查询区间
+                                        &nbsp;&nbsp;&nbsp;&nbsp; 自: <input name=from_str onKeyPress="Numbers()" title="输入格式为:yyyymmdd.
+例:2010年11月1日,输入20101101."
+                                                                           type=text value=""> - <input name=to_str
+                                                                                                        onKeyPress="Numbers()"
+                                                                                                        title="输入格式为:yyyymmdd.
+例:2010年11月1日,输入20101101." type=text value="">
+                                        &nbsp;&nbsp;&nbsp;<input type="submit" value="查询"></td>
+                                    <td id=table3 style="padding-top: 2px;" width="20%">
+                                        &nbsp;&nbsp;&nbsp;
+                                        &nbsp; <a href="personalxiaofei.jsp?page=1&from=20200401&to=20200431"
+                                                  title="上上月">4月</a>
+                                        &nbsp; <a href="personalxiaofei.jsp?page=1&from=20200501&to=20200531"
+                                                  title="上月">5月</a>
+                                        &nbsp; <a href="personalxiaofei.jsp?page=1&from=20200601&to=20200631"
+                                                  title="本月">6月</a>
+                                    </td>
+                                </TR>
+                                </TBODY>
+                            </table>
+                        </td>
+
+                    </TR>
+                    </TBODY>
+                </table>
+            </div>
+        </DIV>
+</form>
+
+<table align=center border=0 cellPadding=0 cellSpacing=0 id=table>
+    <tr>
+        <th>学工号</th>
+        <th>姓名位置</th>
+        <th>日期</th>
+        <th>时间</th>
+        <th>金额</th>
+        <th>地点</th>
+
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一层7#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">8.00</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一楼汇多POS8（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">2.00</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一楼汇多POS5（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">8.50</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一楼汇多POS9（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一楼汇多POS9（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一楼汇多POS17（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">3.00</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂二楼汇多POS53（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">8.00</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂二层38#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一层2#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">8.50</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一层9#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一层7#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂二层31#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">2.00</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一楼汇多POS9（新）</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂二层31#</div>
+        </td>
+    </tr>
+
+
+    <tr>
+        <td>
+            <div align="center">学号位置</div>
+        </td>
+        <td>
+            <div align="center">姓名位置</div>
+        </td>
+        <td>
+            <div align="center">YYYY-MM-dd</div>
+        </td>
+        <td>
+            <div align="center">00:00:00</div>
+        </td>
+        <td>
+            <div align="center">金额位置</div>
+        </td>
+        <td>
+            <div align="center">奉贤某食堂一层9#</div>
+        </td>
+    </tr>
+
+
+</table>
+
+<br/>
+<div align="left" id="listContent">&nbsp;</div>
+<div align="right" id="listContent">&nbsp;&nbsp;第1页&nbsp;&nbsp;
+    共2页&nbsp;&nbsp;&nbsp; <a href="personalxiaofei.jsp?page=2&from=20200101&to=20200431">下一页</a>&nbsp;&nbsp;<a
+            href="personalxiaofei.jsp?page=2&from=20200101&to=20200431">末页</a>&nbsp;&nbsp; <!-- 转到第:<input type="text" name="page" size="3"> 页 <span>
+ <input type="submit" value=" GO "></span>&nbsp;&nbsp;</DIV> -->
+</body>
+</html>

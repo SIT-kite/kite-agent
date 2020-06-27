@@ -1,0 +1,117 @@
+<script language="javascript">
+	function newwin(url) {
+		var newwin = window
+				.open(
+						url,
+						"newwin",
+						"toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=450");
+		newwin.focus();
+		return false;
+	}
+
+</script>
+<script LANGUAGE="javascript">
+	function submit10() {
+		self.location.replace("dk_xxmh.jsp")
+	}
+
+</script>
+<script>
+  function Numbers(){
+   var key = window.event.keyCode;
+   if(key<48 || key>57){
+    window.event.keyCode = 0;
+   }
+  }
+
+</script>
+
+
+<html>
+<head>
+    <meta content="text/html; charset=gb2312" http-equiv="Content-Type">
+    <title>奉贤校区宿舍用电余额查询</title>
+    <LINK href="images/css.css" rel=stylesheet type=text/css>
+    <META content="MSHTML 6.00.2900.6003" name=GENERATOR>
+    <style type="text/css">
+<!--
+.STYLE1 {
+	color: #FF0000;
+	font-size: 18px;
+}
+-->
+
+    </style>
+</head>
+
+<body>
+<FORM action="dk_xxmh.jsp" method="POST" name=notifyForm><INPUT
+        name=actionType type=hidden value=init> <INPUT name=selectstate
+                                                       type=hidden value=on>
+    <DIV class=mainbg>
+        <DIV align=center id=headtitle>
+            <div class=bottom_left>
+                <TABLE align=center border=0 cellPadding=0 cellSpacing=0 width="95%">
+                    <TBODY>
+                    <TR>
+                        <td align="center" id=table1>
+                            <TABLE align=center border=0 cellPadding=0 cellSpacing=0 width="95%">
+                                <TBODY>
+                                <TR>
+                                    <td id=table2 style="padding-top: 1px;" width="75%">请输入要查询的房间号：<input name=fjh
+                                                                                                          onKeyPress="Numbers()"
+                                                                                                          onPaste="return false"
+                                                                                                          size="11"
+                                                                                                          style="ime-mode:disabled"
+                                                                                                          title="输入房间号"
+                                                                                                          type=text
+                                                                                                          value="">&nbsp;<input
+                                            type="submit" value="查询"></td>
+                                    <td id=table3 style="padding-top: 1px;" width="20%">
+                                    </td>
+                                </TR>
+                                </TBODY>
+                            </table>
+                        </td>
+                    </TR>
+                    </TBODY>
+                </table>
+            </div>
+        </DIV>
+</form>
+
+<table align=center border=0 cellPadding=0 cellSpacing=0 id=table>
+    <div align="center" id="notFound">&nbsp;</div>
+    <tr>
+        <th>房间号</th>
+        <th>存款余额(元)</th>
+        <th>电补余额(元)</th>
+        <th>合计余额(元)</th>
+        <th>可用电量(度)</th>
+    </tr>
+
+    <tr>
+        <td>
+            <div align="center">000000</div>
+        </td>
+        <td>
+            <div align="center">0.00</div>
+        </td>
+        <td>
+            <div align="center">0.00</div>
+        </td>
+        <td>
+            <div align="center">0.00</div>
+        </td>
+        <td>
+            <div align="center">0.00</div>
+        </td>
+    </tr>
+</table>
+<div align="center" id="waringMoney"><span class="STYLE1"></span></div>
+<div align="left" id="listContent"><br/>&nbsp;*输入格式为:10+楼号+房间号<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;例如:1号楼202房间,输入101202,23号楼1001房间，输入10231001。<br/>&nbsp;&nbsp;查询结果为每天定时更新数据，与实际数据会有误差。如需查询实时信息请至多媒体机查询。<br/>&nbsp;&nbsp;如对查询结果有疑问，请致电校园卡技术中心咨询，联系电话021-60873113。&nbsp;&nbsp;
+</div>
+
+
+</body>
+</html>
