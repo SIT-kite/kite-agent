@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <title>第二课堂-活动详情</title>
+    <link href="/css/secondclass/common.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/secondclass/secondclass.css" rel="stylesheet" type="text/css"/>
+
+    <script src="/js/jquery-1.4.1.js" type="text/javascript"></script>
+    <script src="/js/artDialog4.1.7/artDialog.js?skin=aero" type="text/javascript"></script>
+    <script src="/js/common.js" type="text/javascript"></script>
+    <script src="/js/system.js" type="text/javascript"></script>
+    <script src="/js/page.js" type="text/javascript"></script>
+
+
+    <script type="text/javascript">
+        function apply(activityId) {
+            $.post("/public/pcenter/checkUser.action?activityId=" + activityId, function (result) {
+                if (result == "0") {
+                    location.href = "/public/pcenter/applyActivity.action?activityId=" + activityId;
+                } else if (result == "1") {
+                    art.dialog({
+                        content: "您的个人信息不全，请补全您的信息！<br />点击确定按钮，系统将为您跳转至个人中心页面进行修改！",
+                        ok: function () {
+                            location.href = "/public/pcenter/index.action";
+                        },
+                        cancelVal: '关闭',
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "2") {
+                    art.dialog({
+                        content: "您已申请过该活动，不能重复申请！",
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "3") {
+                    art.dialog({
+                        content: "对不起，您今天的申请次数已达上限！",
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "4") {
+                    art.dialog({
+                        content: "对不起，该活动的申请人数已达上限！",
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "5") {
+                    art.dialog({
+                        content: "对不起，该活动已过期并停止申请！",
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "6") {
+                    art.dialog({
+                        content: "您已申请过该时间段的活动，不能重复申请！",
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "7") {
+                    art.dialog({
+                        content: "对不起，您不能申请该活动！",
+                        cancel: true,
+                        lock: true
+                    });
+                } else if (result == "8") {
+                    art.dialog({
+                        content: "对不起，您不在该活动的范围内！",
+                        cancel: true,
+                        lock: true
+                    });
+                }
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+
+<div id="content-box">
+    <div style="">
+        <img height="50" src="/images/logo.png" width="400"/>
+        <label style="color:#188AFB;blue; font-size: 35px;font-weight:900;font-family: '黑体';">第二课堂教育管理系统</label>
+        <!-- 
+    <div style="color:#188AFB;blue; font-size: 28px;font-weight:900;font-family: '黑体';float:right;">上海应用技术学院第二课堂学分系统</div>-->
+    </div>
+    <div id="dekt-nav" style="background:rgb(45,147,222);">
+        <a href="/public/init/index.action"><span>首页</span></a>
+        <a href="/public/pcenter/activityOrderList.action"> <span>个人中心</span></a>
+        <a href="/public/activity/activityList.action?categoryId=001"><span>讲座报告</span></a>
+        <a href="/public/activity/activityList.action?categoryId=ff808081674ec4720167ce60dda77cea"><span>主题教育</span></a>
+        <a href="/public/activity/activityList.action?categoryId=ff8080814e241104014eb867e1481dc3"><span>创新创业创意</span></a>
+        <a href="/public/activity/activityList.action?categoryId=8ab17f543fe626a8013fe6278a880001"><span>社团社区易班、学院活动</span></a>
+        <a href="/public/activity/activityList.action?categoryId=8ab17f543fe62d5d013fe62efd3a0002"><span>社会实践</span></a>
+        <a href="/public/activity/activityList.action?categoryId=8ab17f543fe62d5d013fe62e6dc70001"><span>志愿公益</span></a>
+        <a href="/public/activity/activityList.action?categoryId=402881de5d62ba57015d6320f1a7000c"><span>校园安全文明</span></a>
+        <a href="/public/activity/activityList.action?categoryId=8ab17f2a3fe6585e013fe6596c300001"><span>校园文化竞赛活动</span></a>
+        <a href="/public/activity/activityList.action?categoryId=8ab17f533ff05c27013ff06d10bf0001"><span>论文专利</span></a>
+        <a href="/public/activity/activityList.action?categoryId=8F963F2A04013A66E0540021287E4866"><span>校园文明</span></a>
+        <a href="/public/activity/activityList.action?categoryId=ff8080814e241104014fedbbf7fd329d"><span>会议（无学分）</span></a>
+    </div>
+    <div class="BlankLine1"></div>
+
+    <script src="/js/jquery-1.7.1.min.js"></script>
+
+    <script src="/js/marquee.js"></script>
+    <script type="text/javascript">
+        function showSynopsis() {
+            $("#span_score").css("display", "block");
+        }
+
+        function closeSynopsis() {
+            $("#span_score").css("display", "none");
+        }
+
+
+
+    </script>
+
+    <div class="scroll-news" id="wrap7">
+        <ul>
+            <li>【通知公告】<a href="/public/news/detail.action?news.id=ff8080815dbb8eae015dca1535e9000e">关于第二课堂教育管理系统学分显示调整的通知</a>
+            </li>
+            <li>【通知公告】<a href="/public/news/detail.action?news.id=ff808081582e1fae015ab207aed80cd9">关于开展个人社会实践的通知</a>
+            </li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $('#wrap7').marquee({
+                auto: true,
+                interval: 5000,
+                showNum: 3,
+                stepLen: 3,
+                type: 'vertical'
+            });
+        })
+
+    </script>
+    <div class="user-info" style="padding-right:10px;">
+
+        <div>欢迎您：姓名位置 &nbsp;&nbsp;
+            <!-- &nbsp;|&nbsp;<a href="/j_spring_security_logout">注销</a> -->
+            &nbsp;|&nbsp;<a href="/caslogout.jsp">注销</a>
+            &nbsp;|&nbsp;<a href="http://myportal.sit.edu.cn">返回门户</a>
+        </div>
+        <div onmouseover="showSynopsis()">
+            第二课堂学分：<font color="red">7.42</font> &nbsp;
+            累计得分：<font color="red">11.08</font>&nbsp;
+            诚信积分：<font color="red">10.7</font>
+        </div>
+        <div>
+            <form action="/public/activity/activityList.action" method="post">
+                <input name="activityName" style="height:22px;width:120px;"/>&nbsp;
+                <input style="border:1px;" type="submit" value="搜索活动"/>
+            </form>
+        </div>
+
+        <span id="span_score"
+              style="display:none;position:absolute;border: 1px solid #fec3a8;background-color: #fff;color:#f40;padding: 2px 5px;webkit-border-radius: 2px;width:550px;z-index:100;right:220px;-webkit-border-radius: 2px;">
+     		 <b style="color:#fec3a8;position:relative;top:-15px;right:0px">◆</b>
+     		 <b style="color:#fff;position:relative;top:-14px;right:16px">◆</b>
+     		 学分=1.5(主题报告)+1.42(社会实践)+1.5(创新创业创意)+1.0(校园安全文明)+0.0(公益志愿)+2.0(校园文化)
+     		 <iframe allowtransparency="yes" border="0" frameborder="no" marginheight="0" marginwidth="0"
+                     src="/public/pcenter/scoreSynopsis.action" width="550"></iframe>
+      		 <br/>
+      		 <a href="/public/pcenter/scoreDetail.action">进入明细</a>&nbsp;&nbsp;&nbsp;
+      		 <a href="javascript:void(0)" onclick="closeSynopsis()">关闭</a>
+   		   </span>
+    </div>
+
+    <div class="BlankLine1"></div>
+
+    <div class="box-1">
+
+        <h1 class="title_8">【城建康乐福公益服务队】敬老院活动</h1>
+        <div style=" color:#7a7a7a; text-align:center">
+            活动编号：1001182 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            活动开始时间：2014-5-9 12:30:00 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            活动地点：光明村养老院&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            活动时长：240 分钟<br/>
+            负责人：王舜 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            负责人电话：无&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            主办方：康乐福公益服务队&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            承办方：康乐福公益服务队&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            刷卡时间段：2014-05-09 12:30:00&nbsp;&nbsp;--至--&nbsp;&nbsp;2014-05-09 16:30:00
+            !?
+        </div>
+        <div style="padding:30px 50px; font-size:14px;"><strong><span
+                style="font-size:24px;font-family:SimSun;">活动简介</span></strong><span
+                style="font-size:24px;font-family:SimSun;">：</span><span style="font-family:'宋体';"></span><span><span
+                style="font-family:'宋体';">
+<p class="p0" style="text-align:left;text-indent:24pt;">
+	<span style="font-size:24px;font-family:SimSun;">&nbsp;
+</p>
+<p class="p0" style="text-align:left;text-indent:24pt;">
+	前往养老院，帮助住在那的老人整理内务，打扫卫生。并与他们唠唠家常，陪伴他们度过一段愉快的下午。
+</p>
+<p class="p0" style="text-align:left;text-indent:24pt;">
+	</span></span>&nbsp;
+            </p>
+            <p class="p0" style="text-align:left;text-indent:24pt;">
+                &nbsp;
+            </p>
+            </span>
+            <p>
+                <strong><span style="font-size:24px;font-family:SimSun;">活动时间</span></strong><span><span
+                    style="font-size:24px;font-family:SimSun;">：</span><span style="font-size:24px;font-family:SimSun;">2014年5月9日</span></span>
+            </p>
+            <p>
+                <span style="font-family:SimSun;"><strong><span
+                        style="font-size:24px;font-family:SimSun;">活动地点</span></strong><span
+                        style="font-size:24px;font-family:SimSun;">：光明村益人养老院</span></span>
+            </p>
+            <p>
+                <strong><span style="font-size:24px;font-family:SimSun;">活动人限</span></strong><span><span
+                    style="font-size:24px;font-family:SimSun;">：</span><span style="font-size:24px;font-family:SimSun;">12人</span></span>
+            </p>
+            <p>
+                <strong><span style="font-size:24px;font-family:SimSun;">活动对象</span></strong><span><span
+                    style="font-size:24px;font-family:SimSun;">：</span><span style="font-size:24px;font-family:SimSun;">城建学院</span></span><span
+                    style="font-size:24px;font-family:SimSun;">学生</span>
+            </p>
+            <p>
+                <strong><span style="font-size:24px;font-family:SimSun;">活动爱心积分</span></strong><span><span
+                    style="font-size:24px;font-family:SimSun;">：</span><span style="font-size:24px;font-family:SimSun;">40分</span></span>
+            </p>
+            <p>
+                <strong><span style="font-size:24px;font-family:SimSun;">活动负责人</span></strong><span><span
+                    style="font-size:24px;font-family:SimSun;">：王舜</span><span
+                    style="font-size:24px;font-family:SimSun;"><span style="font-size:24px;font-family:'宋体';">&nbsp;&nbsp;（手机号省略）</span></span></span><span
+                    style="font-size:24px;font-family:SimSun;">
+            </p>
+            </span>
+            <p>
+                <span><strong><span style="font-size:24px;font-family:SimSun;">注意事项：</span></strong><span
+                        style="font-size:24px;font-family:SimSun;">请同学们带上一卡通&nbsp; 于12：45在东门集合</span></span>
+            </p>
+            <br/>
+            <div style="font-size:10px">
+
+            </div>
+            <div class="BlankLine5"></div>
+            <div align="center"><input class="ip-3" onclick="apply('1001182')" type="button" value="我要申请"/></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
