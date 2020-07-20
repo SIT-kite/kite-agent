@@ -1,44 +1,45 @@
 //! This module provides ability to test network connectivity and try to connect the campus network.
 
-use awc::{Client, cookie::{Cookie, CookieJar}};
+use awc::{
+    cookie::{Cookie, CookieJar},
+    Client,
+};
 use lazy_static;
 use rand::{seq::SliceRandom, thread_rng};
 
 use super::user_agent;
-use crate::error::{Result, CrawlerError};
+use crate::error::{CrawlerError, Result};
 use std::collections::HashMap;
 
-pub struct NetwrokTestPage {
+pub struct NetworkTestPage {
     pub url: &'static str,
     pub expected_response: &'static str,
 }
 
 /* Defualt configuration */
-lazy_static!{
+lazy_static! {
     /// Test page provided by the public service which are always available and return 200 OK.
-    pub static ref TEST_PAGES: Vec<NetwrokTestPage> = vec![
-        NetwrokTestPage {
+    pub static ref TEST_PAGES: Vec<NetworkTestPage> = vec![
+        NetworkTestPage {
             url: "http://www.msftconnecttest.com/connecttest.txt",
             expected_response: "Microsoft Connect Test",
         },
-        NetwrokTestPage {
+        NetworkTestPage {
             url: "http://captive.apple.com/hotspot-detect.html",
             expected_response: "Success",
         },
-        NetwrokTestPage {
+        NetworkTestPage {
             url: "http://detectportal.firefox.com/",
             expected_response: "success",
         },
     ];
 }
 
-
 /// Campus network portal address.
 pub static PORTAL_ADDRESS: &'static str = "http://172.16.8.70";
 
-
 /// Get a random test url and its expected response.
-fn get_test_page() -> &'static NetwrokTestPage {
+fn get_test_page() -> &'static NetworkTestPage {
     let mut rng = thread_rng();
 
     return TEST_PAGES[..].choose(&mut rng).unwrap();
@@ -57,7 +58,7 @@ pub enum NetworkConnectivity {
 
 /// Test network connectivity.
 /// See `NetworkConnectivity` enum details.
-pub async fn test_netwrok_connectivity() -> NetworkConnectivity {
+pub async fn test_network_connectivity() -> NetworkConnectivity {
     let test_page = get_test_page();
     let client = Client::default();
 
@@ -92,7 +93,8 @@ pub async fn connect_campus_network(student_id: &str, password: &str) -> Result<
 
     let response = Client::new()
         .post(format!("{}/0.htm", PORTAL_ADDRESS))
-        .send_form(&post_data).await?;
+        .send_form(&post_data)
+        .await?;
 
     if response.status().is_success() {
         return Err(CrawlerError::HttpError(response.status()));
