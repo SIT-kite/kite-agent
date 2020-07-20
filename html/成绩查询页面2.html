@@ -1,0 +1,212 @@
+<html>
+<head>
+    <title>成绩列表</title>
+    <link href="../main.css" rel="stylesheet"/>
+</head>
+
+<body>
+<table align="center" border="0" bordercolor="#c0c0c0" cellpadding="2" style="border-collapse:collapse;"
+       width="600">
+    <tr class="title">
+        <td>2019-2020学年第2学期 姓名(学号)的成绩课程列表</td>
+    </tr>
+
+    <form action="scorelist.jsp" method="post" name="frm0">
+        <tr>
+            <td align="right">
+                <select name="yearterm">
+                    <option value="">-选择学期-</option>
+                    <option value="2017秋">2017-2018学年第1学期</option>
+                    <option value="2018春">2017-2018学年第2学期</option>
+                    <option value="2018秋">2018-2019学年第1学期</option>
+                    <option value="2019春">2018-2019学年第2学期</option>
+                    <option value="2019秋">2019-2020学年第1学期</option>
+                    <option selected value="2020春">2019-2020学年第2学期</option>
+                    <option value="2020秋">2020-2021学年第1学期</option>
+                    <option value="2021春">2020-2021学年第2学期</option>
+                    <optgroup label='以往学期'></optgroup>
+                    <option value="2003秋">2003-2004学年第1学期</option>
+                    <option value="2004春">2003-2004学年第2学期</option>
+                    <option value="2004秋">2004-2005学年第1学期</option>
+                    <option value="2005春">2004-2005学年第2学期</option>
+                    <option value="2005秋">2005-2006学年第1学期</option>
+                    <option value="2006春">2005-2006学年第2学期</option>
+                    <option value="2006秋">2006-2007学年第1学期</option>
+                    <option value="2007春">2006-2007学年第2学期</option>
+                    <option value="2007秋">2007-2008学年第1学期</option>
+                    <option value="2008春">2007-2008学年第2学期</option>
+                    <option value="2008秋">2008-2009学年第1学期</option>
+                    <option value="2009春">2008-2009学年第2学期</option>
+                    <option value="2009秋">2009-2010学年第1学期</option>
+                    <option value="2010春">2009-2010学年第2学期</option>
+                    <option value="2010秋">2010-2011学年第1学期</option>
+                    <option value="2011春">2010-2011学年第2学期</option>
+                    <option value="2011秋">2011-2012学年第1学期</option>
+                    <option value="2012春">2011-2012学年第2学期</option>
+                    <option value="2012秋">2012-2013学年第1学期</option>
+                    <option value="2013春">2012-2013学年第2学期</option>
+                    <option value="2013秋">2013-2014学年第1学期</option>
+                    <option value="2014春">2013-2014学年第2学期</option>
+                    <option value="2014秋">2014-2015学年第1学期</option>
+                    <option value="2015春">2014-2015学年第2学期</option>
+                    <option value="2015秋">2015-2016学年第1学期</option>
+                    <option value="2016春">2015-2016学年第2学期</option>
+                    <option value="2016秋">2016-2017学年第1学期</option>
+                    <option value="2017春">2016-2017学年第2学期</option>
+                </select>
+                <input name="studentID" type="hidden" value="171042Y119">
+                <input class="button" onclick="frm0.submit();" type="button" value="搜索">
+                <!--<input type="button" class="button" value="返回" onclick="location.href ='index_rpt.jsp'">&nbsp;&nbsp;&nbsp; -->
+                <input class="button" onclick="location.href ='viewcreditdetail.jsp?studentID=171042Y119'" type="button"
+                       value="个人教学计划完成情况">
+            </td>
+        </tr>
+    </form>
+    <tr>
+        <td colspan="3">
+            <table align="center" border="1" bordercolor="#0000" cellpadding="4"
+                   style="border-collapse:collapse;margin-top:2px;" width="100%">
+                <tr class="head">
+                    <td nowrap>课程代码</td>
+                    <td nowrap>课程名称</td>
+                    <td nowrap>学分</td>
+                    <td nowrap>平时成绩</td>
+                    <td nowrap>期中成绩</td>
+                    <td nowrap>期末成绩</td>
+                    <td nowrap>期末总评</td>
+                    <td nowrap>二考成绩</td>
+                    <td nowrap>二考总评</td>
+                </tr>
+                <tr>
+                    <td>B1310002</td>
+                    <td>大学生就业与创业指导</td>
+                    <td>1</td>
+                    <td align="center">95</td>
+                    <td aign="center">
+
+                    <td align="center">86
+
+                    <td align="center">89</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B3042236</td>
+                    <td>软件测试技术</td>
+                    <td>2.5</td>
+                    <td align="center">96</td>
+                    <td aign="center">
+
+                    <td align="center">82
+
+                    <td align="center">89</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B3042284</td>
+                    <td>软件体系结构与设计模式</td>
+                    <td>2.5</td>
+                    <td align="center">95</td>
+                    <td aign="center">
+
+                    <td align="center">79
+
+                    <td align="center">84</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B3042287</td>
+                    <td>UI界面分析与设计</td>
+                    <td>2.5</td>
+                    <td align="center">90</td>
+                    <td aign="center">
+
+                    <td align="center">93
+
+                    <td align="center">92</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B3042288</td>
+                    <td>Web应用系统开发</td>
+                    <td>2.5</td>
+                    <td align="center">100</td>
+                    <td aign="center">
+
+                    <td align="center">79
+
+                    <td align="center">85</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B4045109</td>
+                    <td>Python基础</td>
+                    <td>2</td>
+                    <td align="center">92</td>
+                    <td aign="center">
+
+                    <td align="center">87
+
+                    <td align="center">90</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B704206</td>
+                    <td>计算机拆装与维护实训</td>
+                    <td>1</td>
+                    <td align="center">94</td>
+                    <td aign="center">
+
+                    <td align="center">73
+
+                    <td align="center">86</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B7042659</td>
+                    <td>软件工程实训</td>
+                    <td>3</td>
+                    <td align="center"></td>
+                    <td aign="center">
+
+                    <td align="center">85
+
+                    <td align="center">85</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+                <tr>
+                    <td>B7042664</td>
+                    <td>Web应用系统开发课程设计</td>
+                    <td>2</td>
+                    <td align="center"></td>
+                    <td aign="center">
+
+                    <td align="center">68
+
+                    <td align="center">68</td>
+                    <td align="center">
+
+                    <td align="center"></td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

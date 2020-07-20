@@ -52,7 +52,7 @@ mod user_agent;
 
 // // body > table > tbody > tr:nth-child(4) > td > table > tbody > tr:nth-child(5) > td:nth-child(1)
 // fn test_parse_course() {
-//     let html_page = std::fs::read_to_string("html\\scorelist.html").unwrap();
+//     let html_page = std::fs::read_to_string("html\\成绩查询页面2.html").unwrap();
 //
 //     let document = Html::parse_document(html_page.as_ref());
 //

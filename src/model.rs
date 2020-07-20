@@ -113,7 +113,7 @@ pub mod tests {
 
     #[test]
     fn test_get_from_file() {
-        let html_page = std::fs::read_to_string("html\\scorelist.html").unwrap();
+        let html_page = std::fs::read_to_string("html\\成绩查询页面2.html").unwrap();
         let origin_course_score_vec = CourseScore::get_from_file(html_page);
         let target_course_score_vec = vec![
             CourseScore {
