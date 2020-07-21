@@ -1,6 +1,8 @@
+mod bill;
 mod course;
 mod second_course;
 
+pub use bill::ElectricityBill;
 pub use course::CourseScore;
 pub use second_course::{Activity, JoinedActivity};
 
