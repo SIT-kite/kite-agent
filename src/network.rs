@@ -1,9 +1,6 @@
 //! This module provides ability to test network connectivity and try to connect the campus network.
 
-use awc::{
-    cookie::{Cookie, CookieJar},
-    Client,
-};
+use awc::Client;
 use lazy_static;
 use rand::{seq::SliceRandom, thread_rng};
 

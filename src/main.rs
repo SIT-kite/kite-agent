@@ -1,17 +1,10 @@
 #[macro_use]
 extern crate lazy_static;
 
-use std::any::Any;
-use std::ops::Deref;
-
-use scraper::node::Element;
-use scraper::{Html, Node, Selector};
-
-use crate::model::CourseScore;
 use crate::network::test_network_connectivity;
 
 mod error;
-mod model;
+mod models;
 mod network;
 mod user_agent;
 
