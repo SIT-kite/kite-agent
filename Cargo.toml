@@ -9,7 +9,8 @@ edition = "2018"
 [dependencies]
 rand = "0.7"
 lazy_static = "1.4"
-
+regex = "1"
+chrono = "0.4"
 scraper = "0.12"
 awc = "1.0.1"
 actix-rt = "1.1"
