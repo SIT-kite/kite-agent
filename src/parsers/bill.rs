@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::parsers::Parser;
+use crate::parsers::Parse;
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{Html, Selector};
@@ -14,7 +14,7 @@ pub struct ElectricityBill {
     pub available_power: f32,
 }
 
-impl Parser for ElectricityBill {
+impl Parse for ElectricityBill {
     fn from_html(html_page: &str) -> Self {
         let document = Html::parse_document(html_page.as_ref());
         let selector = Selector::parse("#table tr td div").unwrap();
@@ -36,12 +36,12 @@ impl Parser for ElectricityBill {
 #[cfg(test)]
 mod test {
     use super::ElectricityBill;
-    use super::Parser;
+    use super::Parse;
 
     #[test]
     pub fn test_electricity_bill_parser() {
         let file = std::fs::read_to_string("html/电费查询页面.html").unwrap();
-        let bill: ElectricityBill = Parser::from_html(file.as_ref());
+        let bill: ElectricityBill = Parse::from_html(file.as_ref());
 
         assert_eq!(
             bill,

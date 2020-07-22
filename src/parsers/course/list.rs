@@ -1,7 +1,6 @@
-use super::Parser;
+use super::Parse;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
-use std::time::Instant;
 
 /// Course time arrangement
 #[derive(Debug, Clone, PartialEq)]
@@ -99,7 +98,7 @@ impl CourseDetail {
     }
 }
 
-impl Parser for Vec<CourseDetail> {
+impl Parse for Vec<CourseDetail> {
     fn from_html(html_page: &str) -> Self {
         // Read html page to parser.
         let document = Html::parse_document(html_page);
@@ -120,11 +119,11 @@ mod test {
 
     #[test]
     fn test_course_detail_parser() {
-        use super::Parser;
+        use super::Parse;
         use super::{CourseDetail, CourseTime};
 
         let content = std::fs::read_to_string("html/课程列表页面 UTF8.html").unwrap();
-        let courses: Vec<CourseDetail> = Parser::from_html(content.as_ref());
+        let courses: Vec<CourseDetail> = Parse::from_html(content.as_ref());
 
         assert_eq!(courses.len(), 3159);
         assert_eq!(

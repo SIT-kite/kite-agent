@@ -1,25 +1,22 @@
 #[macro_use]
 extern crate lazy_static;
 
+use crate::error::Result;
 use crate::network::test_network_connectivity;
-use crate::parsers::JoinedActivity;
-use crate::parsers::Parser;
+use crate::parsers::{ActivityDetail, TryParse};
 
 use std::io::Read;
+use std::time::Instant;
 
 mod error;
 mod network;
 mod parsers;
 mod user_agent;
 
-// #[actix_rt::main]
-// async fn async_main() {
-//     print!("{:?}", test_network_connectivity().await)
-// }
-
 fn main() {
-    let file = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
-    let activities: Vec<JoinedActivity> = Parser::from_html(file.as_ref());
-
-    println!("{:#?}", activities);
+    let content = std::fs::read_to_string("html/第二课堂详情页面.html").unwrap();
+    let now = Instant::now();
+    let r: Result<ActivityDetail> = TryParse::try_from_html(content.as_ref());
+    println!("{}", now.elapsed().as_millis());
+    println!("{:?}", r);
 }

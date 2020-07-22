@@ -1,4 +1,4 @@
-use super::Parser;
+use super::Parse;
 use scraper::{Html, Selector};
 
 /// Course score function.
@@ -60,7 +60,7 @@ impl From<&Vec<String>> for CourseScore {
     } // End of function: from
 }
 
-impl Parser for Vec<CourseScore> {
+impl Parse for Vec<CourseScore> {
     fn from_html(html_page: &str) -> Self {
         // Read html page to parser.
         let document = Html::parse_document(html_page.as_ref());
@@ -98,12 +98,12 @@ impl Parser for Vec<CourseScore> {
 pub mod tests {
     use super::CourseScore;
     use super::{CourseScoreInner, CourseScoreLine};
-    use crate::parsers::Parser;
+    use crate::parsers::Parse;
 
     #[test]
     fn test_get_from_file() {
         let html_page = std::fs::read_to_string("html\\成绩查询页面2.html").unwrap();
-        let origin_course_score_vec: Vec<CourseScore> = Parser::from_html(html_page.as_ref());
+        let origin_course_score_vec: Vec<CourseScore> = Parse::from_html(html_page.as_ref());
         let target_course_score_vec = vec![
             CourseScore {
                 course_code: "B1310002".to_string(),

@@ -94,7 +94,7 @@ pub async fn connect_campus_network(student_id: &str, password: &str) -> Result<
         .await?;
 
     if response.status().is_success() {
-        return Err(CrawlerError::HttpError(response.status()));
+        return Err(CrawlerError::Http(response.status()));
     }
     Ok(())
 }
