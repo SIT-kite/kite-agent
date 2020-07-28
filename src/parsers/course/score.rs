@@ -101,7 +101,7 @@ pub mod tests {
     use crate::parsers::Parse;
 
     #[test]
-    fn test_get_from_file() {
+    fn test_course_score_parser() {
         let html_page = std::fs::read_to_string("html\\成绩查询页面2.html").unwrap();
         let origin_course_score_vec: Vec<CourseScore> = Parse::from_html(html_page.as_ref());
         let target_course_score_vec = vec![

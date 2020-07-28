@@ -122,7 +122,7 @@ mod test {
         use super::Parse;
         use super::{CourseDetail, CourseTime};
 
-        let content = std::fs::read_to_string("html/课程列表页面 UTF8.html").unwrap();
+        let content = std::fs::read_to_string("html/课程列表页面.html").unwrap();
         let courses: Vec<CourseDetail> = Parse::from_html(content.as_ref());
 
         assert_eq!(courses.len(), 3159);
@@ -171,6 +171,6 @@ mod test {
                 arranged_class: vec![String::from("18109331")],
                 note: String::from("")
             }
-        )
+        );
     }
 }
