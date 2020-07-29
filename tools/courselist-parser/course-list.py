@@ -9,6 +9,7 @@
 
 import requests
 import re
+import json
 from bs4 import BeautifulSoup
 from collections import namedtuple
 
@@ -41,73 +42,82 @@ CourseTime = namedtuple('CourseTime',
 '''
     Parse range string, for example, '1-20' -> (1, 20), '3' -> (3, 3)
 '''
-def parse_range_string(range_string: str) -> (int, int):
+def process_range_string(range_string: str) -> (int, int):
     l = range_string.split('-')
     if len(l) == 2:
         return int(l[0]), int(l[1])
     else:
         return int(l[0]), int(l[0])
 
-def parse_place_string(place_string: str) -> list:
-    return place_string.split(',')
+def process_place_string(place_string: str) -> list:
+    # return place_string.split(',')
+    return '{' + place_string + '}'
 
-def parse_teacher_string(teacher_string: str) -> list:
-    return teacher_string.split(',')
+def process_teacher_string(teacher_string: str) -> list:
+    # return teacher_string.split(',')
+    return '{' + teacher_string + '}'
 
-def parse_class_string(class_string: str) -> list:
-    return class_string.split(', ')
+def process_class_string(class_string: str) -> list:
+    # return class_string.split(', ')
+    return '{' + class_string + '}'
 
 '''
     Parse time string, return a list of CourseTime objects. For example:
     第4-11周,周1,第1-2节;  -> (4, 11), '', 1, (1, 2)
 '''
-def parse_time_string(time_string: str) -> list:
+def process_time_string(time_string: str) -> list:
     time_array = time_string.split(';')
     result: list = []
 
     for each_time_arrangement in time_array:
         for item in re.findall(r'第(\d+(?:-\d+)?)周([*]{0,2}),周(\d),第(\d+(?:-\d+)?)节', each_time_arrangement):
-            week_range = parse_range_string(item[0])
-            class_range = parse_range_string(item[3])
+            week_range = process_range_string(item[0])
+            class_range = process_range_string(item[3])
 
-            result.append(CourseTime(
-                week_range=week_range,
-                type=len(item[1]),
-                day_index=int(item[2]),
-                day_range=class_range
-            ))
-    return result
-
-# Load course list page.
-html = open("课程列表页面.html", encoding="GBK")
-page = BeautifulSoup(html, "html5lib")
-
-# Select each course line.
-each_course_html = page.select("table tr[bgcolor=\"#efefef\"]")
-course_list: list = []
-
-for cols in each_course_html:
-    # Convert each column to string and trim whites.
-    # Profermance tip: Redundant strip() and string copy may cost CPU calculation.
-    cols = [x.text.strip() for x in cols.select('td')]
-    # Convert to Course obejct.
-    course = Course(
-        id = cols[0],
-        name = cols[1],
-        code = cols[2],
-        type = cols[3],
-        credit = float(cols[4]),
-        teacher = parse_teacher_string(cols[5]),
-        time_array = parse_time_string(cols[6]),
-        place = parse_place_string(cols[7]),
-        campus = cols[8],
-        plan_count = int(cols[9]),
-        selected_count = int(cols[10]),
-        arranged_class = parse_class_string(cols[12]),
-        note = cols[13],
-    )
-    course_list.append(course)
+            result.append({
+                'week_range' : week_range,
+                'type': len(item[1]),
+                'day_index': int(item[2]),
+                'day_range': class_range
+            })
+    return json.dumps(result).replace(' ', '')
 
 
-for course in course_list:
-    print(course)
+if __name__ == '__main__':
+
+    # Load course list page.
+    html = open("2020A.html", encoding="GBK")
+    page = BeautifulSoup(html, "html5lib")
+
+    # Select each course line.
+    each_course_html = page.select("table tr[bgcolor=\"#efefef\"]")
+    course_list: list = []
+
+    for cols in each_course_html:
+        # Convert each column to string and trim whites.
+        # Profermance tip: Redundant strip() and string copy may cost CPU calculation.
+        cols = [x.text.strip() for x in cols.select('td')]
+        # Convert to Course obejct.
+        course = Course(
+            id = cols[0],
+            name = cols[1],
+            code = cols[2],
+            type = cols[3],
+            credit = float(cols[4]),
+            teacher = process_teacher_string(cols[5]),
+            time_array = process_time_string(cols[6]),
+            place = process_place_string(cols[7]),
+            campus = cols[8],
+            plan_count = int(cols[9]),
+            selected_count = int(cols[10]),
+            arranged_class = process_class_string(cols[12].replace('\n', '').replace(' ', '')),
+            note = cols[13],
+        )
+        course_list.append(course)
+
+    with open('Course.csv', 'a+', encoding='utf-8') as f:
+        for c in course_list:
+            f.write('INSERT INTO course.course_list VALUES(\'2020A\',\'{}\',\'{}\',\'{}\',\'{}\',{},\'{}\',\'{}\',\'{}\',{},{},\'{}\',\'{}\',\'{}\'::jsonb);\n'.format( \
+                c.code, c.name, c.id, c.type, c.credit, c.teacher, \
+                c.place, c.campus, c.plan_count, c.selected_count, c.arranged_class, c.note, c.time_array))
+
