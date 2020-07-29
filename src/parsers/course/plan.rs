@@ -3,100 +3,90 @@ use scraper::{ElementRef, Html, Selector};
 
 /// CoursePlan information from teaching plan.
 #[derive(Debug, Clone, Default, PartialEq)]
-pub struct CoursePlan {
+pub struct PlannedCourse {
     /// Course unique identifier.
-    pub course_code: String,
+    pub code: String,
     /// Course name.
-    pub course_name: String,
+    pub name: String,
     /// Need exam or not.
     pub has_exam: bool,
     /// Credit.
-    pub course_credit: f32,
+    pub credit: f32,
     /// Theory lesson hours.
     pub theory_hour: u32,
     /// Practice lesson hours.
     pub practice_hour: u32,
-    /// Department code of the Course.
-    pub department_code: u32,
+    /// Code of college or department the course affiliated.
+    pub department_code: String,
     /// Semester which the course on.
-    pub semester: Vec<u32>,
+    /// From 1 to 10 means 大一上, 大一下...
+    pub semester: Option<u8>,
 }
 
-impl CoursePlan {
-    pub fn from(mut fields: Vec<String>) -> Self {
-        let semester_option_fields: Vec<String> = fields.drain(8..18).collect();
-        let semester: Vec<u32> = semester_option_fields
-            .iter()
-            .enumerate()
-            .filter(|(i, n)| !n.is_empty())
-            .map(|(i, v)| (i + 1) as u32)
+impl From<ElementRef<'_>> for PlannedCourse {
+    fn from<'a>(line: ElementRef<'a>) -> Self {
+        let cols_selector = Selector::parse("td").unwrap();
+        // Convert each column to string and collect to Vec<String>.
+        let cols: Vec<String> = line
+            .select(&cols_selector)
+            .map(|x| x.inner_html().trim().to_string())
             .collect();
-        Self {
-            course_code: fields[1].parse().unwrap_or_default(),
-            course_name: fields[3].parse().unwrap_or_default(),
-            has_exam: !fields[4].is_empty(),
-            course_credit: fields[5].parse().unwrap_or_default(),
-            theory_hour: fields[6].parse().unwrap_or_default(),
-            practice_hour: fields[7].parse().unwrap_or_default(),
-            department_code: fields[8].parse().unwrap_or_default(),
+        // Count the relevant columns and find the semester of the course.
+        let mut semester: Option<u8> = None;
+        for i in 8..18 {
+            if !cols[i].is_empty() {
+                semester = Some((i - 7) as u8);
+                break;
+            }
+        }
+        // The department code may looks like '<span title="体育教育部">23</span>'
+        // Get the code '23' as a string
+        let re = regex::Regex::new(r"(\d{2})").unwrap();
+        let department = re.find(&cols[18]).map(|e| e.as_str().to_string());
+        // Construct result
+        PlannedCourse {
+            code: cols[1].to_string(),
+            name: cols[3].to_string(),
+            has_exam: !cols[4].is_empty(),
+            credit: cols[5].parse().unwrap_or(0.0),
+            theory_hour: cols[6].parse().unwrap_or(0),
+            practice_hour: cols[7].parse().unwrap_or(0),
+            department_code: department.unwrap_or_default(),
             semester,
         }
     }
 }
-
-impl Parse for Vec<CoursePlan> {
+impl Parse for Vec<PlannedCourse> {
     fn from_html(html_page: &str) -> Self {
         let document = Html::parse_document(html_page);
-        let table_selector =
-            "body > div > table > tbody > tr:nth-child(3) > td > table > tbody".to_string();
-        let table = document
-            .select(&Selector::parse(table_selector.as_str()).unwrap())
-            .next()
-            .unwrap();
-
-        let mut table_rows: Vec<ElementRef> = table.select(&Selector::parse("tr").unwrap()).collect();
-        let table_rows: Vec<ElementRef> = table_rows.drain(1..(table_rows.len() - 2)).collect();
-
-        let mut table_datas: Vec<Vec<String>> = table_rows
-            .into_iter()
-            .map(|e| {
-                e.select(&Selector::parse("td").unwrap())
-                    .map(|e| e.inner_html().trim().to_string())
-                    .collect()
-            })
+        let row_selector = Selector::parse("tr[onclick='doClick(this);']").unwrap();
+        // Select data lines.
+        let results: Vec<PlannedCourse> = document
+            .select(&row_selector)
+            .map(|e| PlannedCourse::from(e))
             .collect();
-        // deal with the major ID
-        table_datas.iter_mut().for_each(|v| {
-            let department_element = v[18].clone();
-            v[18] = Html::parse_fragment(department_element.as_str())
-                .select(&Selector::parse("span").unwrap())
-                .next()
-                .unwrap()
-                .inner_html();
-        });
-        let results: Vec<CoursePlan> = table_datas.iter().map(|v| CoursePlan::from(v.clone())).collect();
         results
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::{CoursePlan, Parse};
+    use super::{Parse, PlannedCourse};
 
     #[test]
-    fn test_course_plan_parse() {
+    fn test_course_plan_parser() {
         let html_page = std::fs::read_to_string("html/教学计划查询页面.html").unwrap();
-        let course_plans: Vec<CoursePlan> = Parse::from_html(html_page.as_str());
+        let course_plans: Vec<PlannedCourse> = Parse::from_html(html_page.as_str());
 
-        let target = CoursePlan {
-            course_code: "B123001".to_string(),
-            course_name: "体育1".to_string(),
+        let target = PlannedCourse {
+            code: "B123001".to_string(),
+            name: "体育1".to_string(),
             has_exam: true,
-            course_credit: 1.0,
+            credit: 1.0,
             theory_hour: 32,
             practice_hour: 0,
-            department_code: 23,
-            semester: vec![1u32],
+            department_code: String::from("23"),
+            semester: Some(1),
         };
         assert_eq!(course_plans[1], target)
     }

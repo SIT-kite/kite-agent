@@ -7,7 +7,7 @@ use regex::Error as RegexError;
 use thiserror::Error;
 
 pub use bill::ElectricityBill;
-pub use course::{CourseDetail, CoursePlan, CourseScore};
+pub use course::{CourseDetail, CourseScore, PlannedCourse};
 pub use second_course::{Activity, ActivityDetail, JoinedActivity};
 
 pub trait Parse {
