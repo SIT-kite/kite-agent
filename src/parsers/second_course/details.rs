@@ -41,14 +41,6 @@ fn regex_find_one(re: Regex, text: &str) -> Result<String> {
         .and_then(|cap| Ok(cap.get(1).unwrap().as_str().trim().to_string()))
 }
 
-#[inline]
-fn get_inner_html(html: &ElementRef, selector: &str) -> String {
-    html.select(&Selector::parse(selector).unwrap())
-        .nth(0)
-        .unwrap()
-        .inner_html()
-}
-
 impl TryParse for ActivityDetail {
     fn try_from_html(html_page: &str) -> Result<ActivityDetail> {
         let document = Html::parse_document(html_page);
