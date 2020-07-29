@@ -7,6 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+kite-protocol = { version = "0.1", path = "../kite-protocol", branch = "develop" }
+
 rand = "0.7"
 lazy_static = "1.4"
 regex = "1"

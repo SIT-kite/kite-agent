@@ -9,15 +9,10 @@ use scraper::{ElementRef, Html, Selector};
 use std::io::Read;
 use std::time::Instant;
 
+mod agent;
 mod error;
 mod network;
 mod parsers;
 mod user_agent;
 
-fn main() {
-    let html_page = std::fs::read_to_string("kite-crawler/html/教学计划查询页面.html").unwrap();
-
-    let results: Vec<PlannedCourse> = Parse::from_html(html_page.as_str());
-
-    println!("{:#?}", results[1]);
-}
+fn main() {}
