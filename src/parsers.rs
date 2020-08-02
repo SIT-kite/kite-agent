@@ -10,7 +10,7 @@ use thiserror::Error;
 pub use bill::ElectricityBill;
 pub use course::{CourseDetail, CourseScore, PlannedCourse, SelectedCourse};
 pub use expense::ExpenseRecord;
-pub use second_course::{Activity, ActivityDetail, JoinedActivity};
+pub use second_course::{Activity, ActivityDetail, JoinedActivity, SecondScore};
 
 pub trait Parse {
     fn from_html(html_page: &str) -> Self;
