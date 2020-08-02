@@ -6,12 +6,19 @@ use scraper::{Html, Selector};
 /// Campus card consumption records
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExpenseRecord {
+    /// User unique identifier.
     pub code: String,
+    /// User name.
     pub name: String,
+    /// Record date.
     pub date: NaiveDate,
+    /// Record time.
     pub time: NaiveTime,
+    /// Expense amount.
     pub amount: f32,
+    /// Expense address.
     pub address: String,
+    /// The pageinfo for current record.
     pub page_info: PageInfo,
 }
 
@@ -54,7 +61,7 @@ impl Parse for Vec<ExpenseRecord> {
             .next()
             .unwrap();
 
-        // Record
+        // Records
         let mut datas = frame
             .select(&Selector::parse("tr").unwrap())
             .map(|e| {
@@ -72,7 +79,7 @@ impl Parse for Vec<ExpenseRecord> {
             v.push(total_pages.clone());
         });
 
-        // Return Vec<ExpenseRecord>.
+        // Vec<ExpenseRecord>.
         let res = datas
             .iter()
             .map(|v| ExpenseRecord::from(v.clone()))

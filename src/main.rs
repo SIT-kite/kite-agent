@@ -3,7 +3,7 @@ extern crate lazy_static;
 
 use crate::error::Result;
 use crate::network::test_network_connectivity;
-use crate::parsers::{ActivityDetail, ExpenseRecord, Parse, PlannedCourse, TryParse};
+use crate::parsers::{ActivityDetail, ExpenseRecord, Parse, PlannedCourse, SelectedCourse, TryParse};
 
 use error::CrawlerError;
 use parsers::ParserError;
@@ -18,9 +18,9 @@ mod parsers;
 mod user_agent;
 
 fn main() {
-    let html_page = std::fs::read_to_string("kite-crawler/html/消费记录页面.html").unwrap();
+    let html_page = std::fs::read_to_string("kite-crawler/html/我的课表页面.html").unwrap();
 
-    let res: Vec<ExpenseRecord> = Parse::from_html(html_page.as_str());
+    let res: Vec<SelectedCourse> = Parse::from_html(html_page.as_str());
 
-    println!("{:#?}", res)
+    println!("{:#?}", res[0])
 }

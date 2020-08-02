@@ -8,7 +8,7 @@ use regex::Error as RegexError;
 use thiserror::Error;
 
 pub use bill::ElectricityBill;
-pub use course::{CourseDetail, CourseScore, PlannedCourse};
+pub use course::{CourseDetail, CourseScore, PlannedCourse, SelectedCourse};
 pub use expense::ExpenseRecord;
 pub use second_course::{Activity, ActivityDetail, JoinedActivity};
 
