@@ -1,5 +1,6 @@
 mod bill;
 mod course;
+mod expense;
 mod second_course;
 
 use crate::error::{CrawlerError, Result};
@@ -8,6 +9,7 @@ use thiserror::Error;
 
 pub use bill::ElectricityBill;
 pub use course::{CourseDetail, CourseScore, PlannedCourse};
+pub use expense::ExpenseRecord;
 pub use second_course::{Activity, ActivityDetail, JoinedActivity};
 
 pub trait Parse {
