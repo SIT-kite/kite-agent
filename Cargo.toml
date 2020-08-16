@@ -14,13 +14,16 @@ lazy_static = "1.4"
 regex = "1"
 thiserror = "1"
 chrono = "0.4"
+tokio = { version = "0.2", features = ["full"] }
+futures-util = "0.3"
+serde = { version = "1.0", features = ["derive"] }
 
 # Network related
 scraper = "0.12"
 awc = { version = "1.0.1", features = ["rustls"] }
 actix-http = "1"
 actix-rt = "1.1"
-tokio = { version = "0.2", features = ["full"] }
+tokio-tungstenite = { version = "0.11", features = ["tls"] } # Websocket library
 
 # Database
 sled = "0.34"

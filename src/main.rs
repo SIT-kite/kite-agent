@@ -1,26 +1,33 @@
 #[macro_use]
 extern crate lazy_static;
 
-use crate::error::Result;
-use crate::network::test_network_connectivity;
-use crate::parsers::{
-    ActivityDetail, ExpenseRecord, Parse, PlannedCourse, SecondScore, SelectedCourse, TryParse,
-};
-
-use error::CrawlerError;
-use parsers::ParserError;
-use regex::Regex;
-use scraper::{ElementRef, Html, Selector};
-use std::io::Read;
-use std::time::Instant;
-
+mod actions;
+mod agent;
 mod error;
 mod network;
 mod parsers;
 mod user_agent;
 
-fn main() {
-    let html_page = std::fs::read_to_string("kite-crawler/html/第二课堂得分页面.html").unwrap();
-    let res: SecondScore = Parse::from_html(html_page.as_str());
-    println!("{:#?}", res)
+use crate::error::Result;
+use agent::{AgentBuilder, Request, Response};
+use tokio::time::Duration;
+
+#[actix_rt::main]
+async fn main() {
+    let mut agent = AgentBuilder::new("0001".to_string())
+        .host("wss://localhost.sunnysab.cn:8443/agent/")
+        .set_callback(on_new_request, String::from("Hello world"))
+        .finish();
+
+    agent.start().await;
+
+    loop {
+        tokio::time::delay_for(Duration::from_secs(1)).await;
+    }
+}
+
+// fn(Request, Data) -> crate::error::Result<Response>;
+pub fn on_new_request(request: Request, data: String) -> Result<Response> {
+    println!("data = {}", data);
+    Ok(Response)
 }
