@@ -1,6 +1,6 @@
 '''
     SecondCourse Crawler for testing and importing.
-    As part of [kite-crawler](https://github.com/sunnysab/kite-crawler) package.
+    As part of [kite-agent](https://github.com/sunnysab/kite-crawler) package.
 
     sunnysab (C) 2020 All right reserved.
     July 15, 2020

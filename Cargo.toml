@@ -1,5 +1,5 @@
 [package]
-name = "kite-crawler"
+name = "kite-agent"
 version = "0.1.0"
 authors = ["sunnysab <sunnysab@yeah.net>"]
 edition = "2018"
