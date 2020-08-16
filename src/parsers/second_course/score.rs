@@ -44,7 +44,7 @@ impl Parse for SecondScore {
     fn from_html(html_page: &str) -> Self {
         let document = Html::parse_document(html_page);
 
-        let mut display_score_vec = document
+        let display_score_vec = document
             .select(&Selector::parse("#content-box > div.user-info > div:nth-child(2) > font").unwrap())
             .map(|e| e.inner_html())
             .collect::<Vec<String>>();

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 #[macro_use]
 extern crate lazy_static;
 
@@ -27,7 +28,7 @@ async fn main() {
 }
 
 // fn(Request, Data) -> crate::error::Result<Response>;
-pub fn on_new_request(request: Request, data: String) -> Result<Response> {
+pub fn on_new_request(_request: Request, data: String) -> Result<Response> {
     println!("data = {}", data);
     Ok(Response)
 }

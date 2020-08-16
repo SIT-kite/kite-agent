@@ -4,9 +4,9 @@ use std::fs::File;
 use std::io::Read;
 
 /// User-Agent list filename.
-static UA_FILE: &'static str = "user-agents.txt";
+const UA_FILE: &'static str = "user-agents.txt";
 /// Default User-Agent string could be used when UA_FILE can not be read.
-static DEFAULT_UA_STRING: &'static str =
+const DEFAULT_UA_STRING: &'static str =
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0";
 
 lazy_static! {

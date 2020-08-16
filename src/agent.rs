@@ -126,7 +126,7 @@ where
                 // Spawn new thread to execute the function because it usually costs a lot of time.
                 actix_rt::spawn(Self::dispatch_message(content, message_tx, on_message.clone()));
             }
-            Message::Ping(content) => {
+            Message::Ping(_) => {
                 // Pong will be responded automatically by the framework.
                 ()
             }
@@ -156,7 +156,7 @@ where
                 Ok(message) => {
                     Self::process_message(message, message_tx.clone(), on_message.clone()).await
                 }
-                Err(e) => {}
+                Err(_) => {}
             }
         }
     }

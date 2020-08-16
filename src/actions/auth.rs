@@ -4,6 +4,7 @@ use actix_http::httpmessage::HttpMessage;
 use awc::Client;
 
 /// Login page.
+#[allow(dead_code)]
 const LOGIN_URL: &str = "https://authserver.sit.edu.cn/authserver/login";
 
 /// Concat parameters to a url-formed string.
@@ -25,10 +26,10 @@ macro_rules! regex_find {
 }
 
 /// Login on campus official auth-server with student id and password.
-/// Return cookie string on `.sit.edu.cn`.
+/// Return string of cookies on `.sit.edu.cn`.
 pub async fn portal_login(user_name: &str, password: &str) -> Result<String> {
     // Create a http client, but, awc::Client may not support cookie store..
-    let mut client = Client::default();
+    let client = Client::default();
 
     // Request login page to get encrypt key and so on.
     let mut response = client.get(LOGIN_URL).send().await.unwrap();
@@ -44,7 +45,7 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<String> {
     let text = std::str::from_utf8(&index_html).unwrap();
     let aes_key = regex_find!(text, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
 
-    let mut response = client
+    let response = client
         .post(LOGIN_URL)
         .set_header("Content-Type", "application/x-www-form-urlencoded")
         .set_header("Referrer", LOGIN_URL)

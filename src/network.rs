@@ -33,7 +33,7 @@ lazy_static! {
 }
 
 /// Campus network portal address.
-pub static PORTAL_ADDRESS: &'static str = "http://172.16.8.70";
+pub const PORTAL_ADDRESS: &'static str = "http://172.16.8.70";
 
 /// Get a random test url and its expected response.
 fn get_test_page() -> &'static NetworkTestPage {
