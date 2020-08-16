@@ -17,7 +17,7 @@ async fn main() {
     let mut agent = AgentBuilder::new("0001".to_string())
         .host("wss://localhost.sunnysab.cn:8443/agent/")
         .set_callback(on_new_request, String::from("Hello world"))
-        .finish();
+        .build();
 
     agent.start().await;
 
