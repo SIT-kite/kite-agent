@@ -1,5 +1,6 @@
 mod bill;
 mod course;
+mod expense;
 mod second_course;
 
 use crate::error::{CrawlerError, Result};
@@ -7,8 +8,9 @@ use regex::Error as RegexError;
 use thiserror::Error;
 
 pub use bill::ElectricityBill;
-pub use course::{CourseDetail, CourseScore, PlannedCourse};
-pub use second_course::{Activity, ActivityDetail, JoinedActivity};
+pub use course::{CourseDetail, CourseScore, PlannedCourse, SelectedCourse};
+pub use expense::ExpenseRecord;
+pub use second_course::{Activity, ActivityDetail, JoinedActivity, SecondScore};
 
 pub trait Parse {
     fn from_html(html_page: &str) -> Self;
