@@ -1,4 +1,5 @@
-use crate::error::{CrawlerError, Result};
+use super::ActionError;
+use crate::error::Result;
 use actix_http::http::StatusCode;
 use actix_http::httpmessage::HttpMessage;
 use awc::Client;
@@ -71,10 +72,7 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<String> {
             .collect::<Vec<String>>()
             .join(""));
     }
-    Err(CrawlerError::Connection(format!(
-        "服务器返回 {}",
-        response.status().as_u16()
-    )))
+    Err(ActionError::LoginFailed.into())
 }
 
 /// When submit password to `authserver.sit.edu.cn`, it's required to do AES and base64 algorithm with

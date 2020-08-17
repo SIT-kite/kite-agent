@@ -3,7 +3,7 @@ mod course;
 mod expense;
 mod second_course;
 
-use crate::error::{CrawlerError, Result};
+use crate::error::{AgentError, Result};
 use regex::Error as RegexError;
 use thiserror::Error;
 
@@ -36,13 +36,13 @@ impl From<RegexError> for ParserError {
     }
 }
 
-impl From<ParserError> for CrawlerError {
+impl From<ParserError> for AgentError {
     fn from(parser_err: ParserError) -> Self {
-        CrawlerError::HtmlParser(parser_err.to_string())
+        AgentError::HtmlParser(parser_err.to_string())
     }
 }
 
-impl From<regex::Error> for CrawlerError {
+impl From<regex::Error> for AgentError {
     fn from(regex_err: regex::Error) -> Self {
         ParserError::RegexErr(regex_err.to_string()).into()
     }

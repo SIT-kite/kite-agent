@@ -1,4 +1,4 @@
-use super::{Agent, AgentBuilder, AgentData, Request, Response};
+use super::{Agent, AgentBuilder, Request, Response};
 use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
 use tokio::sync::mpsc;

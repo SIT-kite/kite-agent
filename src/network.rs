@@ -5,7 +5,7 @@ use lazy_static;
 use rand::{seq::SliceRandom, thread_rng};
 
 use super::user_agent;
-use crate::error::{CrawlerError, Result};
+use crate::error::{AgentError, Result};
 use std::collections::HashMap;
 
 pub struct NetworkTestPage {
@@ -94,7 +94,7 @@ pub async fn connect_campus_network(student_id: &str, password: &str) -> Result<
         .await?;
 
     if response.status().is_success() {
-        return Err(CrawlerError::Http(response.status()));
+        return Err(AgentError::Http(response.status()));
     }
     Ok(())
 }

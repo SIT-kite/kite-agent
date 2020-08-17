@@ -10,6 +10,7 @@ mod communication;
 mod error;
 mod network;
 mod parsers;
+mod session;
 mod user_agent;
 
 use communication::on_new_request;

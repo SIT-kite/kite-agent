@@ -1,4 +1,4 @@
-use crate::error::{AgentError, Result};
+use crate::error::Result;
 use chrono::{NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

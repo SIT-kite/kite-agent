@@ -1,4 +1,4 @@
-use crate::error::{CrawlerError, Result};
+use crate::error::{AgentError, Result};
 use crate::parsers::{ParserError, TryParse};
 use chrono::NaiveDateTime;
 use regex::Regex;
@@ -51,7 +51,7 @@ impl TryParse for ActivityDetail {
         let frame: ElementRef = document
             .select(&Selector::parse(".box-1").unwrap())
             .nth(0)
-            .ok_or(CrawlerError::from(ParserError::NoSuchElement(String::from(
+            .ok_or(AgentError::from(ParserError::NoSuchElement(String::from(
                 ".box-1",
             ))))?;
 
