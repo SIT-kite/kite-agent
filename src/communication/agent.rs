@@ -1,40 +1,22 @@
+use super::{Agent, AgentBuilder, AgentData, Request, Response};
 use futures_util::{SinkExt, StreamExt};
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_tungstenite::tungstenite::Message;
 
-/// Host request
-#[derive(Deserialize)]
-pub struct Request;
-
-/// Agent response
-#[derive(Serialize)]
-pub struct Response;
-
 /// Message callback function
-type MessageCallbackFn<Data> = fn(Request, Data) -> crate::error::Result<Response>;
+pub type MessageCallbackFn<Data> = fn(Request, Data) -> Response;
 
 /// Message callback function and parameter
-struct MessageCallback<Data>
+pub struct MessageCallback<T>
 where
-    Data: Clone + Send + Sync + 'static,
+    T: Clone + Send + Sync + 'static,
 {
-    pub function: MessageCallbackFn<Data>,
-    pub parameter: Data,
+    pub function: MessageCallbackFn<T>,
+    pub parameter: T,
 }
 
-/// Agent instance builder
-pub struct AgentBuilder<D: Clone + Send + Sync + 'static> {
-    /// Local agent name
-    name: String,
-    /// Host url, a string like "wss://example.com/ws/"
-    host_addr: Option<String>,
-    /// Callback structure, with callback function point and parameter.
-    message_callback: Option<MessageCallback<D>>,
-}
-
-impl<D: Clone + Send + Sync + 'static> AgentBuilder<D> {
+impl<T: Clone + Send + Sync + 'static> AgentBuilder<T> {
     /// Create a new agent instance.
     pub fn new(name: String) -> Self {
         Self {
@@ -51,7 +33,7 @@ impl<D: Clone + Send + Sync + 'static> AgentBuilder<D> {
     }
 
     /// Set callback function which will be called when packet comes.
-    pub fn set_callback(mut self, callback_fn: MessageCallbackFn<D>, parameter: D) -> Self {
+    pub fn set_callback(mut self, callback_fn: MessageCallbackFn<T>, parameter: T) -> Self {
         self.message_callback = Some(MessageCallback {
             function: callback_fn,
             parameter,
@@ -60,28 +42,15 @@ impl<D: Clone + Send + Sync + 'static> AgentBuilder<D> {
     }
 
     /// Build a valid Agent structure. `panic` if host or callback function is not set.
-    pub fn build(self) -> Agent<D> {
+    pub fn build(self) -> Agent<T> {
+        let message_callback = self.message_callback.expect("You should set callback function.");
+
         Agent {
-            name: self.name,
+            name: self.name.clone(),
             host_addr: self.host_addr.expect("Host address is needed."),
-            message_callback: Arc::new(
-                self.message_callback.expect("You should set callback function."),
-            ),
+            message_callback: Arc::new(message_callback),
         }
     }
-}
-
-/// Agent node in campus side.
-pub struct Agent<D>
-where
-    D: Clone + Send + Sync + 'static,
-{
-    /// Local agent name
-    name: String,
-    /// Host url, a string like "wss://example.com/ws/"
-    host_addr: String,
-    /// Callback structure, with callback function point and parameter.
-    message_callback: Arc<MessageCallback<D>>,
 }
 
 impl<D> Agent<D>
@@ -102,11 +71,10 @@ where
 
             // TODO: Return result instead of doing nothing.
             // If callback functions successfully, serialize the response and send back to host.
-            if let Ok(response) = request_callback(req, callback_parameter) {
-                let response_content = bincode::serialize(&response);
-                if let Ok(response_content) = response_content {
-                    socket_tx.send(Message::Binary(response_content)).await;
-                }
+            let response = request_callback(req, callback_parameter);
+            let response_content = bincode::serialize(&response);
+            if let Ok(response_content) = response_content {
+                socket_tx.send(Message::Binary(response_content)).await;
             }
         }
         // TODO: Send error code `unknown`.
