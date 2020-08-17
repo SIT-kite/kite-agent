@@ -69,9 +69,9 @@ impl Session {
     }
 
     pub async fn validate(&self) -> Result<bool> {
-        use crate::actions;
+        use crate::service;
 
-        actions::portal_login(&self.account, &self.account).await?;
+        service::portal_login(&self.account, &self.account).await?;
         Ok(true)
     }
 
@@ -79,7 +79,7 @@ impl Session {
         self.cookie.clear();
         self.cookie.insert(
             String::from(".sit.edu.cn"),
-            crate::actions::portal_login(&self.account, &self.account).await?,
+            crate::service::portal_login(&self.account, &self.account).await?,
         );
         Ok(())
     }

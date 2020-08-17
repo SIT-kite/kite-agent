@@ -5,11 +5,11 @@ extern crate lazy_static;
 #[macro_use]
 extern crate num_derive;
 
-mod actions;
 mod communication;
 mod error;
 mod net;
-mod parsers;
+mod parser;
+mod service;
 
 use communication::on_new_request;
 use communication::{AgentBuilder, AgentData};

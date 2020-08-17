@@ -1,4 +1,4 @@
-use crate::parsers::Parse;
+use crate::parser::Parse;
 use scraper::{Html, Selector};
 
 /// Electricity bill

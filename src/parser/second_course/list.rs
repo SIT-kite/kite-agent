@@ -1,6 +1,6 @@
 pub use crate::error::Result;
 
-use crate::parsers::Parse;
+use crate::parser::Parse;
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{Html, Selector};

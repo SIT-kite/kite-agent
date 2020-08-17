@@ -8,17 +8,8 @@ use awc::Client;
 #[allow(dead_code)]
 const LOGIN_URL: &str = "https://authserver.sit.edu.cn/authserver/login";
 
-/// Concat parameters to a url-formed string.
-macro_rules! make_parameter {
-    // Concatenate web form parameters to a string.
-    ($($para: expr => $val: expr), *) => {{
-        let mut url = String::new();
-        $( url = url + $para + "=" + $val + "&"; )*
-
-        url.clone()
-    }}
-}
-
+/// Search in text by regex, and return the first group.
+#[macro_export]
 macro_rules! regex_find {
     ($text: expr, $pattern: expr) => {{
         let re = regex::Regex::new($pattern).unwrap();

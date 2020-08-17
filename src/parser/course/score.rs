@@ -98,7 +98,7 @@ impl Parse for Vec<CourseScore> {
 pub mod tests {
     use super::CourseScore;
     use super::{CourseScoreInner, CourseScoreLine};
-    use crate::parsers::Parse;
+    use crate::parser::Parse;
 
     #[test]
     fn test_course_score_parser() {

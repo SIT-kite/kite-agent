@@ -1,4 +1,4 @@
-use crate::parsers::Parse;
+use crate::parser::Parse;
 use regex::Regex;
 use scraper::{Html, Selector};
 

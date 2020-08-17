@@ -1,5 +1,5 @@
 use crate::error::{AgentError, Result};
-use crate::parsers::{ParserError, TryParse};
+use crate::parser::{ParserError, TryParse};
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};

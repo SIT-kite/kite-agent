@@ -1,4 +1,4 @@
-use crate::actions::ActionError;
+use crate::service::ActionError;
 use awc::error::SendRequestError;
 use awc::http::StatusCode;
 use bincode::Error as BincodeError;
