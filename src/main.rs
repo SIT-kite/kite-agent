@@ -8,10 +8,8 @@ extern crate num_derive;
 mod actions;
 mod communication;
 mod error;
-mod network;
+mod net;
 mod parsers;
-mod session;
-mod user_agent;
 
 use communication::on_new_request;
 use communication::{AgentBuilder, AgentData};

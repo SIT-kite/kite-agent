@@ -83,7 +83,4 @@ impl Session {
         );
         Ok(())
     }
-    pub async fn refresh(&mut self) {}
-
-    pub async fn get() {}
 }
