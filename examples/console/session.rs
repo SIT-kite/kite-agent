@@ -11,6 +11,8 @@ pub enum SessionCommand {
     List(ListSession),
     /// Add a account to the database with account and credential
     Insert(InsertSession),
+    /// Delete all sessions
+    Clean,
 }
 
 impl SessionCommand {
@@ -18,6 +20,7 @@ impl SessionCommand {
         match self {
             SessionCommand::List(list) => list.process(sessions).await,
             SessionCommand::Insert(new) => new.process(sessions).await,
+            SessionCommand::Clean => CleanSession.process(sessions).await,
         }
     }
 }
@@ -84,5 +87,14 @@ impl InsertSession {
             }
             Err(e) => println!("Failed to login: {:?}", e),
         }
+    }
+}
+
+/// Delete all sessions.
+pub struct CleanSession;
+
+impl CleanSession {
+    pub async fn process(self, mut storage: SessionStorage) {
+        storage.clear();
     }
 }

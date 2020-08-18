@@ -3,7 +3,6 @@ extern crate prettytable;
 
 mod session;
 
-use chrono::Utc;
 use kite_agent::SessionStorage;
 use session::SessionCommand;
 use structopt::StructOpt;

@@ -77,6 +77,11 @@ impl SessionStorage {
         }
         Ok(None)
     }
+
+    pub fn clear(&mut self) -> Result<()> {
+        self.db.clear();
+        Ok(())
+    }
 }
 
 /// Campus account login session
