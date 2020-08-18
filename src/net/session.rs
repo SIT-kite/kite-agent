@@ -18,9 +18,12 @@ pub struct SessionStorage {
 }
 
 impl SessionStorage {
-    /// Create a session storage client.
+    /// Create a session database client.
     pub fn new() -> Result<Self> {
-        let db = sled::open(DB_FILE)?;
+        let db = sled::Config::new()
+            .mode(sled::Mode::HighThroughput)
+            .path(DB_FILE)
+            .open()?;
 
         Ok(Self { db })
     }
@@ -46,6 +49,23 @@ impl SessionStorage {
         Ok(())
     }
 
+    /// List session
+    pub fn list(&self, index: u16, size: u16) -> Result<Vec<Session>> {
+        let sessions = self
+            .db
+            .iter()
+            .skip((index * size) as usize)
+            .take(size as usize)
+            .filter_map(|item| {
+                if let Ok((_, value)) = item {
+                    bincode::deserialize::<Session>(&value).ok()
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<Session>>();
+        Ok(sessions)
+    }
     /// Choose a session data randomly.
     pub fn choose_randomly(&mut self) -> Result<Option<Session>> {
         // TODO: handle error
@@ -60,16 +80,16 @@ impl SessionStorage {
 }
 
 /// Campus account login session
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Session {
     /// Student ldap account
-    account: String,
+    pub account: String,
     /// Ldap raw password
-    password: String,
+    pub password: String,
     /// Http cookie, indexed by domains.
-    cookie: HashMap<String, String>,
+    pub cookie: HashMap<String, String>,
     /// Last use time.
-    last_update: NaiveDateTime,
+    pub last_update: NaiveDateTime,
 }
 
 impl Session {

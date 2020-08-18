@@ -54,7 +54,7 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<String> {
         ))
         .await
         .unwrap();
-    if response.status() == StatusCode::MOVED_PERMANENTLY {
+    if response.status() == StatusCode::FOUND {
         let cookies = response.cookies().unwrap();
 
         return Ok(cookies
