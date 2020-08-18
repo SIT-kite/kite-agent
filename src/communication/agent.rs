@@ -1,22 +1,27 @@
-use super::{Agent, AgentBuilder, Request, Response};
+use super::{Agent, AgentBuilder, AgentData, Request, Response};
+use crate::net::SessionStorage;
+use futures::Future;
 use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
 use tokio::sync::mpsc;
 use tokio_tungstenite::tungstenite::Message;
 
 /// Message callback function
-pub type MessageCallbackFn<Data> = fn(Request, Data) -> Response;
+pub type MessageCallbackFn<O> = fn(Request, AgentData) -> O;
 
 /// Message callback function and parameter
-pub struct MessageCallback<T>
+pub struct MessageCallback<O>
 where
-    T: Clone + Send + Sync + 'static,
+    O: Future<Output = Response> + Send + 'static,
 {
-    pub function: MessageCallbackFn<T>,
-    pub parameter: T,
+    pub function: MessageCallbackFn<O>,
+    pub parameter: AgentData,
 }
 
-impl<T: Clone + Send + Sync + 'static> AgentBuilder<T> {
+impl<O> AgentBuilder<O>
+where
+    O: Future<Output = Response> + Send + 'static,
+{
     /// Create a new agent instance.
     pub fn new(name: String) -> Self {
         Self {
@@ -33,16 +38,20 @@ impl<T: Clone + Send + Sync + 'static> AgentBuilder<T> {
     }
 
     /// Set callback function which will be called when packet comes.
-    pub fn set_callback(mut self, callback_fn: MessageCallbackFn<T>, parameter: T) -> Self {
+    pub fn set_callback(mut self, callback_fn: MessageCallbackFn<O>, parameter: SessionStorage) -> Self {
         self.message_callback = Some(MessageCallback {
             function: callback_fn,
-            parameter,
+            parameter: AgentData {
+                agent: String::new(),
+                local_addr: String::new(),
+                parameter,
+            },
         });
         self
     }
 
     /// Build a valid Agent structure. `panic` if host or callback function is not set.
-    pub fn build(self) -> Agent<T> {
+    pub fn build(self) -> Agent<O> {
         let message_callback = self.message_callback.expect("You should set callback function.");
 
         Agent {
@@ -53,15 +62,15 @@ impl<T: Clone + Send + Sync + 'static> AgentBuilder<T> {
     }
 }
 
-impl<D> Agent<D>
+impl<O> Agent<O>
 where
-    D: Clone + Send + Sync + 'static,
+    O: Future<Output = Response> + Send + 'static,
 {
     /// Unpack binary request payload, do the command, then pack and send response to host.
     async fn dispatch_message(
         content: Vec<u8>,
         mut socket_tx: mpsc::Sender<Message>,
-        on_message: Arc<MessageCallback<D>>,
+        on_message: Arc<MessageCallback<O>>,
     ) {
         let request = bincode::deserialize(&content);
         if let Ok(req) = request {
@@ -71,7 +80,7 @@ where
 
             // TODO: Return result instead of doing nothing.
             // If callback functions successfully, serialize the response and send back to host.
-            let response = request_callback(req, callback_parameter);
+            let response = request_callback(req, callback_parameter).await;
             let response_content = bincode::serialize(&response);
             if let Ok(response_content) = response_content {
                 socket_tx.send(Message::Binary(response_content)).await;
@@ -84,7 +93,7 @@ where
     async fn process_message(
         message: Message,
         mut message_tx: mpsc::Sender<Message>,
-        on_message: Arc<MessageCallback<D>>,
+        on_message: Arc<MessageCallback<O>>,
     ) {
         // Resolve request message, and response.
         // For Ping, Pong, Close message, we can send response immediately, while for binary we need
@@ -92,7 +101,9 @@ where
         match message {
             Message::Binary(content) => {
                 // Spawn new thread to execute the function because it usually costs a lot of time.
-                actix_rt::spawn(Self::dispatch_message(content, message_tx, on_message.clone()));
+                actix_rt::spawn(async move {
+                    Self::dispatch_message(content, message_tx, on_message.clone()).await
+                });
             }
             Message::Ping(_) => {
                 // Pong will be responded automatically by the framework.
@@ -114,7 +125,7 @@ where
     async fn receiver_loop<T>(
         mut socket_rx: T,
         message_tx: mpsc::Sender<Message>,
-        on_message: Arc<MessageCallback<D>>,
+        on_message: Arc<MessageCallback<O>>,
     ) where
         T: StreamExt + std::marker::Unpin,
         T::Item: Into<std::result::Result<Message, tokio_tungstenite::tungstenite::Error>>,

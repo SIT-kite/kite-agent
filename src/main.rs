@@ -11,15 +11,17 @@ mod net;
 mod parser;
 mod service;
 
+use crate::net::SessionStorage;
 use communication::on_new_request;
-use communication::{AgentBuilder, AgentData};
+use communication::AgentBuilder;
 use tokio::time::Duration;
 
 #[actix_rt::main]
 async fn main() {
+    let session_storage = SessionStorage::new().unwrap();
     let mut agent = AgentBuilder::new("0001".to_string())
         .host("wss://localhost.sunnysab.cn:8443/agent/")
-        .set_callback(on_new_request, AgentData::new(String::new()))
+        .set_callback(on_new_request, session_storage)
         .build();
 
     agent.start().await;

@@ -1,5 +1,5 @@
 use super::{Request, RequestPayload, Response, ResponsePayload};
-use crate::communication::{AgentData, Handle};
+use crate::communication::AgentData;
 
 impl Response {
     /// Respond normally.
@@ -26,18 +26,19 @@ impl Response {
     }
 }
 
-fn dispatch_command<D: Clone>(seq: usize, request: RequestPayload, parameter: AgentData<D>) -> Response {
+async fn dispatch_command(seq: usize, request: RequestPayload, parameter: AgentData) -> Response {
     let response = match request {
-        RequestPayload::AgentInfo(r) => r.process(parameter),
+        RequestPayload::AgentInfo(r) => r.process(parameter).await,
+        RequestPayload::ElectricityBill(r) => r.process(parameter).await,
     };
     response.ack(seq)
 }
 
-pub fn on_new_request<D: Clone>(request: Request, data: AgentData<D>) -> Response {
+pub async fn on_new_request(request: Request, data: AgentData) -> Response {
     let request_body = bincode::deserialize::<RequestPayload>(&request.payload);
 
     if let Ok(body) = request_body {
-        dispatch_command(request.seq, body, data)
+        dispatch_command(request.seq, body, data).await
     } else {
         Response::error(1).ack(request.seq)
     }

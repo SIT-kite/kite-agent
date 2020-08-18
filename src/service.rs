@@ -1,6 +1,9 @@
-pub mod auth;
+mod auth;
+mod bill;
 
 pub use auth::portal_login;
+
+pub use bill::ElectricityBillRequest;
 
 #[derive(Debug, thiserror::Error, ToPrimitive)]
 pub enum ActionError {

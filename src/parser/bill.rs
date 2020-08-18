@@ -1,8 +1,9 @@
 use crate::parser::Parse;
 use scraper::{Html, Selector};
+use serde::Serialize;
 
 /// Electricity bill
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Serialize, PartialEq)]
 pub struct ElectricityBill {
     pub room_id: String,
     pub deposit_balance: f32,

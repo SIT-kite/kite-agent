@@ -7,11 +7,12 @@ use std::collections::HashMap;
 const DB_FILE: &str = "kite-cache";
 
 /// Session structure key format in relation.
-const SESSION_KEY_FORMAT: &str = "s:{}";
+const SESSION_KEY_FORMAT: &str = "s:";
 
 pub enum SessionError {}
 
-struct SessionStorage {
+#[derive(Clone)]
+pub struct SessionStorage {
     /// Sled handle
     db: sled::Db,
 }
@@ -20,6 +21,7 @@ impl SessionStorage {
     /// Create a session storage client.
     pub fn new() -> Result<Self> {
         let db = sled::open(DB_FILE)?;
+
         Ok(Self { db })
     }
 
@@ -27,9 +29,9 @@ impl SessionStorage {
     pub fn query(&mut self, account: &str) -> Result<Option<Session>> {
         // Query session struct from db.
         let value_option = self.db.get(String::from(SESSION_KEY_FORMAT) + account)?;
+
         if let Some(session_value) = value_option {
             let session: Session = bincode::deserialize::<Session>(session_value.as_ref())?;
-
             return Ok(Some(session));
         }
         Ok(None)
@@ -42,6 +44,18 @@ impl SessionStorage {
 
         self.db.insert(&db_key, value)?;
         Ok(())
+    }
+
+    /// Choose a session data randomly.
+    pub fn choose_randomly(&mut self) -> Result<Option<Session>> {
+        // TODO: handle error
+        if let Some(Ok((_, session))) = self.db.iter().next() {
+            let content = session.to_vec();
+            let session = bincode::deserialize::<Session>(&content)?;
+
+            return Ok(Some(session));
+        }
+        Ok(None)
     }
 }
 
@@ -68,10 +82,11 @@ impl Session {
         }
     }
 
+    // TODO: validate cookie.
     pub async fn validate(&self) -> Result<bool> {
-        use crate::service;
-
-        service::portal_login(&self.account, &self.account).await?;
+        // use crate::service;
+        //
+        // service::portal_login(&self.account, &self.account).await?;
         Ok(true)
     }
 
@@ -82,5 +97,21 @@ impl Session {
             crate::service::portal_login(&self.account, &self.account).await?,
         );
         Ok(())
+    }
+
+    pub fn get_cookie_string(&self, domain: &str) -> String {
+        let cookies = self
+            .cookie
+            .iter()
+            .filter_map(|(key, value)| {
+                if domain.ends_with(key) {
+                    Some(value.clone())
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<String>>()
+            .join(" ");
+        cookies
     }
 }

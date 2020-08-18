@@ -3,6 +3,9 @@ mod error;
 mod process;
 mod request;
 
+use crate::net::SessionStorage;
+use futures::Future;
+use request::*;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -10,26 +13,29 @@ pub use agent::{MessageCallback, MessageCallbackFn};
 pub use process::on_new_request;
 
 /// Agent instance builder
-pub struct AgentBuilder<T: Clone + Send + Sync + 'static> {
+pub struct AgentBuilder<O>
+where
+    O: Future<Output = Response> + Send + 'static,
+{
     /// Local agent name
     name: String,
     /// Host url, a string like "wss://example.com/ws/"
     host_addr: Option<String>,
     /// Callback structure, with callback function point and parameter.
-    message_callback: Option<MessageCallback<T>>,
+    message_callback: Option<MessageCallback<O>>,
 }
 
 /// Agent node in campus side.
-pub struct Agent<D>
+pub struct Agent<O>
 where
-    D: Clone + Send + Sync + 'static,
+    O: Future<Output = Response> + Send + 'static,
 {
     /// Local agent name
     name: String,
     /// Host url, a string like "wss://example.com/ws/"
     host_addr: String,
     /// Callback structure, with callback function point and parameter.
-    message_callback: Arc<MessageCallback<D>>,
+    message_callback: Arc<MessageCallback<O>>,
 }
 
 /// Host request
@@ -54,38 +60,27 @@ pub struct Response {
     pub payload: Vec<u8>,
 }
 
-use request::*;
+use crate::parser::ElectricityBill;
+use crate::service::ElectricityBillRequest;
 
 /// Response payload
 #[derive(Deserialize)]
 pub enum RequestPayload {
     AgentInfo(AgentInfoRequest),
+    ElectricityBill(ElectricityBillRequest),
 }
 
 /// Response payload
 #[derive(Serialize)]
 pub enum ResponsePayload {
     Credential(AgentInfo),
+    ElectricityBill(ElectricityBill),
 }
 
 #[derive(Clone)]
-pub struct AgentData<D: Clone> {
+pub struct AgentData {
     pub agent: String,
     pub local_addr: String,
 
-    pub parameter: D,
-}
-
-impl<D: Clone> AgentData<D> {
-    pub fn new(parameter: D) -> Self {
-        Self {
-            agent: String::new(),
-            local_addr: String::new(),
-            parameter,
-        }
-    }
-}
-
-pub trait Handle<D: Clone> {
-    fn process(self, parameter: AgentData<D>) -> Response;
+    pub parameter: SessionStorage,
 }

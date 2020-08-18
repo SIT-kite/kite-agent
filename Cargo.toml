@@ -15,6 +15,7 @@ regex = "1"
 num-traits = "0.2"
 num-derive = "0.3"
 thiserror = "1"
+futures = "0.3"
 chrono = { version = "0.4", features = ["serde"] }
 tokio = { version = "0.2", features = ["full"] }
 futures-util = "0.3"
@@ -26,6 +27,7 @@ awc = { version = "1.0.1", features = ["rustls"] }
 actix-http = "1"
 actix-rt = "1.1"
 tokio-tungstenite = { version = "0.11", features = ["tls"] } # Websocket library
+reqwest = "0.10"
 
 # Database
 sled = "0.34"
