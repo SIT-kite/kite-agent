@@ -1,17 +1,24 @@
 #[macro_use]
 extern crate prettytable;
 
+/// Use the given account to fetch page
+mod page;
+/// Edit stored sessions
 mod session;
 
 use kite_agent::SessionStorage;
-use session::SessionCommand;
 use structopt::StructOpt;
+
+use page::PageCommand;
+use session::SessionCommand;
 
 #[derive(StructOpt)]
 #[structopt(name = "kite-agent-cli")]
 enum Command {
     #[structopt(name = "session")]
     SessionCommand(SessionCommand),
+    #[structopt(name = "page")]
+    PageCommand(PageCommand),
 }
 
 #[actix_rt::main]
@@ -24,6 +31,7 @@ async fn main() {
 
     match command {
         Command::SessionCommand(c) => c.process(session_storage).await,
+        Command::PageCommand(p) => p.process(session_storage).await,
     }
     println!("Finished.")
 }

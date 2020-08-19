@@ -8,8 +8,9 @@ mod communication;
 mod error;
 mod net;
 mod parser;
-mod service;
+pub mod service;
 
+pub use communication::AgentData;
 pub use error::{AgentError, Result};
 pub use net::{Session, SessionStorage};
 pub use service::portal_login;

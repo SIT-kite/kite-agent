@@ -50,7 +50,7 @@ pub struct Request {
 }
 
 /// Agent response
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct Response {
     /// Response sequence
     pub ack: usize,
