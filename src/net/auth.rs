@@ -1,9 +1,8 @@
-use super::ActionError;
 use crate::error::Result;
 use crate::make_parameter;
-use actix_http::http::StatusCode;
-use actix_http::httpmessage::HttpMessage;
-use awc::Client;
+use crate::service::ActionError;
+use reqwest::redirect::Policy;
+use reqwest::{Client, StatusCode};
 use std::collections::HashMap;
 
 /// Login page.
@@ -22,46 +21,37 @@ macro_rules! regex_find {
 /// Login on campus official auth-server with student id and password.
 /// Return string of cookies on `.sit.edu.cn`.
 pub async fn portal_login(user_name: &str, password: &str) -> Result<HashMap<String, String>> {
-    // Create a http client, but, awc::Client may not support cookie store..
-    let client = Client::default();
+    let client = Client::builder()
+        .redirect(Policy::none())
+        .cookie_store(true)
+        .build()?;
 
     // Request login page to get encrypt key and so on.
-    let mut response = client.get(LOGIN_URL).send().await.unwrap();
-    let index_html = response.body().await.unwrap();
-    let cookie_string = response
-        .cookies()
-        .unwrap()
-        .iter()
-        .map(|x| format!("{}={}; ", x.name(), x.value()))
-        .collect::<Vec<String>>()
-        .join("");
+    let mut first_response = client.get(LOGIN_URL).send().await?;
+    let index_html = first_response.text().await?;
 
-    let text = std::str::from_utf8(&index_html).unwrap();
-    let aes_key = regex_find!(text, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
-
+    let aes_key = regex_find!(&index_html, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
     let response = client
         .post(LOGIN_URL)
-        .set_header("Content-Type", "application/x-www-form-urlencoded")
-        .set_header("Referrer", LOGIN_URL)
-        .set_header("Cookie", cookie_string)
-        .send_body(&make_parameter!(
+        .header("content-type", "application/x-www-form-urlencoded")
+        .body(make_parameter!(
             "username" => user_name,
             "password" => &urlencoding::encode(&generate_passwd_string(&password.to_string(), &aes_key)),
             "dllt" => "userNamePasswordLogin",
             "execution" => "e1s1",
             "_eventId" => "submit",
             "rmShown" => "1",
-            "lt" => &regex_find!(text, r#"<input type="hidden" name="lt" value="(.*?)"/>"#).unwrap()
+            "lt" => &regex_find!(&index_html, r#"<input type="hidden" name="lt" value="(.*?)"/>"#).unwrap()
         ))
-        .await
-        .unwrap();
+        .send()
+        .await?;
 
     if response.status() == StatusCode::FOUND {
         let mut results = HashMap::new();
         // Default domain (or host) is where we request.
         let default_domain = "authserver.sit.edu.cn";
 
-        for x in response.cookies().unwrap().iter() {
+        for x in response.cookies() {
             // If the response set cookie in a given domain
             // For example, authserver may set cookies on .sit.edu.cn
             let current_domain = x.domain().unwrap_or(default_domain).to_string();

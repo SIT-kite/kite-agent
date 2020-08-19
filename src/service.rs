@@ -1,7 +1,6 @@
-mod auth;
 mod bill;
 
-pub use auth::portal_login;
+pub use crate::net::auth::portal_login;
 
 pub use bill::ElectricityBillRequest;
 

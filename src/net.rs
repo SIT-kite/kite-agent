@@ -1,3 +1,4 @@
+pub mod auth;
 mod availability;
 mod session;
 mod user_agent;

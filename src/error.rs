@@ -2,6 +2,7 @@ use crate::service::ActionError;
 use awc::error::SendRequestError;
 use awc::http::StatusCode;
 use bincode::Error as BincodeError;
+use reqwest::Error as ReqwestError;
 use sled::Error as SledError;
 use thiserror::Error;
 
@@ -44,5 +45,11 @@ impl From<BincodeError> for AgentError {
 impl From<ActionError> for AgentError {
     fn from(err: ActionError) -> Self {
         AgentError::ActionError(err)
+    }
+}
+
+impl From<ReqwestError> for AgentError {
+    fn from(err: ReqwestError) -> Self {
+        AgentError::Connection(err.to_string())
     }
 }
