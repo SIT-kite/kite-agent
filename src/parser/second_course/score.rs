@@ -86,8 +86,8 @@ impl Parse for SecondScore {
 mod test {
     #[test]
     fn test_second_score_parser() {
-        use super::Parse;
-        use super::{Html, Regex, SecondScore, Selector};
+        use super::{Parse, SecondScore};
+
         let html_page = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
         let origin: SecondScore = Parse::from_html(html_page.as_str());
         let target = SecondScore {

@@ -85,7 +85,7 @@ pub async fn connect_campus_network(student_id: &str, password: &str) -> Result<
     post_data.insert("upass", password);
     post_data.insert("0MKKey", "%B5%C7%A1%A1%C2%BC");
 
-    let response = reqwest::Client::new()
+    let _response = reqwest::Client::new()
         .post(&format!("{}/0.htm", PORTAL_ADDRESS))
         .form(&post_data)
         .send()

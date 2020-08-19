@@ -70,7 +70,7 @@ mod test {
     #[test]
     fn test_selected_course_parser() {
         use super::Parse;
-        use super::{Html, SelectedCourse, Selector};
+        use super::SelectedCourse;
 
         let html_page = std::fs::read_to_string("html/我的课表页面.html").unwrap();
 

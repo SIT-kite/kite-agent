@@ -1,4 +1,5 @@
 use super::{Agent, AgentBuilder, AgentData, Request, Response};
+use crate::error::Result;
 use crate::net::SessionStorage;
 use futures::Future;
 use futures_util::{SinkExt, StreamExt};
@@ -83,7 +84,9 @@ where
             let response = request_callback(req, callback_parameter).await;
             let response_content = bincode::serialize(&response);
             if let Ok(response_content) = response_content {
-                socket_tx.send(Message::Binary(response_content)).await;
+                if let Err(_) = socket_tx.send(Message::Binary(response_content)).await {
+                    ()
+                }
             }
         }
         // TODO: Send error code `unknown`.
@@ -94,7 +97,7 @@ where
         message: Message,
         mut message_tx: mpsc::Sender<Message>,
         on_message: Arc<MessageCallback<O>>,
-    ) {
+    ) -> Result<()> {
         // Resolve request message, and response.
         // For Ping, Pong, Close message, we can send response immediately, while for binary we need
         // to decode and usually do further operation then.
@@ -116,9 +119,10 @@ where
             _ => {
                 // When Message::Close or Message::Text (which unexpected for us) received,
                 // close connection.
-                message_tx.send(Message::Close(None)).await;
+                message_tx.send(Message::Close(None)).await?;
             }
         }
+        Ok(())
     }
 
     /// Receiver loop, accept commands and requests from the host.
@@ -133,7 +137,11 @@ where
         while let Some(r) = socket_rx.next().await {
             match r.into() {
                 Ok(message) => {
-                    Self::process_message(message, message_tx.clone(), on_message.clone()).await
+                    if let Err(_) =
+                        Self::process_message(message, message_tx.clone(), on_message.clone()).await
+                    {
+                        ()
+                    }
                 }
                 Err(_) => {}
             }
@@ -147,7 +155,9 @@ where
         Item: From<Message>,
     {
         while let Some(response) = message_rx.recv().await {
-            socket_tx.send(response.into()).await;
+            if let Err(_) = socket_tx.send(response.into()).await {
+                ()
+            }
         }
     }
 

@@ -3,9 +3,7 @@ mod course;
 mod expense;
 mod second_course;
 
-use crate::error::{AgentError, Result};
-use regex::Error as RegexError;
-use thiserror::Error;
+use crate::error::Result;
 
 pub use bill::ElectricityBill;
 pub use course::{CourseDetail, CourseScore, PlannedCourse, SelectedCourse};
@@ -22,28 +20,10 @@ pub trait TryParse {
         Self: std::marker::Sized;
 }
 
-#[derive(Error, Debug)]
+#[derive(thiserror::Error, Debug)]
 pub enum ParserError {
     #[error("找不到对应元素: {0}")]
     NoSuchElement(String),
     #[error("正则解析错误: {0}")]
     RegexErr(String),
-}
-
-impl From<RegexError> for ParserError {
-    fn from(regex_err: RegexError) -> Self {
-        ParserError::RegexErr(regex_err.to_string())
-    }
-}
-
-impl From<ParserError> for AgentError {
-    fn from(parser_err: ParserError) -> Self {
-        AgentError::HtmlParser(parser_err.to_string())
-    }
-}
-
-impl From<regex::Error> for AgentError {
-    fn from(regex_err: regex::Error) -> Self {
-        ParserError::RegexErr(regex_err.to_string()).into()
-    }
 }

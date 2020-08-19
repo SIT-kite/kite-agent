@@ -11,6 +11,6 @@ mod parser;
 pub mod service;
 
 pub use communication::AgentData;
-pub use error::{AgentError, Result};
+pub use error::Result;
 pub use net::{Session, SessionStorage};
 pub use service::portal_login;

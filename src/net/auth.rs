@@ -27,7 +27,7 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<HashMap<Str
         .build()?;
 
     // Request login page to get encrypt key and so on.
-    let mut first_response = client.get(LOGIN_URL).send().await?;
+    let first_response = client.get(LOGIN_URL).send().await?;
     let index_html = first_response.text().await?;
 
     let aes_key = regex_find!(&index_html, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();

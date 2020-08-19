@@ -79,7 +79,7 @@ impl SessionStorage {
     }
 
     pub fn clear(&mut self) -> Result<()> {
-        self.db.clear();
+        self.db.clear()?;
         Ok(())
     }
 }
