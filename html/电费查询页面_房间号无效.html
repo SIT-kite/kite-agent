@@ -1,0 +1,84 @@
+<script language="javascript">
+	function newwin(url) {
+		var newwin = window
+				.open(
+						url,
+						"newwin",
+						"toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=450");
+		newwin.focus();
+		return false;
+	}
+</script>
+<script LANGUAGE="javascript">
+	function submit10() {
+		self.location.replace("dk_xxmh.jsp")
+	}
+</script>
+<script>
+  function Numbers(){
+   var key = window.event.keyCode;
+   if(key<48 || key>57){
+    window.event.keyCode = 0;
+   }
+  } 
+</script>
+
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>奉贤校区宿舍用电余额查询</title>
+<LINK href="images/css.css" type=text/css rel=stylesheet>
+<META content="MSHTML 6.00.2900.6003" name=GENERATOR>
+<style type="text/css">
+<!--
+.STYLE1 {
+	color: #FF0000;
+	font-size: 18px;
+}
+-->
+</style>
+</head>
+
+<body>
+<FORM name=notifyForm method="POST" action="dk_xxmh.jsp"><INPUT
+	type=hidden value=init name=actionType> <INPUT type=hidden
+	value=on name=selectstate>
+<DIV class=mainbg>
+<DIV id=headtitle align=center>
+<div class=bottom_left>
+<TABLE cellSpacing=0 cellPadding=0 align=center border=0 width="95%">
+	<TBODY>
+		<TR>
+			<td align="center" id=table1>
+			<TABLE cellSpacing=0 cellPadding=0 align=center border=0 width="95%">
+				<TBODY>
+					<TR>
+						<td width="75%" style="padding-top: 1px;" id=table2>请输入要查询的房间号：<input type=text size="11" onKeyPress="Numbers()" 
+            onPaste="return false"  name=fjh value="" title="输入房间号" style= "ime-mode:disabled" >&nbsp;<input type="submit" value="查询"></td>
+						<td width="20%" style="padding-top: 1px;" id=table3>
+						</td>
+					</TR>
+				</TBODY>
+			</table>
+			</td>
+		</TR>
+	</TBODY>
+</table>
+</div>
+</DIV>
+</form>
+
+<table id=table cellSpacing=0 cellPadding=0 align=center border=0>
+<div id="notFound" align="center">&nbsp;<div id='listContent' align='center'><br /><span class='STYLE1'>房间号未找到，请重新输入正确的房间号！</span></div><div id='listContent' align='left'><br />&nbsp;*输入格式为:10+楼号+房间号<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;例如:1号楼202房间,输入101202;23号楼1001房间，输入10231001。<br />&nbsp;&nbsp;查询结果为每天定时更新数据，与实际数据会有误差。如需查询实时信息请至多媒体机查询。<br />&nbsp;&nbsp;如对查询结果有疑问，请致电一卡通中心咨询，联系电话021-60873113。</div><div>&nbsp;</div></div>
+	<tr>
+		<th>房间号</th>
+		<th>存款余额(元)</th>
+		<th>电补余额(元)</th>
+		<th>合计余额(元)</th>
+		<th>可用电量(度)</th>
+	</tr>
+	
+
+</body>
+</html>
