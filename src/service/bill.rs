@@ -18,6 +18,7 @@ impl ElectricityBillRequest {
             let http_response = reqwest::Client::new()
                 .post("http://card.sit.edu.cn/dk_xxmh.jsp")
                 .header("Cookie", cookie)
+                .header("Content-Type", "application/x-www-form-urlencoded")
                 .body(make_parameter!(
                     "actionType" => "init",
                     "selectstate" => "on",
@@ -35,6 +36,8 @@ impl ElectricityBillRequest {
                 }
                 Err(_) => (),
             };
+        } else {
+            println!("No session found.");
         }
         Response::error(11)
     }

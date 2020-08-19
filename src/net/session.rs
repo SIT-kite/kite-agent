@@ -142,7 +142,7 @@ impl Session {
             .iter()
             .filter_map(|(key, value)| {
                 if domain.ends_with(key) {
-                    Some(value.clone())
+                    Some(format!("{}; ", value))
                 } else {
                     None
                 }

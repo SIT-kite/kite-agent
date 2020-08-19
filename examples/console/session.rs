@@ -71,15 +71,12 @@ impl InsertSession {
 
         match r {
             Ok(cookie) => {
-                let mut cookie_map = HashMap::new();
-
-                println!("Cookie in .sit.edu.cn: {}", cookie);
-                cookie_map.insert(String::from(".sit.edu.cn"), cookie);
+                println!("Cookies {:#?}", cookie);
 
                 let new_session = Session {
                     account: self.account,
                     password: self.credential,
-                    cookie: cookie_map,
+                    cookie: cookie,
                     last_update: Utc::now().naive_local(),
                 };
                 println!("Write to database.");

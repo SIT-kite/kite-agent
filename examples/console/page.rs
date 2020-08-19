@@ -25,6 +25,8 @@ pub struct QueryElectricityBill {
 
 impl QueryElectricityBill {
     pub async fn process(self, sessions: SessionStorage) {
+        println!("Query room {}", self.room);
+
         let request = ElectricityBillRequest { room: self.room };
         let response = request
             .process(AgentData {

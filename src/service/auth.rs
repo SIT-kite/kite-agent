@@ -70,7 +70,7 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<HashMap<Str
             } else {
                 String::new()
             };
-            val.push_str(&format!("{}={}; ", x.name(), x.value()));
+            val.push_str(&format!("{}={}; ", x.name(), urlencoding::encode(x.value())));
             results.insert(current_domain, val);
         }
         return Ok(results);
