@@ -16,7 +16,7 @@ use communication::on_new_request;
 use communication::AgentBuilder;
 use tokio::time::Duration;
 
-#[actix_rt::main]
+#[tokio::main]
 async fn main() {
     let session_storage = SessionStorage::new().unwrap();
     let mut agent = AgentBuilder::new("0001".to_string())

@@ -101,7 +101,7 @@ where
         match message {
             Message::Binary(content) => {
                 // Spawn new thread to execute the function because it usually costs a lot of time.
-                actix_rt::spawn(async move {
+                tokio::spawn(async move {
                     Self::dispatch_message(content, message_tx, on_message.clone()).await
                 });
             }

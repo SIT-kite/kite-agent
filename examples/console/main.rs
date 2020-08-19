@@ -21,7 +21,7 @@ enum Command {
     PageCommand(PageCommand),
 }
 
-#[actix_rt::main]
+#[tokio::main]
 async fn main() {
     // Read commands from command line parameters.
     let command = Command::from_args();

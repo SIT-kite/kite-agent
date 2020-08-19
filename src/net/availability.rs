@@ -1,11 +1,10 @@
 //! This module provides ability to test network connectivity and try to connect the campus network.
 
-use awc::Client;
 use lazy_static;
 use rand::{seq::SliceRandom, thread_rng};
 
 use super::user_agent;
-use crate::error::{AgentError, Result};
+use crate::error::Result;
 use std::collections::HashMap;
 
 pub struct NetworkTestPage {
@@ -57,23 +56,21 @@ pub enum NetworkConnectivity {
 /// See `NetworkConnectivity` enum details.
 pub async fn test_network_connectivity() -> NetworkConnectivity {
     let test_page = get_test_page();
-    let client = Client::default();
 
     // Create request builder and send request
-    let response = client
+    let response = reqwest::Client::new()
         .get(test_page.url)
         .header("User-Agent", user_agent::get_random_ua_string().as_str())
         .send()
         .await;
+
     match response {
-        Ok(mut r) => {
-            if r.status().is_success() {
-                // Get response body and differ it from expected_response.
-                if let Ok(body) = r.body().await {
-                    if body == test_page.expected_response.as_bytes() {
-                        return NetworkConnectivity::Connected;
-                    }
-                }
+        Ok(r) => {
+            // Get response body and differ it from expected_response.
+            if r.status().is_success()
+                && r.text().await.unwrap_or_default() == test_page.expected_response
+            {
+                return NetworkConnectivity::Connected;
             }
             NetworkConnectivity::LoginNeeded
         }
@@ -88,13 +85,13 @@ pub async fn connect_campus_network(student_id: &str, password: &str) -> Result<
     post_data.insert("upass", password);
     post_data.insert("0MKKey", "%B5%C7%A1%A1%C2%BC");
 
-    let response = Client::new()
-        .post(format!("{}/0.htm", PORTAL_ADDRESS))
-        .send_form(&post_data)
+    let response = reqwest::Client::new()
+        .post(&format!("{}/0.htm", PORTAL_ADDRESS))
+        .form(&post_data)
+        .send()
         .await?;
-
-    if response.status().is_success() {
-        return Err(AgentError::Http(response.status()));
-    }
+    // if response.status().is_success() {
+    //     return Err(AgentError::Http(response.status()));
+    // }
     Ok(())
 }

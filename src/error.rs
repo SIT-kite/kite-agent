@@ -1,6 +1,4 @@
 use crate::service::ActionError;
-use awc::error::SendRequestError;
-use awc::http::StatusCode;
 use bincode::Error as BincodeError;
 use reqwest::Error as ReqwestError;
 use sled::Error as SledError;
@@ -10,8 +8,6 @@ pub type Result<T> = std::result::Result<T, AgentError>;
 
 #[derive(Error, Debug)]
 pub enum AgentError {
-    #[error("Http响应异常: {0}")]
-    Http(StatusCode),
     #[error("网络连接异常: {0}")]
     Connection(String),
     #[error("解析Html出错, {0}")]
@@ -22,12 +18,6 @@ pub enum AgentError {
     BincodeError(String),
     #[error("{0}")]
     ActionError(ActionError),
-}
-
-impl From<SendRequestError> for AgentError {
-    fn from(request_err: SendRequestError) -> Self {
-        AgentError::Connection(request_err.to_string())
-    }
 }
 
 impl From<SledError> for AgentError {
