@@ -3,7 +3,7 @@ use scraper::{Html, Selector};
 use serde::Serialize;
 
 /// Electricity bill
-#[derive(Debug, Serialize, PartialEq)]
+#[derive(Debug, Serialize, PartialEq, Default)]
 pub struct ElectricityBill {
     pub room_id: String,
     pub deposit_balance: f32,
@@ -16,6 +16,11 @@ impl Parse for ElectricityBill {
     fn from_html(html_page: &str) -> Self {
         let document = Html::parse_document(html_page.as_ref());
         let selector = Selector::parse("#table tr td div").unwrap();
+        let err_selector = Selector::parse("#notFound span").unwrap();
+
+        if document.select(&err_selector).count() != 0 {
+            return Self::default();
+        }
         let cols: Vec<String> = document
             .select(&selector)
             .map(|x| x.inner_html().to_string())
