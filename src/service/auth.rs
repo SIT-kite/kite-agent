@@ -4,6 +4,7 @@ use crate::make_parameter;
 use actix_http::http::StatusCode;
 use actix_http::httpmessage::HttpMessage;
 use awc::Client;
+use std::collections::HashMap;
 
 /// Login page.
 #[allow(dead_code)]
@@ -20,7 +21,7 @@ macro_rules! regex_find {
 
 /// Login on campus official auth-server with student id and password.
 /// Return string of cookies on `.sit.edu.cn`.
-pub async fn portal_login(user_name: &str, password: &str) -> Result<String> {
+pub async fn portal_login(user_name: &str, password: &str) -> Result<HashMap<String, String>> {
     // Create a http client, but, awc::Client may not support cookie store..
     let client = Client::default();
 
@@ -54,15 +55,25 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<String> {
         ))
         .await
         .unwrap();
-    if response.status() == StatusCode::FOUND {
-        let cookies = response.cookies().unwrap();
 
-        return Ok(cookies
-            .iter()
-            .filter(|x| x.domain().unwrap_or_default() == ".sit.edu.cn")
-            .map(|x| format!("{}={}; ", x.name(), x.value()))
-            .collect::<Vec<String>>()
-            .join(""));
+    if response.status() == StatusCode::FOUND {
+        let mut results = HashMap::new();
+        // Default domain (or host) is where we request.
+        let default_domain = "authserver.sit.edu.cn";
+
+        for x in response.cookies().unwrap().iter() {
+            // If the response set cookie in a given domain
+            // For example, authserver may set cookies on .sit.edu.cn
+            let current_domain = x.domain().unwrap_or(default_domain).to_string();
+            let mut val = if let Some(v) = results.remove(&current_domain) {
+                v
+            } else {
+                String::new()
+            };
+            val.push_str(&format!("{}={}; ", x.name(), x.value()));
+            results.insert(current_domain, val);
+        }
+        return Ok(results);
     }
     Err(ActionError::LoginFailed.into())
 }

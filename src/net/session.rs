@@ -84,6 +84,20 @@ impl SessionStorage {
     }
 }
 
+// Note: You should not implement Default for SessionStorage. If you write code like this:
+// AgentData {
+//     parameter: SessionStorage,
+//     ..AgentData::default(),
+// }
+// The default function will open database file separately, which may lead to:
+// `The process cannot access the file because another process has locked a portion of the file.`
+//
+// impl Default for SessionStorage {
+//     fn default() -> Self {
+//         Self::new().unwrap()
+//     }
+// }
+
 /// Campus account login session
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Session {
@@ -117,10 +131,8 @@ impl Session {
 
     pub async fn login(&mut self) -> Result<()> {
         self.cookie.clear();
-        self.cookie.insert(
-            String::from(".sit.edu.cn"),
-            crate::service::portal_login(&self.account, &self.account).await?,
-        );
+        self.cookie = crate::service::portal_login(&self.account, &self.account).await?;
+
         Ok(())
     }
 
