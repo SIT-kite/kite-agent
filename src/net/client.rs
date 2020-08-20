@@ -45,29 +45,24 @@ pub struct Client {
 
 impl Client {
     fn domain(url: &str) -> String {
-        let regex = regex::Regex::new(r"(?<=://)[a-zA-Z\.0-9]+(?=\/)").unwrap();
-        let captures = regex
-            .captures_iter(url)
-            .skip(1)
-            .next()
-            .expect("No domain captured.");
-        let domain = captures.get(0).unwrap().as_str();
+        let regex = regex::Regex::new(r"http[s]?://([a-zA-Z\.0-9]+)/").unwrap();
+        let captures = regex.captures(url).expect("No domain captured.");
 
-        domain.to_owned()
+        captures[1].to_string()
     }
 
-    pub fn get(self, url: &str) -> RequestBuilder {
+    pub fn get(&mut self, url: &str) -> RequestBuilder {
         RequestBuilder {
-            session: self.session,
+            session: &mut self.session,
             domain: Self::domain(url),
             request_builder: self.client.get(url),
             payload: "",
         }
     }
 
-    pub fn post(self, url: &str) -> RequestBuilder {
+    pub fn post(&mut self, url: &str) -> RequestBuilder {
         RequestBuilder {
-            session: self.session,
+            session: &mut self.session,
             domain: Self::domain(url),
             request_builder: self.client.post(url),
             payload: "",
@@ -76,7 +71,7 @@ impl Client {
 }
 
 pub struct RequestBuilder<'a> {
-    session: Session,
+    session: &'a mut Session,
     domain: String,
     request_builder: reqwest::RequestBuilder,
     payload: &'a str,
@@ -102,9 +97,15 @@ impl<'a> RequestBuilder<'a> {
         if self.payload != "" {
             self.request_builder = self.request_builder.body(self.payload.to_string());
         }
-        let response = self.request_builder.send().await?;
 
+        if !self.session.cookies.is_empty() {
+            let cookie_str = self.session.get_cookie_string(&self.domain);
+            self = self.header("cookie", &cookie_str);
+        }
+
+        let response = self.request_builder.send().await?;
         self.session.sync_cookies(&self.domain, response.cookies());
+
         Ok(response)
     }
 }

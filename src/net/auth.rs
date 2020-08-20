@@ -1,9 +1,9 @@
+use super::client::ClientBuilder;
 use crate::error::Result;
 use crate::make_parameter;
+use crate::net::Session;
 use crate::service::ActionError;
-use reqwest::redirect::Policy;
-use reqwest::{Client, StatusCode};
-use std::collections::HashMap;
+use reqwest::StatusCode;
 
 /// Login page.
 #[allow(dead_code)]
@@ -20,14 +20,11 @@ macro_rules! regex_find {
 
 /// Login on campus official auth-server with student id and password.
 /// Return string of cookies on `.sit.edu.cn`.
-pub async fn portal_login(
-    user_name: &str,
-    password: &str,
-) -> Result<HashMap<String, HashMap<String, String>>> {
-    let client = Client::builder()
-        .redirect(Policy::none())
-        .cookie_store(true)
-        .build()?;
+pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
+    let mut client = ClientBuilder::new(Session::new(user_name, password))
+        .proxy("http://127.0.0.1:8888/")
+        .redirect(false)
+        .build();
 
     // Request login page to get encrypt key and so on.
     let first_response = client.get(LOGIN_URL).send().await?;
@@ -37,7 +34,7 @@ pub async fn portal_login(
     let response = client
         .post(LOGIN_URL)
         .header("content-type", "application/x-www-form-urlencoded")
-        .body(make_parameter!(
+        .text(&make_parameter!(
             "username" => user_name,
             "password" => &urlencoding::encode(&generate_passwd_string(&password.to_string(), &aes_key)),
             "dllt" => "userNamePasswordLogin",
@@ -50,23 +47,10 @@ pub async fn portal_login(
         .await?;
 
     if response.status() == StatusCode::FOUND {
-        let mut results = HashMap::new();
-        // Default domain (or host) is where we request.
-        let default_domain = "authserver.sit.edu.cn";
+        let mut new_session = Session::new(user_name, password);
 
-        for x in response.cookies() {
-            // If the response set cookie in a given domain
-            // For example, authserver may set cookies on .sit.edu.cn
-            let current_domain = x.domain().unwrap_or(default_domain).to_string();
-            let mut val = if let Some(v) = results.remove(&current_domain) {
-                v
-            } else {
-                HashMap::new()
-            };
-            val.insert(x.name().to_string(), urlencoding::encode(x.value()));
-            results.insert(String::from(current_domain), val);
-        }
-        return Ok(results);
+        new_session.sync_cookies("authserver.sit.edu.cn", response.cookies());
+        return Ok(new_session);
     }
     Err(ActionError::LoginFailed.into())
 }
