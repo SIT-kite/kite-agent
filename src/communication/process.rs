@@ -30,6 +30,7 @@ async fn dispatch_command(seq: usize, request: RequestPayload, parameter: AgentD
     let response = match request {
         RequestPayload::AgentInfo(r) => r.process(parameter).await,
         RequestPayload::ElectricityBill(r) => r.process(parameter).await,
+        RequestPayload::ActivityList(r) => r.process(parameter).await,
     };
     response.ack(seq)
 }

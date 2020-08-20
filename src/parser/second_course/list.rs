@@ -4,9 +4,10 @@ use crate::parser::Parse;
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{Html, Selector};
+use serde::Serialize;
 
 /// Activity link, used for list recent activities.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Activity {
     pub title: String,
     pub id: String,

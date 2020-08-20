@@ -60,7 +60,9 @@ pub struct Response {
     pub payload: Vec<u8>,
 }
 
+use crate::parser::Activity;
 use crate::parser::ElectricityBill;
+use crate::service::ActivityListRequest;
 use crate::service::ElectricityBillRequest;
 
 /// Response payload
@@ -68,6 +70,7 @@ use crate::service::ElectricityBillRequest;
 pub enum RequestPayload {
     AgentInfo(AgentInfoRequest),
     ElectricityBill(ElectricityBillRequest),
+    ActivityList(ActivityListRequest),
 }
 
 /// Response payload
@@ -75,6 +78,7 @@ pub enum RequestPayload {
 pub enum ResponsePayload {
     Credential(AgentInfo),
     ElectricityBill(ElectricityBill),
+    ActivityList(Vec<Activity>),
 }
 
 #[derive(Clone)]

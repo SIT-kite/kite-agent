@@ -1,4 +1,4 @@
-use kite_agent::{Session, SessionStorage};
+use kite_agent::SessionStorage;
 use prettytable::{Cell, Row, Table};
 use structopt::StructOpt;
 
