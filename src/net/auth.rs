@@ -20,7 +20,10 @@ macro_rules! regex_find {
 
 /// Login on campus official auth-server with student id and password.
 /// Return string of cookies on `.sit.edu.cn`.
-pub async fn portal_login(user_name: &str, password: &str) -> Result<HashMap<String, String>> {
+pub async fn portal_login(
+    user_name: &str,
+    password: &str,
+) -> Result<HashMap<String, HashMap<String, String>>> {
     let client = Client::builder()
         .redirect(Policy::none())
         .cookie_store(true)
@@ -58,10 +61,10 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<HashMap<Str
             let mut val = if let Some(v) = results.remove(&current_domain) {
                 v
             } else {
-                String::new()
+                HashMap::new()
             };
-            val.push_str(&format!("{}={}; ", x.name(), urlencoding::encode(x.value())));
-            results.insert(current_domain, val);
+            val.insert(x.name().to_string(), urlencoding::encode(x.value()));
+            results.insert(String::from(current_domain), val);
         }
         return Ok(results);
     }
