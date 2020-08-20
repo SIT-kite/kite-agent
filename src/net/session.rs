@@ -1,5 +1,6 @@
 use crate::error::Result;
 use chrono::{NaiveDateTime, Utc};
+use reqwest::cookie::Cookie;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -98,15 +99,18 @@ impl SessionStorage {
 //     }
 // }
 
+pub type AccountCookies = HashMap<String, HashMap<String, String>>;
+
 /// Campus account login session
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Session {
     /// Student ldap account
     pub account: String,
     /// Ldap raw password
     pub password: String,
     /// Http cookie, indexed by domains.
-    pub cookie: HashMap<String, String>,
+    /// Stored in (domain, (key, value))
+    pub cookies: AccountCookies,
     /// Last use time.
     pub last_update: NaiveDateTime,
 }
@@ -116,7 +120,7 @@ impl Session {
         Self {
             account: account.to_string(),
             password: password.to_string(),
-            cookie: HashMap::default(),
+            cookies: HashMap::default(),
             last_update: Utc::now().naive_utc(),
         }
     }
@@ -130,25 +134,61 @@ impl Session {
     }
 
     pub async fn login(&mut self) -> Result<()> {
-        self.cookie.clear();
-        self.cookie = crate::service::portal_login(&self.account, &self.account).await?;
+        self.cookies = crate::service::portal_login(&self.account, &self.account)
+            .await?
+            .cookies;
+        self.last_update = Utc::now().naive_local();
 
         Ok(())
     }
 
     pub fn get_cookie_string(&self, domain: &str) -> String {
-        let cookies = self
-            .cookie
-            .iter()
-            .filter_map(|(key, value)| {
-                if domain.ends_with(key) {
-                    Some(format!("{}; ", value))
-                } else {
-                    None
+        // TODO: If more than one domain has cookie with the same name, we may not know what we pick.
+        let mut cookie_pairs = HashMap::<String, String>::new();
+        self.cookies.iter().for_each(|(key, value)| {
+            if domain.ends_with(key) {
+                for (v0, v1) in value {
+                    cookie_pairs.insert(v0.clone(), v1.clone());
                 }
-            })
+            }
+        });
+        cookie_pairs
+            .into_iter()
+            .map(|(k, v)| format!("{}={};", k, v))
             .collect::<Vec<String>>()
-            .join(" ");
-        cookies
+            .join("")
+    }
+
+    pub fn query_cookie(&self, domain: &str, name: &str) -> Option<&String> {
+        for (key, domain_cookies) in self.cookies.iter() {
+            if domain.ends_with(key) {
+                if let Some(value) = domain_cookies.get(name) {
+                    return Some(value);
+                }
+            }
+        }
+        None
+    }
+
+    pub fn sync_cookies<'a, T>(&mut self, domain: &str, cookies: T)
+    where
+        T: Iterator<Item = Cookie<'a>>,
+    {
+        cookies.for_each(|x| {
+            let domain = x.domain().unwrap_or(domain);
+            let mut domain_cookies = if let Some(c) = self.cookies.remove(domain) {
+                c
+            } else {
+                HashMap::new()
+            };
+            domain_cookies.insert(x.name().to_string(), x.value().to_string());
+            self.cookies.insert(String::from(domain), domain_cookies);
+        });
+    }
+}
+
+impl PartialEq<Session> for Session {
+    fn eq(&self, other: &Session) -> bool {
+        self.account == other.account && self.password == other.password && self.cookies == other.cookies
     }
 }

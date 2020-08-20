@@ -1,5 +1,11 @@
 use super::Session;
 use crate::error::Result;
+use chrono::Utc;
+
+pub fn domain(url: &str) -> Option<String> {
+    let regex = regex::Regex::new(r"http[s]?://([a-zA-Z\.0-9]+)/").unwrap();
+    regex.captures(url).and_then(|x| Some(x[1].to_string()))
+}
 
 pub struct ClientBuilder {
     session: Session,
@@ -44,17 +50,10 @@ pub struct Client {
 }
 
 impl Client {
-    fn domain(url: &str) -> String {
-        let regex = regex::Regex::new(r"http[s]?://([a-zA-Z\.0-9]+)/").unwrap();
-        let captures = regex.captures(url).expect("No domain captured.");
-
-        captures[1].to_string()
-    }
-
     pub fn get(&mut self, url: &str) -> RequestBuilder {
         RequestBuilder {
             session: &mut self.session,
-            domain: Self::domain(url),
+            domain: domain(url).unwrap(),
             request_builder: self.client.get(url),
             payload: "",
         }
@@ -63,10 +62,14 @@ impl Client {
     pub fn post(&mut self, url: &str) -> RequestBuilder {
         RequestBuilder {
             session: &mut self.session,
-            domain: Self::domain(url),
+            domain: domain(url).unwrap(),
             request_builder: self.client.post(url),
             payload: "",
         }
+    }
+
+    pub fn session(&self) -> &Session {
+        &self.session
     }
 }
 
@@ -105,6 +108,7 @@ impl<'a> RequestBuilder<'a> {
 
         let response = self.request_builder.send().await?;
         self.session.sync_cookies(&self.domain, response.cookies());
+        self.session.last_update = Utc::now().naive_local();
 
         Ok(response)
     }

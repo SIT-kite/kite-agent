@@ -1,7 +1,5 @@
-use chrono::Utc;
 use kite_agent::{Session, SessionStorage};
 use prettytable::{Cell, Row, Table};
-use std::collections::HashMap;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -70,17 +68,11 @@ impl InsertSession {
         let r = kite_agent::portal_login(&self.account, &self.credential).await;
 
         match r {
-            Ok(cookie) => {
-                println!("Cookies {:#?}", cookie);
+            Ok(session) => {
+                println!("Session {:#?}", session);
 
-                let new_session = Session {
-                    account: self.account,
-                    password: self.credential,
-                    cookie: cookie,
-                    last_update: Utc::now().naive_local(),
-                };
                 println!("Write to database.");
-                storage.insert(&new_session).unwrap();
+                storage.insert(&session).unwrap();
             }
             Err(e) => println!("Failed to login: {:?}", e),
         }
