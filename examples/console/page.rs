@@ -46,10 +46,6 @@ impl QueryElectricityBill {
 
 #[derive(StructOpt)]
 pub struct GetRecentActivities {
-    // #[structopt(long)]
-    // pub account: Option<String>,
-    // #[structopt(long)]
-    // pub credential: Option<String>,
     /// Count of activities per page.
     #[structopt(long, short, default_value = "10")]
     pub count: u16,

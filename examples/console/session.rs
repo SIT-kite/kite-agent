@@ -26,6 +26,8 @@ impl SessionCommand {
 #[derive(StructOpt)]
 /// Show sessions.
 pub struct ListSession {
+    #[structopt(long, short = "u")]
+    account: Option<String>,
     #[structopt(long, short, default_value = "0")]
     index: u16,
     #[structopt(long, short, default_value = "10")]
@@ -33,11 +35,16 @@ pub struct ListSession {
 }
 
 impl ListSession {
-    pub async fn process(self, storage: SessionStorage) {
-        let index = if self.index == 1 { 0 } else { self.index };
-        let sessions = storage.list(index, self.size).unwrap();
+    pub fn print_account_list(storage: SessionStorage, page: u16, count: u16) {
+        let index = if page == 1 { 0 } else { page };
+        let sessions = storage.list(index, count).unwrap();
 
-        println!("{} result(s) found in page {}.", sessions.len(), self.index);
+        println!(
+            "{} result(s) found in the page {}, total: {}",
+            sessions.len(),
+            page,
+            storage.len()
+        );
         let mut table = Table::new();
 
         table.add_row(row!["ACCOUNT", "CREDENTIAL", "LAST UPDATE"]);
@@ -49,6 +56,34 @@ impl ListSession {
             ]));
         }
         table.printstd();
+    }
+
+    pub fn print_cookie_list(storage: SessionStorage, account: String) {
+        let session = storage.query(&account).unwrap();
+        let mut table = Table::new();
+
+        if let Some(session) = session {
+            table.add_row(row!["DOMAIN", "NAME", "VALUE"]);
+            for each_domain in session.cookies {
+                for each_cookie in each_domain.1 {
+                    table.add_row(Row::new(vec![
+                        Cell::new(&each_domain.0),
+                        Cell::new(&each_cookie.0),
+                        Cell::new(&each_cookie.1),
+                    ]));
+                }
+            }
+            table.printstd();
+        } else {
+            println!("Could not find account {}", account);
+        }
+    }
+    pub async fn process(self, storage: SessionStorage) {
+        if let Some(account) = self.account {
+            Self::print_cookie_list(storage, account);
+        } else {
+            Self::print_account_list(storage, self.index, self.size);
+        }
     }
 }
 

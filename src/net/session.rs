@@ -28,7 +28,7 @@ impl SessionStorage {
     }
 
     /// Query session by user.
-    pub fn query(&mut self, account: &str) -> Result<Option<Session>> {
+    pub fn query(&self, account: &str) -> Result<Option<Session>> {
         // Query session struct from db.
         let value_option = self.db.get(String::from(SESSION_KEY_FORMAT) + account)?;
 
@@ -80,6 +80,10 @@ impl SessionStorage {
     pub fn clear(&mut self) -> Result<()> {
         self.db.clear()?;
         Ok(())
+    }
+
+    pub fn len(&self) -> usize {
+        self.db.len()
     }
 }
 
