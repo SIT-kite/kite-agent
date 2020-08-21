@@ -5,6 +5,7 @@ extern crate lazy_static;
 extern crate num_derive;
 
 mod communication;
+mod config;
 mod error;
 mod net;
 mod parser;

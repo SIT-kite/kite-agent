@@ -6,6 +6,7 @@ extern crate lazy_static;
 extern crate num_derive;
 
 mod communication;
+mod config;
 mod error;
 mod net;
 mod parser;
@@ -18,15 +19,16 @@ use tokio::time::Duration;
 
 #[tokio::main]
 async fn main() {
-    let session_storage = SessionStorage::new().unwrap();
-    let mut agent = AgentBuilder::new("0001".to_string())
-        .host("wss://localhost.sunnysab.cn:8443/agent/")
-        .set_callback(on_new_request, session_storage)
-        .build();
 
-    agent.start().await;
-
-    loop {
-        tokio::time::delay_for(Duration::from_secs(1)).await;
-    }
+    // let session_storage = SessionStorage::new().unwrap();
+    // let mut agent = AgentBuilder::new("0001".to_string())
+    //     .host("wss://localhost.sunnysab.cn:8443/agent/")
+    //     .set_callback(on_new_request, session_storage)
+    //     .build();
+    //
+    // agent.start().await;
+    //
+    // loop {
+    //     tokio::time::delay_for(Duration::from_secs(1)).await;
+    // }
 }

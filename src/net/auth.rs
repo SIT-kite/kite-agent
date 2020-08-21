@@ -22,7 +22,6 @@ macro_rules! regex_find {
 /// Return string of cookies on `.sit.edu.cn`.
 pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
     let mut client = ClientBuilder::new(Session::new(user_name, password))
-        .proxy("http://127.0.0.1:8888/")
         .redirect(false)
         .build();
 

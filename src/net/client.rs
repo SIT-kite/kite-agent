@@ -1,4 +1,5 @@
 use super::Session;
+use crate::config::CONFIG;
 use crate::error::Result;
 use chrono::Utc;
 
@@ -34,9 +35,12 @@ impl ClientBuilder {
         self
     }
 
-    pub fn build(self) -> Client {
-        let client = self.client_builder.build().unwrap();
+    pub fn build(mut self) -> Client {
+        if let Some(proxy_string) = &CONFIG.agent.proxy {
+            self = self.proxy(proxy_string.as_str());
+        }
 
+        let client = self.client_builder.build().unwrap();
         Client {
             session: self.session,
             client,

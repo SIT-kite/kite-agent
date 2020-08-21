@@ -1,11 +1,9 @@
+use crate::config::CONFIG;
 use crate::error::Result;
 use chrono::{NaiveDateTime, Utc};
 use reqwest::cookie::Cookie;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-
-/// Db filename.
-const DB_FILE: &str = "kite-cache";
 
 /// Session structure key format in relation.
 const SESSION_KEY_FORMAT: &str = "s:";
@@ -23,7 +21,7 @@ impl SessionStorage {
     pub fn new() -> Result<Self> {
         let db = sled::Config::new()
             .mode(sled::Mode::HighThroughput)
-            .path(DB_FILE)
+            .path(&CONFIG.agent.db)
             .open()?;
 
         Ok(Self { db })

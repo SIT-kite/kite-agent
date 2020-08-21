@@ -49,10 +49,7 @@ impl ActivityListRequest {
             return Response::error(10);
         }
         let session = session.unwrap();
-        let mut client = ClientBuilder::new(session)
-            .redirect(false)
-            .proxy("http://127.0.0.1:8888/")
-            .build();
+        let mut client = ClientBuilder::new(session).redirect(false).build();
 
         let mut try_count = 2;
         let mut html = String::new();

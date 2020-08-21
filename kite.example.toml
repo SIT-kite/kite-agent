@@ -1,0 +1,13 @@
+[agent]
+# Agent name, identify agent for server
+name = "localhost"
+# Db cache name. we will create a directory to stored sessions automatically.
+db = "kite-cache"
+# Fetch over the given http proxy (no sock5 supported)
+# proxy = "http://localhost:8888/"
+
+[server]
+# Server websocket address.
+websocket = "wss://localhost:8443/agent"
+# Max connections to server
+conn = 5
