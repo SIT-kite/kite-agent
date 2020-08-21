@@ -71,6 +71,10 @@ impl Client {
     pub fn session(&self) -> &Session {
         &self.session
     }
+
+    pub fn session_mut(&mut self) -> &mut Session {
+        &mut self.session
+    }
 }
 
 pub struct RequestBuilder<'a> {

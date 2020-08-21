@@ -54,30 +54,38 @@ impl ActivityListRequest {
             .proxy("http://127.0.0.1:8888/")
             .build();
 
-        let t = client.session().query_cookie("sc.sit.edu.cn", "JSESSIONID");
-        if t.is_none() {
-            Self::get_with_auto_redirect(&mut client, COOKIE_PAGE).await;
+        let mut try_count = 2;
+        let mut html = String::new();
+
+        while try_count > 0 {
+            let t = client.session().query_cookie("sc.sit.edu.cn", "JSESSIONID");
+            if t.is_none() {
+                Self::get_with_auto_redirect(&mut client, COOKIE_PAGE).await;
+            }
+
+            let response = client
+                .get(&format!(
+                    "http://sc.sit.edu.cn/public/activity/activityList.action?{}",
+                    make_parameter!(
+                    "pageNo" => &self.index.to_string(),
+                    "pageSize" => &self.count.to_string(),
+                    "categoryId" => "",
+                    "activityName" => ""
+                    )
+                ))
+                .send()
+                .await
+                .unwrap();
+
+            html = response.text().await.unwrap();
+            if html.starts_with("<script languge='javascript'>") && html.len() < 500 {
+                client.session_mut().login().await;
+            }
+            try_count -= 1;
         }
-
-        let response = client
-            .get(&format!(
-                "http://sc.sit.edu.cn/public/activity/activityList.action?{}",
-                make_parameter!(
-                "pageNo" => &self.index.to_string(),
-                "pageSize" => &self.count.to_string(),
-                "categoryId" => "",
-                "activityName" => ""
-                )
-            ))
-            .send()
-            .await
-            .unwrap();
-
         session_storage.insert(client.session());
 
-        let html = response.text().await.unwrap();
         let activities: Vec<Activity> = Parse::from_html(&html);
-
         Response::normal(ResponsePayload::ActivityList(activities))
     }
 }

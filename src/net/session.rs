@@ -134,6 +134,7 @@ impl Session {
     }
 
     pub async fn login(&mut self) -> Result<()> {
+        self.cookies.clear();
         self.cookies = crate::service::portal_login(&self.account, &self.account)
             .await?
             .cookies;
