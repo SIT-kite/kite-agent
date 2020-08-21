@@ -7,8 +7,6 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct ActivityListRequest {
-    // pub account: String,
-    // pub credential: String,
     /// Count of activities per page.
     pub count: u16,
     /// Page index.
@@ -41,6 +39,7 @@ impl ActivityListRequest {
         response
     }
 
+    /// Fetch and parse activity list page.
     pub async fn process(self, parameter: AgentData) -> Response {
         let mut session_storage = parameter.parameter;
         let session = session_storage.choose_randomly().unwrap();
@@ -77,6 +76,8 @@ impl ActivityListRequest {
             html = response.text().await.unwrap();
             if html.starts_with("<script languge='javascript'>") && html.len() < 500 {
                 client.session_mut().login().await;
+            } else {
+                break;
             }
             try_count -= 1;
         }
