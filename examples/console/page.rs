@@ -1,4 +1,5 @@
 use kite_agent::service::ActivityListRequest;
+use kite_agent::service::CourseScoreRequest;
 use kite_agent::service::ElectricityBillRequest;
 use kite_agent::{AgentData, SessionStorage};
 use structopt::StructOpt;
@@ -10,6 +11,8 @@ pub enum PageCommand {
     QueryElectricityBill(QueryElectricityBill),
     /// Query recent activities in second-course platform.
     GetRecentActivities(GetRecentActivities),
+    /// Query score history.
+    GetScoreList(GetScoreList),
 }
 
 impl PageCommand {
@@ -17,6 +20,7 @@ impl PageCommand {
         match self {
             PageCommand::QueryElectricityBill(query) => query.process(sessions).await,
             PageCommand::GetRecentActivities(query) => query.process(sessions).await,
+            PageCommand::GetScoreList(query) => query.process(sessions).await,
         }
     }
 }
@@ -65,6 +69,34 @@ impl GetRecentActivities {
                 agent: "".to_string(),
                 local_addr: "".to_string(),
                 parameter: sessions.clone(),
+            })
+            .await;
+    }
+}
+
+#[derive(StructOpt)]
+pub struct GetScoreList {
+    #[structopt(long, short = "u")]
+    pub account: String,
+    #[structopt(long, short = "p")]
+    pub credential: String,
+    #[structopt(long, short)]
+    pub term: String,
+}
+
+impl GetScoreList {
+    pub async fn process(self, sessions: SessionStorage) {
+        let request = CourseScoreRequest {
+            account: self.account,
+            credential: self.credential,
+            term: self.term,
+        };
+
+        let resposne = request
+            .process(AgentData {
+                agent: String::new(),
+                local_addr: String::new(),
+                parameter: sessions,
             })
             .await;
     }

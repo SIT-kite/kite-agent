@@ -5,6 +5,7 @@ mod sc;
 pub use crate::net::auth::portal_login;
 
 pub use bill::ElectricityBillRequest;
+pub use course::CourseScoreRequest;
 pub use sc::ActivityListRequest;
 
 #[derive(Debug, thiserror::Error, ToPrimitive)]

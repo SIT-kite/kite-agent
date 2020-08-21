@@ -7,7 +7,7 @@ use chrono::Utc;
 /// after the domain. The function used to get domain and pick cookies from cookie store by name, or
 /// determine whether the path is relative or absolute.
 pub fn domain(url: &str) -> Option<String> {
-    let regex = regex::Regex::new(r"http[s]?://([a-zA-Z\.0-9]+)/").unwrap();
+    let regex = regex::Regex::new(r"http[s]?://([a-zA-Z\.0-9]+)(:[0-9]+)?/").unwrap();
     regex.captures(url).and_then(|x| Some(x[1].to_string()))
 }
 
@@ -75,7 +75,7 @@ impl Client {
             session: &mut self.session,
             domain: domain(url).unwrap(),
             request_builder: self.client.get(url),
-            payload: "",
+            payload: Vec::new(),
         }
     }
 
@@ -85,7 +85,7 @@ impl Client {
             session: &mut self.session,
             domain: domain(url).unwrap(),
             request_builder: self.client.post(url),
-            payload: "",
+            payload: Vec::new(),
         }
     }
 
@@ -108,7 +108,7 @@ pub struct RequestBuilder<'a> {
     /// Reqwest request builder
     request_builder: reqwest::RequestBuilder,
     /// Text payload
-    payload: &'a str,
+    payload: Vec<u8>,
 }
 
 impl<'a> RequestBuilder<'a> {
@@ -120,20 +120,27 @@ impl<'a> RequestBuilder<'a> {
 
     /// Set the form as the payload
     pub fn form(mut self, text: &'a str) -> Self {
-        self.payload = text;
+        self.payload = text.as_bytes().to_vec();
         self.header("content-type", "application/x-www-form-urlencoded")
     }
 
     /// Set a text as the payload
     pub fn text(mut self, text: &'a str) -> Self {
-        self.payload = text;
+        self.payload = text.as_bytes().to_vec();
+        self
+    }
+
+    /// Set binary payload
+    pub fn binary(mut self, content: &[u8]) -> Self {
+        self.payload = content.to_vec();
         self
     }
 
     /// Send request
     pub async fn send(mut self) -> Result<reqwest::Response> {
-        if self.payload != "" {
-            self.request_builder = self.request_builder.body(self.payload.to_string());
+        if !self.payload.is_empty() {
+            // Note: performance issue.
+            self.request_builder = self.request_builder.body(self.payload.to_vec());
         }
 
         // If cookie store is not empty, add cookie string in header.

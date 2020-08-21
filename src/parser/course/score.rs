@@ -1,8 +1,9 @@
 use super::Parse;
 use scraper::{Html, Selector};
+use serde::Serialize;
 
 /// Course score function.
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Debug, Clone, PartialEq, Default)]
 pub struct CourseScoreInner {
     /// Score got for daily performance
     pub regular_grade: f32,
@@ -18,7 +19,7 @@ pub struct CourseScoreInner {
     pub make_up_total: f32,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Serialize, PartialEq)]
 pub enum CourseScoreLine {
     /// Have commented the teacher
     Normal(CourseScoreInner),
@@ -26,7 +27,7 @@ pub enum CourseScoreLine {
     Uncomment,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Serialize, PartialEq)]
 pub struct CourseScore {
     /// Unique ID of the course
     pub course_code: String,
