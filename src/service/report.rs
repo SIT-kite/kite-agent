@@ -1,5 +1,5 @@
-use super::Response;
-use crate::communication::{AgentData, ResponsePayload};
+use crate::communication::AgentData;
+use crate::service::{ResponsePayload, ResponseResult};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -11,8 +11,8 @@ pub struct AgentInfo {
 }
 
 impl AgentInfoRequest {
-    pub async fn process(self, parameter: AgentData) -> Response {
-        Response::normal(ResponsePayload::Credential(AgentInfo {
+    pub async fn process(self, parameter: AgentData) -> ResponseResult {
+        Ok(ResponsePayload::Credential(AgentInfo {
             name: parameter.agent,
         }))
     }

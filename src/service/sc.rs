@@ -1,7 +1,9 @@
-use crate::communication::{AgentData, Response, ResponsePayload};
+use super::ResponseResult;
+use crate::communication::AgentData;
 use crate::make_parameter;
 use crate::net::{domain, Client, ClientBuilder};
 use crate::parser::{Activity, Parse};
+use crate::service::{ActionError, ResponsePayload};
 use reqwest::{Response as HttpResponse, StatusCode};
 use serde::Deserialize;
 
@@ -40,14 +42,11 @@ impl ActivityListRequest {
     }
 
     /// Fetch and parse activity list page.
-    pub async fn process(self, parameter: AgentData) -> Response {
+    pub async fn process(self, parameter: AgentData) -> ResponseResult {
         let mut session_storage = parameter.parameter;
-        let session = session_storage.choose_randomly().unwrap();
-
-        if session.is_none() {
-            return Response::error(10);
-        }
-        let session = session.unwrap();
+        let session = session_storage
+            .choose_randomly()?
+            .ok_or(ActionError::NoSessionAvailable)?;
         let mut client = ClientBuilder::new(session).redirect(false).build();
 
         let mut try_count = 2;
@@ -70,20 +69,19 @@ impl ActivityListRequest {
                     )
                 ))
                 .send()
-                .await
-                .unwrap();
+                .await?;
 
-            html = response.text().await.unwrap();
+            html = response.text().await?;
             if html.starts_with("<script languge='javascript'>") && html.len() < 500 {
-                client.session_mut().login().await;
+                client.session_mut().login().await?;
             } else {
                 break;
             }
             try_count -= 1;
         }
-        session_storage.insert(client.session());
+        session_storage.insert(client.session())?;
 
         let activities: Vec<Activity> = Parse::from_html(&html);
-        Response::normal(ResponsePayload::ActivityList(activities))
+        Ok(ResponsePayload::ActivityList(activities))
     }
 }

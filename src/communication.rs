@@ -1,14 +1,13 @@
 mod agent;
-mod error;
 mod process;
-mod request;
 
 use crate::net::SessionStorage;
+use crate::service::report::*;
 use futures::Future;
-use request::*;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
+use crate::service::ResponseResult;
 pub use agent::{MessageCallback, MessageCallbackFn};
 pub use process::on_new_request;
 
@@ -60,36 +59,19 @@ pub struct Response {
     pub payload: Vec<u8>,
 }
 
-use crate::parser::Activity;
-use crate::parser::CourseScore;
-use crate::parser::ElectricityBill;
-
-use crate::service::ActivityListRequest;
-use crate::service::CourseScoreRequest;
-use crate::service::ElectricityBillRequest;
-
-/// Response payload
-#[derive(Deserialize)]
-pub enum RequestPayload {
-    AgentInfo(AgentInfoRequest),
-    ElectricityBill(ElectricityBillRequest),
-    ActivityList(ActivityListRequest),
-    ScoreList(CourseScoreRequest),
-}
-
-/// Response payload
-#[derive(Serialize)]
-pub enum ResponsePayload {
-    Credential(AgentInfo),
-    ElectricityBill(ElectricityBill),
-    ActivityList(Vec<Activity>),
-    ScoreList(Vec<CourseScore>),
-}
-
 #[derive(Clone)]
 pub struct AgentData {
     pub agent: String,
     pub local_addr: String,
 
     pub parameter: SessionStorage,
+}
+
+impl From<ResponseResult> for Response {
+    fn from(result: ResponseResult) -> Self {
+        match result {
+            Ok(payload) => Response::normal(payload),
+            Err(e) => Response::error(e.code, e.msg),
+        }
+    }
 }

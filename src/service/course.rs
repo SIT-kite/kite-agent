@@ -1,7 +1,8 @@
-use crate::communication::{AgentData, Response, ResponsePayload};
+use crate::communication::AgentData;
 use crate::make_parameter;
 use crate::net::{domain, Client, ClientBuilder, Session};
 use crate::parser::{CourseScore, Parse};
+use crate::service::{ResponsePayload, ResponseResult};
 use reqwest::{Response as HttpResponse, StatusCode};
 use serde::Deserialize;
 
@@ -43,11 +44,11 @@ impl CourseScoreRequest {
         response
     }
 
-    pub async fn process(self, parameter: AgentData) -> Response {
+    pub async fn process(self, parameter: AgentData) -> ResponseResult {
         let mut session_storage = parameter.parameter;
         // Get account session. If account in storage but the password is out of date, update it. When the session query
         // failed, add the account to session storage.
-        let session = if let Some(mut s) = session_storage.query(&self.account).unwrap() {
+        let session = if let Some(mut s) = session_storage.query(&self.account)? {
             if s.password != self.credential {
                 s.password = self.credential;
             }
@@ -59,34 +60,25 @@ impl CourseScoreRequest {
             }
             s
         };
-
         let mut client = ClientBuilder::new(session).redirect(false).build();
 
         // When we access ems.sit.edu.cn for the first time, the host will set cookies in sub-domain.
-        let auth = client.session().query_cookie("ems.sit.edu.cn", "EMS_TOKEN");
-
-        if auth.is_none() {
+        if let None = client.session().query_cookie("ems.sit.edu.cn", "EMS_TOKEN") {
             Self::get_with_auto_redirect(&mut client, "http://ems1.sit.edu.cn:85/student/").await;
         }
-
         let response = client
             .post("http://ems1.sit.edu.cn:85/student/graduate/scorelist.jsp")
-            // .header("content-type", "application/x-www-form-urlencoded")
-            .text(
-                (&make_parameter!(
-                    "yearterm" => &Self::get_term_string(self.term),
-                    "studentID" => &self.account
-                ))
-                    .as_ref(),
-            )
+            .text(&make_parameter!(
+                "yearterm" => &Self::get_term_string(self.term),
+                "studentID" => &self.account
+            ))
             .send()
-            .await
-            .unwrap();
-        session_storage.insert(client.session());
+            .await?;
+        session_storage.insert(client.session())?;
 
-        let html = response.text_with_charset("GBK").await.unwrap();
+        let html = response.text_with_charset("GBK").await?;
         let course_scores: Vec<CourseScore> = Parse::from_html(&html);
-        println!("{:#?}", course_scores);
-        Response::normal(ResponsePayload::ScoreList(course_scores))
+
+        Ok(ResponsePayload::ScoreList(course_scores))
     }
 }

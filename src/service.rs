@@ -1,17 +1,41 @@
 mod bill;
 mod course;
+mod error;
+pub mod report;
 mod sc;
 
-pub use crate::net::auth::portal_login;
+use serde::{Deserialize, Serialize};
 
+pub use crate::net::auth::portal_login;
+pub use error::{ActionError, ErrorResponse};
+
+use crate::communication::Response;
 pub use bill::ElectricityBillRequest;
 pub use course::CourseScoreRequest;
+pub use report::AgentInfoRequest;
 pub use sc::ActivityListRequest;
 
-#[derive(Debug, thiserror::Error, ToPrimitive)]
-pub enum ActionError {
-    #[error("用户名或密码错误")]
-    LoginFailed = 50,
+use crate::parser::Activity;
+use crate::parser::CourseScore;
+use crate::parser::ElectricityBill;
+use report::AgentInfo;
+
+/// Response payload
+#[derive(Deserialize)]
+pub enum RequestPayload {
+    AgentInfo(AgentInfoRequest),
+    ElectricityBill(ElectricityBillRequest),
+    ActivityList(ActivityListRequest),
+    ScoreList(CourseScoreRequest),
+}
+
+/// Response payload
+#[derive(Serialize)]
+pub enum ResponsePayload {
+    Credential(AgentInfo),
+    ElectricityBill(ElectricityBill),
+    ActivityList(Vec<Activity>),
+    ScoreList(Vec<CourseScore>),
 }
 
 /// Concat parameters to a url-formed string.
@@ -25,3 +49,6 @@ macro_rules! make_parameter {
         url.clone()
     }}
 }
+
+// Result has two sides, Ok(ResponsePayload) and Err(ResponseError)
+pub type ResponseResult = std::result::Result<ResponsePayload, ErrorResponse>;
