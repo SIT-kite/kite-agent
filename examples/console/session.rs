@@ -1,3 +1,4 @@
+use crate::ConsoleResult;
 use kite_agent::SessionStorage;
 use prettytable::{Cell, Row, Table};
 use structopt::StructOpt;
@@ -14,11 +15,11 @@ pub enum SessionCommand {
 }
 
 impl SessionCommand {
-    pub async fn process(self, sessions: SessionStorage) {
+    pub async fn process(self, sessions: SessionStorage) -> ConsoleResult<()> {
         match self {
             SessionCommand::List(list) => list.process(sessions).await,
             SessionCommand::Insert(new) => new.process(sessions).await,
-            SessionCommand::Clean => CleanSession.process(sessions).await,
+            SessionCommand::Clean => Ok(CleanSession.process(sessions).await),
         }
     }
 }
@@ -35,9 +36,9 @@ pub struct ListSession {
 }
 
 impl ListSession {
-    pub fn print_account_list(storage: SessionStorage, page: u16, count: u16) {
+    pub fn print_account_list(storage: SessionStorage, page: u16, count: u16) -> ConsoleResult<()> {
         let index = if page == 1 { 0 } else { page };
-        let sessions = storage.list(index, count).unwrap();
+        let sessions = storage.list(index, count)?;
 
         println!(
             "{} result(s) found in the page {}, total: {}",
@@ -56,10 +57,11 @@ impl ListSession {
             ]));
         }
         table.printstd();
+        Ok(())
     }
 
-    pub fn print_cookie_list(storage: SessionStorage, account: String) {
-        let session = storage.query(&account).unwrap();
+    pub fn print_cookie_list(storage: SessionStorage, account: String) -> ConsoleResult<()> {
+        let session = storage.query(&account)?;
         let mut table = Table::new();
 
         if let Some(session) = session {
@@ -77,13 +79,15 @@ impl ListSession {
         } else {
             println!("Could not find account {}", account);
         }
+        Ok(())
     }
-    pub async fn process(self, storage: SessionStorage) {
+    pub async fn process(self, storage: SessionStorage) -> ConsoleResult<()> {
         if let Some(account) = self.account {
             Self::print_cookie_list(storage, account);
         } else {
             Self::print_account_list(storage, self.index, self.size);
         }
+        Ok(())
     }
 }
 
@@ -97,20 +101,15 @@ pub struct InsertSession {
 }
 
 impl InsertSession {
-    pub async fn process(self, mut storage: SessionStorage) {
+    pub async fn process(self, mut storage: SessionStorage) -> ConsoleResult<()> {
         println!("Connect and verify..");
         // Verify on authserver
-        let r = kite_agent::portal_login(&self.account, &self.credential).await;
+        let session = kite_agent::portal_login(&self.account, &self.credential).await?;
 
-        match r {
-            Ok(session) => {
-                println!("Session {:#?}", session);
-
-                println!("Write to database.");
-                storage.insert(&session).unwrap();
-            }
-            Err(e) => println!("Failed to login: {:?}", e),
-        }
+        println!("Session {:#?}", session);
+        println!("Write to database.");
+        storage.insert(&session).unwrap();
+        Ok(())
     }
 }
 

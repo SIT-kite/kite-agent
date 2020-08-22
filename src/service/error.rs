@@ -13,6 +13,8 @@ pub enum ActionError {
 }
 
 /// Error code and message to response
+#[derive(Debug, thiserror::Error)]
+#[error("{} ({})", msg, code)]
 pub struct ErrorResponse {
     pub code: u16,
     pub msg: String,
