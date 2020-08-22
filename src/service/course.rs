@@ -18,7 +18,7 @@ pub struct CourseScoreRequest {
 impl CourseScoreRequest {
     /// Convert term string format.
     /// 2020A -> 2020春, 2020B -> 2020秋
-    fn get_term_string(origin: String) -> String {
+    fn get_term_string(origin: &String) -> String {
         origin.replace("A", "%B4%BA").replace("B", "%C7%EF")
     }
 
@@ -55,28 +55,36 @@ impl CourseScoreRequest {
             s
         } else {
             let mut s = Session::new(&self.account, &self.credential);
-            if s.login().await.is_err() {
-                panic!("密码错误");
-            }
+            s.login().await?;
             s
         };
         let mut client = ClientBuilder::new(session).redirect(false).build();
 
-        // When we access ems.sit.edu.cn for the first time, the host will set cookies in sub-domain.
-        if let None = client.session().query_cookie("ems.sit.edu.cn", "EMS_TOKEN") {
-            Self::get_with_auto_redirect(&mut client, "http://ems1.sit.edu.cn:85/student/").await;
-        }
-        let response = client
-            .post("http://ems1.sit.edu.cn:85/student/graduate/scorelist.jsp")
-            .text(&make_parameter!(
-                "yearterm" => &Self::get_term_string(self.term),
-                "studentID" => &self.account
-            ))
-            .send()
-            .await?;
-        session_storage.insert(client.session())?;
+        let mut count = 2;
+        let mut html = String::new();
+        while count > 0 {
+            // When we access ems.sit.edu.cn for the first time, the host will set cookies in sub-domain.
+            if let None = client.session().query_cookie("ems1.sit.edu.cn", "EMS_TOKEN") {
+                Self::get_with_auto_redirect(&mut client, "http://ems1.sit.edu.cn:85/student/").await;
+            }
+            let response = client
+                .post("http://ems1.sit.edu.cn:85/student/graduate/scorelist.jsp")
+                .text(&make_parameter!(
+                    "yearterm" => &Self::get_term_string(&self.term),
+                    "studentID" => &self.account
+                ))
+                .send()
+                .await?;
+            session_storage.insert(client.session())?;
 
-        let html = response.text_with_charset("GBK").await?;
+            html = response.text_with_charset("GBK").await?;
+            if html.starts_with("The URL has moved") {
+                client.session_mut().login().await?;
+            } else {
+                break;
+            }
+            count -= 1;
+        }
         let course_scores: Vec<CourseScore> = Parse::from_html(&html);
 
         Ok(ResponsePayload::ScoreList(course_scores))
