@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 pub use crate::net::auth::portal_login;
 pub use error::{ActionError, ErrorResponse};
 
-use crate::communication::Response;
 pub use bill::ElectricityBillRequest;
 pub use course::CourseScoreRequest;
 pub use report::AgentInfoRequest;

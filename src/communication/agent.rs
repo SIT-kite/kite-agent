@@ -33,8 +33,8 @@ where
     }
 
     /// Set host address
-    pub fn host(mut self, addr: &str) -> Self {
-        self.host_addr = Some(addr.to_string());
+    pub fn host(mut self, addr: String) -> Self {
+        self.host_addr = Some(addr);
         self
     }
 
@@ -43,7 +43,7 @@ where
         self.message_callback = Some(MessageCallback {
             function: callback_fn,
             parameter: AgentData {
-                agent: String::new(),
+                agent: self.name.clone(),
                 local_addr: String::new(),
                 parameter,
             },
