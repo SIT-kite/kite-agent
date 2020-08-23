@@ -49,5 +49,5 @@ convert_error_type!(ReqwestError);
 use sled::Error as SledError;
 convert_error_type!(SledError);
 
-type E = Box<dyn std::error::Error>;
+type E = anyhow::Error;
 convert_error_type!(E);

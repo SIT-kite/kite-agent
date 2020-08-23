@@ -9,6 +9,7 @@ edition = "2018"
 [dependencies]
 
 # Common tools
+anyhow = "1.0"
 rand = "0.7"
 lazy_static = "1.4"
 regex = "1"

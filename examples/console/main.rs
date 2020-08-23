@@ -13,7 +13,7 @@ use structopt::StructOpt;
 use page::PageCommand;
 use session::SessionCommand;
 
-pub type ConsoleResult<T> = std::result::Result<T, Box<dyn Error>>;
+pub type ConsoleResult<T> = std::result::Result<T, anyhow::Error>;
 
 #[derive(StructOpt)]
 #[structopt(name = "kite-agent-cli")]
