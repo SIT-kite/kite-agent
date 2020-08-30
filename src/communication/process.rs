@@ -1,5 +1,4 @@
 use super::{Request, Response};
-
 use crate::communication::AgentData;
 use crate::service::{ActionError, ErrorResponse, RequestPayload, ResponsePayload};
 
@@ -17,17 +16,18 @@ impl Response {
     fn raw(code: u16, payload: Vec<u8>) -> Self {
         Self {
             ack: 0,
+            size: payload.len() as u32,
             code,
             payload,
         }
     }
-    pub fn ack(mut self, ack: usize) -> Self {
+    pub fn ack(mut self, ack: u64) -> Self {
         self.ack = ack;
         self
     }
 }
 
-async fn dispatch_command(seq: usize, request: RequestPayload, parameter: AgentData) -> Response {
+async fn dispatch_command(seq: u64, request: RequestPayload, parameter: AgentData) -> Response {
     let response: Response = match request {
         RequestPayload::AgentInfo(r) => r.process(parameter).await,
         RequestPayload::ElectricityBill(r) => r.process(parameter).await,

@@ -24,7 +24,7 @@ async fn main() {
 
     for _ in 0..CONFIG.server.conn {
         let local_name = CONFIG.agent.name.clone();
-        let remote_server = CONFIG.server.websocket.clone();
+        let remote_server = CONFIG.server.addr.clone();
         let storage = session_storage.clone();
 
         tokio::spawn(async move {

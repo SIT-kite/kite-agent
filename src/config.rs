@@ -22,7 +22,7 @@ pub struct Config {
 #[derive(Deserialize)]
 pub struct ServerConfig {
     /// Server address string. e.g, "wss://localhost/ag"
-    pub websocket: String,
+    pub addr: String,
     ///  Max connections to server.
     pub conn: u8,
 }
