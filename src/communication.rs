@@ -10,7 +10,7 @@ use crate::service::ResponseResult;
 pub use agent::{MessageCallback, MessageCallbackFn};
 use bytes::{Buf, BytesMut};
 pub use process::on_new_request;
-use tokio::io::AsyncReadExt;
+use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
 
 use crate::error::Result;
 
@@ -82,16 +82,14 @@ impl From<ResponseResult> for Response {
 }
 
 impl Request {
-    async fn read_header<T: AsyncReadExt + Unpin>(stream: &mut T) -> Result<Self> {
+    async fn read_header<T: AsyncRead + AsyncReadExt + Unpin>(stream: &mut T) -> Result<Self> {
+        // Default request header is 8 bytes.
+        let mut buffer = BufReader::with_capacity(12, stream);
         let mut request = Request::default();
-        let mut header_buffer = BytesMut::with_capacity(10); // Default request header is 8 bytes.
-
-        // Read request header from the stream
-        stream.read_exact(&mut header_buffer).await?;
 
         // Read the fields
-        request.seq = header_buffer.get_u64();
-        request.size = header_buffer.get_u32();
+        request.seq = buffer.read_u64().await?;
+        request.size = buffer.read_u32().await?;
 
         Ok(request)
     }
@@ -102,6 +100,9 @@ impl Request {
     ) -> Result<Request> {
         let mut request = Self::read_header(stream).await?;
 
+        if request.size == 0 {
+            return Ok(request);
+        }
         if buffer.capacity() < request.size as usize {
             buffer.resize(request.size as usize, 0u8);
         }

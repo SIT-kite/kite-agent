@@ -4,7 +4,7 @@ use crate::net::SessionStorage;
 use bytes::BytesMut;
 use futures::Future;
 use std::sync::Arc;
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncWriteExt, BufWriter};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::sync::mpsc;
 
@@ -120,10 +120,14 @@ where
 
     /// Send response to host.
     async fn sender_loop(mut socket_tx: OwnedWriteHalf, mut message_rx: mpsc::Receiver<Response>) {
+        let mut buffer = BufWriter::new(socket_tx);
+
         while let Some(response) = message_rx.recv().await {
-            socket_tx.write_u64(response.ack).await;
-            socket_tx.write_u16(response.code).await;
-            socket_tx.write_all(&response.payload).await;
+            buffer.write_u64(response.ack).await;
+            buffer.write_u32(response.size).await;
+            buffer.write_u16(response.code).await;
+            buffer.write_all(&response.payload).await;
+            buffer.flush().await;
         }
     }
 
