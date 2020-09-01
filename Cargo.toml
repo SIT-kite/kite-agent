@@ -29,7 +29,7 @@ toml = "0.5"
 
 # Network related
 scraper = "0.12"
-reqwest = { version = "0.10", features = ["cookies", "rustls-tls"] }
+reqwest = { version = "0.10", features = ["cookies", "rustls-tls", "socks"] }
 
 # Database
 sled = "0.34"

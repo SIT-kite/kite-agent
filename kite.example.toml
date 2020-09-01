@@ -3,11 +3,11 @@
 name = "localhost"
 # Db cache name. we will create a directory to stored sessions automatically.
 db = "kite-cache"
-# Fetch over the given http proxy (no sock5 supported)
+# Fetch over the given http/https/socks5 proxy
 # proxy = "http://localhost:8888/"
 
 [server]
-# Server websocket address.
-websocket = "wss://localhost:8443/agent"
+# Message host address.
+addr = "localhost:8443"
 # Max connections to server
 conn = 5
