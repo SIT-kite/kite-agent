@@ -8,11 +8,11 @@ use std::sync::Arc;
 
 use crate::service::ResponseResult;
 pub use agent::{MessageCallback, MessageCallbackFn};
-use bytes::{Buf, BytesMut};
 pub use process::on_new_request;
-use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
+use tokio::io::{AsyncReadExt, BufReader};
 
 use crate::error::Result;
+use tokio::net::tcp::OwnedReadHalf;
 
 /// Agent instance builder
 pub struct AgentBuilder<O>
@@ -82,9 +82,7 @@ impl From<ResponseResult> for Response {
 }
 
 impl Request {
-    async fn read_header<T: AsyncRead + AsyncReadExt + Unpin>(stream: &mut T) -> Result<Self> {
-        // Default request header is 8 bytes.
-        let mut buffer = BufReader::with_capacity(12, stream);
+    async fn read_header(buffer: &mut BufReader<OwnedReadHalf>) -> Result<Self> {
         let mut request = Request::default();
 
         // Read the fields
@@ -94,18 +92,15 @@ impl Request {
         Ok(request)
     }
 
-    pub async fn from_stream<T: AsyncReadExt + Unpin>(
-        stream: &mut T,
-        buffer: &mut BytesMut,
-    ) -> Result<Request> {
-        let mut request = Self::read_header(stream).await?;
-
+    pub async fn from_stream(buffer: &mut BufReader<OwnedReadHalf>) -> Result<Request> {
+        let mut request = Self::read_header(buffer).await?;
         if request.size == 0 {
             return Ok(request);
         }
-        if buffer.capacity() < request.size as usize {
-            buffer.resize(request.size as usize, 0u8);
-        }
+
+        println!("body size = {}", request.size);
+        request.payload = vec![0u8; request.size as usize];
+
         // Read request body
         let mut p = 0usize; // read len
         while p < request.size as usize {
@@ -113,9 +108,14 @@ impl Request {
             if read_currently > 2048 {
                 read_currently = 2048usize;
             }
-            p += stream.read_exact(&mut buffer[p..(p + read_currently)]).await?;
+            // println!("buf len = {}", request.payload.len());
+            // let buf = &mut request.payload[p..(p + read_currently)];
+
+            println!("p = {}, current = {}", p, read_currently);
+            p += buffer
+                .read_exact(&mut request.payload[p..(p + read_currently)])
+                .await?;
         }
-        request.payload = buffer.to_vec();
         Ok(request)
     }
 }

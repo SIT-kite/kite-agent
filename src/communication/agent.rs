@@ -1,10 +1,9 @@
 use super::{Agent, AgentBuilder, AgentData, Request, Response};
 use crate::error::Result;
 use crate::net::SessionStorage;
-use bytes::BytesMut;
 use futures::Future;
 use std::sync::Arc;
-use tokio::io::{AsyncWriteExt, BufWriter};
+use tokio::io::{AsyncWriteExt, BufReader, BufWriter};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::sync::mpsc;
 
@@ -107,19 +106,20 @@ where
 
     /// Receiver loop, accept commands and requests from the host.
     async fn receiver_loop(
-        mut socket_rx: OwnedReadHalf,
+        socket_rx: OwnedReadHalf,
         message_tx: mpsc::Sender<Response>,
         on_message: Arc<MessageCallback<O>>,
     ) {
-        let mut buffer = BytesMut::with_capacity(1024 * 1024); // 1M receive buffer by default.
+        // 1M receive buffer by default.
+        let mut buffer = BufReader::with_capacity(1024 * 1024, socket_rx);
 
-        while let Ok(r) = Request::from_stream(&mut socket_rx, &mut buffer).await {
+        while let Ok(r) = Request::from_stream(&mut buffer).await {
             Self::process_message(r, message_tx.clone(), on_message.clone()).await;
         }
     }
 
     /// Send response to host.
-    async fn sender_loop(mut socket_tx: OwnedWriteHalf, mut message_rx: mpsc::Receiver<Response>) {
+    async fn sender_loop(socket_tx: OwnedWriteHalf, mut message_rx: mpsc::Receiver<Response>) {
         let mut buffer = BufWriter::new(socket_tx);
 
         while let Some(response) = message_rx.recv().await {
