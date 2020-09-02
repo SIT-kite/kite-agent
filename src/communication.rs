@@ -14,6 +14,18 @@ use tokio::io::{AsyncReadExt, BufReader};
 use crate::error::Result;
 use tokio::net::tcp::OwnedReadHalf;
 
+/// Message callback function
+pub type MessageCallbackFn<O> = fn(Request, AgentData) -> O;
+
+/// Message callback function and parameter
+pub struct MessageCallback<O>
+where
+    O: Future<Output = Response> + Send + 'static,
+{
+    pub function: MessageCallbackFn<O>,
+    pub parameter: AgentData,
+}
+
 /// Agent instance builder
 pub struct AgentBuilder<O>
 where
@@ -97,8 +109,6 @@ impl Request {
         if request.size == 0 {
             return Ok(request);
         }
-
-        println!("body size = {}", request.size);
         request.payload = vec![0u8; request.size as usize];
 
         // Read request body
@@ -108,10 +118,6 @@ impl Request {
             if read_currently > 2048 {
                 read_currently = 2048usize;
             }
-            // println!("buf len = {}", request.payload.len());
-            // let buf = &mut request.payload[p..(p + read_currently)];
-
-            println!("p = {}, current = {}", p, read_currently);
             p += buffer
                 .read_exact(&mut request.payload[p..(p + read_currently)])
                 .await?;

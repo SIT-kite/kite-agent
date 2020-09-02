@@ -1,4 +1,5 @@
 use super::{Agent, AgentBuilder, AgentData, Request, Response};
+use super::{MessageCallback, MessageCallbackFn};
 use crate::error::Result;
 use crate::net::SessionStorage;
 use futures::Future;
@@ -6,18 +7,6 @@ use std::sync::Arc;
 use tokio::io::{AsyncWriteExt, BufReader, BufWriter};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::sync::mpsc;
-
-/// Message callback function
-pub type MessageCallbackFn<O> = fn(Request, AgentData) -> O;
-
-/// Message callback function and parameter
-pub struct MessageCallback<O>
-where
-    O: Future<Output = Response> + Send + 'static,
-{
-    pub function: MessageCallbackFn<O>,
-    pub parameter: AgentData,
-}
 
 impl<O> AgentBuilder<O>
 where
@@ -126,7 +115,9 @@ where
             buffer.write_u64(response.ack).await;
             buffer.write_u32(response.size).await;
             buffer.write_u16(response.code).await;
-            buffer.write_all(&response.payload).await;
+            if !response.payload.is_empty() {
+                buffer.write_all(&response.payload).await;
+            }
             buffer.flush().await;
         }
     }
