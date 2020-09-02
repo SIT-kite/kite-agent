@@ -1,5 +1,4 @@
-pub use crate::error::Result;
-
+use crate::error::Result;
 use crate::parser::Parse;
 use chrono::NaiveDateTime;
 use regex::Regex;
@@ -15,12 +14,12 @@ pub struct Activity {
 }
 
 impl Parse for Vec<Activity> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page.as_ref());
         let selector = Selector::parse(".ul_7 li > a").unwrap();
-        let re = Regex::new(r"(\d){7}").unwrap();
+        let re = Regex::new(r"(\d){7}")?;
 
-        document
+        let activities = document
             .select(&selector)
             .map(|each_line| {
                 let link = each_line.value().attr("href").unwrap();
@@ -35,7 +34,8 @@ impl Parse for Vec<Activity> {
                     link: String::from(link),
                 }
             })
-            .collect()
+            .collect();
+        Ok(activities)
     }
 }
 
@@ -48,11 +48,11 @@ pub struct JoinedActivity {
 }
 
 impl Parse for Vec<JoinedActivity> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page.as_ref());
         let selector = Selector::parse("table[width=\"100%\"] > tbody > tr").unwrap();
 
-        document
+        let activities = document
             .select(&selector)
             .map(|each_line| {
                 let cols: Vec<String> = each_line
@@ -72,6 +72,7 @@ impl Parse for Vec<JoinedActivity> {
                     score: score.unwrap_or_default(),
                 }
             })
-            .collect()
+            .collect();
+        Ok(activities)
     }
 }

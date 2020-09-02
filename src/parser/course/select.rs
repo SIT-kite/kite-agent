@@ -1,3 +1,4 @@
+use crate::error::Result;
 use crate::parser::Parse;
 use scraper::{Html, Selector};
 
@@ -35,7 +36,7 @@ impl From<Vec<String>> for SelectedCourse {
 }
 
 impl Parse for Vec<SelectedCourse> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page);
 
         let fragment = document
@@ -61,7 +62,7 @@ impl Parse for Vec<SelectedCourse> {
             .map(|v| SelectedCourse::from(v.clone()))
             .collect::<Vec<SelectedCourse>>();
 
-        res
+        Ok(res)
     }
 }
 #[cfg(test)]
@@ -74,7 +75,7 @@ mod test {
 
         let html_page = std::fs::read_to_string("html/我的课表页面.html").unwrap();
 
-        let origin: Vec<SelectedCourse> = Parse::from_html(html_page.as_str());
+        let origin: Vec<SelectedCourse> = Parse::from_html(html_page.as_str()).unwrap();
 
         let target = SelectedCourse {
             name: "大学物理实验2".to_string(),

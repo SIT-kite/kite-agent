@@ -81,7 +81,7 @@ impl ActivityListRequest {
         }
         session_storage.insert(client.session())?;
 
-        let activities: Vec<Activity> = Parse::from_html(&html);
+        let activities: Vec<Activity> = Parse::from_html(&html)?;
         Ok(ResponsePayload::ActivityList(activities))
     }
 }

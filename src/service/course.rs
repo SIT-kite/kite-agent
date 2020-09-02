@@ -85,8 +85,7 @@ impl CourseScoreRequest {
             }
             count -= 1;
         }
-        let course_scores: Vec<CourseScore> = Parse::from_html(&html);
-
+        let course_scores: Vec<CourseScore> = Parse::from_html(&html)?;
         Ok(ResponsePayload::ScoreList(course_scores))
     }
 }

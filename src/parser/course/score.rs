@@ -1,4 +1,5 @@
 use super::Parse;
+use crate::error::Result;
 use scraper::{Html, Selector};
 use serde::Serialize;
 
@@ -62,7 +63,7 @@ impl From<&Vec<String>> for CourseScore {
 }
 
 impl Parse for Vec<CourseScore> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         // Read html page to parser.
         let document = Html::parse_document(html_page.as_ref());
         let table_selector: String =
@@ -91,7 +92,7 @@ impl Parse for Vec<CourseScore> {
             .into_iter()
             .map(|data| CourseScore::from(data))
             .collect();
-        result
+        Ok(result)
     }
 }
 
@@ -104,7 +105,7 @@ pub mod tests {
     #[test]
     fn test_course_score_parser() {
         let html_page = std::fs::read_to_string("html\\成绩查询页面2.html").unwrap();
-        let origin_course_score_vec: Vec<CourseScore> = Parse::from_html(html_page.as_ref());
+        let origin_course_score_vec: Vec<CourseScore> = Parse::from_html(html_page.as_ref()).unwrap();
         let target_course_score_vec = vec![
             CourseScore {
                 course_code: "B1310002".to_string(),

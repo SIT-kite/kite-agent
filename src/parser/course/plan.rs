@@ -1,4 +1,5 @@
 use super::Parse;
+use crate::error::Result;
 use scraper::{ElementRef, Html, Selector};
 
 /// CoursePlan information from teaching plan.
@@ -57,7 +58,7 @@ impl From<ElementRef<'_>> for PlannedCourse {
     }
 }
 impl Parse for Vec<PlannedCourse> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page);
         let row_selector = Selector::parse("tr[onclick='doClick(this);']").unwrap();
         // Select data lines.
@@ -65,7 +66,7 @@ impl Parse for Vec<PlannedCourse> {
             .select(&row_selector)
             .map(|e| PlannedCourse::from(e))
             .collect();
-        results
+        Ok(results)
     }
 }
 

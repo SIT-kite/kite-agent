@@ -1,3 +1,4 @@
+use crate::error::Result;
 use crate::parser::Parse;
 use chrono::{NaiveDate, NaiveTime};
 use regex::Regex;
@@ -31,7 +32,7 @@ pub struct PageInfo {
 }
 
 impl Parse for Vec<ExpenseRecord> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page);
 
         let pages_information: String = document
@@ -40,8 +41,8 @@ impl Parse for Vec<ExpenseRecord> {
             .unwrap()
             .inner_html();
 
-        let current_page_re = Regex::new(r"第(\d+)页").unwrap();
-        let total_pages_pages_re = Regex::new(r"共(\d+)页").unwrap();
+        let current_page_re = Regex::new(r"第(\d+)页")?;
+        let total_pages_pages_re = Regex::new(r"共(\d+)页")?;
 
         let current_page = current_page_re
             .captures_iter(pages_information.as_str())
@@ -85,7 +86,7 @@ impl Parse for Vec<ExpenseRecord> {
             .map(|v| ExpenseRecord::from(v.clone()))
             .collect::<Vec<ExpenseRecord>>();
 
-        res
+        Ok(res)
     }
 }
 
@@ -117,7 +118,7 @@ mod test {
         use super::{ExpenseRecord, PageInfo};
         let html_page = std::fs::read_to_string("html/消费记录页面.html").unwrap();
 
-        let origin: Vec<ExpenseRecord> = Parse::from_html(html_page.as_str());
+        let origin: Vec<ExpenseRecord> = Parse::from_html(html_page.as_str()).unwrap();
 
         let target = ExpenseRecord {
             code: "学号位置".to_string(),

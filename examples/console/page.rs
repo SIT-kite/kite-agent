@@ -52,9 +52,9 @@ impl QueryElectricityBill {
             table.add_row(row!["ROOM", "BALANCE", "POWER AVAILABLE"]);
 
             table.add_row(Row::new(vec![
-                Cell::new(&data.room_id),
-                Cell::new(&data.total_balance.to_string()),
-                Cell::new(&data.available_power.to_string()),
+                Cell::new(&data.room),
+                Cell::new(&data.total.to_string()),
+                Cell::new(&data.power.to_string()),
             ]));
             table.printstd();
         }

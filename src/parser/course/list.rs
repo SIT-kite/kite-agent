@@ -1,4 +1,5 @@
 use super::Parse;
+use crate::error::Result;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
@@ -99,7 +100,7 @@ impl CourseDetail {
 }
 
 impl Parse for Vec<CourseDetail> {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Vec<CourseDetail>> {
         // Read html page to parser.
         let document = Html::parse_document(html_page);
         let selector = Selector::parse("table > tbody > tr[bgcolor=\"#efefef\"]").unwrap();
@@ -110,7 +111,7 @@ impl Parse for Vec<CourseDetail> {
             .select(&selector)
             .map(|x| CourseDetail::from(x, &td_selector))
             .collect();
-        courses
+        Ok(courses)
     }
 }
 

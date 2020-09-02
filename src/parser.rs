@@ -11,7 +11,9 @@ pub use expense::ExpenseRecord;
 pub use second_course::{Activity, ActivityDetail, JoinedActivity, SecondScore};
 
 pub trait Parse {
-    fn from_html(html_page: &str) -> Self;
+    fn from_html(html_page: &str) -> Result<Self>
+    where
+        Self: std::marker::Sized;
 }
 
 pub trait TryParse {

@@ -33,6 +33,6 @@ impl ElectricityBillRequest {
         let html_page = http_response.text_with_charset("GB2312").await.unwrap();
         Ok(ResponsePayload::ElectricityBill(ElectricityBill::from_html(
             &html_page,
-        )))
+        )?))
     }
 }

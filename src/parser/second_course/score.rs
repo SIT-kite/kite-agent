@@ -1,3 +1,4 @@
+use crate::error::Result;
 use crate::parser::Parse;
 use regex::Regex;
 use scraper::{Html, Selector};
@@ -41,7 +42,7 @@ impl From<Vec<String>> for SecondScore {
 }
 
 impl Parse for SecondScore {
-    fn from_html(html_page: &str) -> Self {
+    fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page);
 
         let display_score_vec = document
@@ -56,12 +57,12 @@ impl Parse for SecondScore {
             .inner_html();
 
         let hide_score_re_vec = vec![
-            Regex::new(r"=(\d+\.\d{0,2})\(主题报告\)").unwrap(),
-            Regex::new(r"\+(\d+\.\d{0,2})\(社会实践\)").unwrap(),
-            Regex::new(r"\+(\d+\.\d{0,2})\(创新创业创意\)").unwrap(),
-            Regex::new(r"\+(\d+\.\d{0,2})\(校园安全文明\)").unwrap(),
-            Regex::new(r"\+(\d+\.\d{0,2})\(公益志愿\)").unwrap(),
-            Regex::new(r"\+(\d+\.\d{0,2})\(校园文化\)").unwrap(),
+            Regex::new(r"=(\d+\.\d{0,2})\(主题报告\)")?,
+            Regex::new(r"\+(\d+\.\d{0,2})\(社会实践\)")?,
+            Regex::new(r"\+(\d+\.\d{0,2})\(创新创业创意\)")?,
+            Regex::new(r"\+(\d+\.\d{0,2})\(校园安全文明\)")?,
+            Regex::new(r"\+(\d+\.\d{0,2})\(公益志愿\)")?,
+            Regex::new(r"\+(\d+\.\d{0,2})\(校园文化\)")?,
         ];
 
         let mut hide_score_vec = hide_score_re_vec
@@ -78,7 +79,7 @@ impl Parse for SecondScore {
         let mut data = display_score_vec;
         data.append(&mut hide_score_vec);
 
-        SecondScore::from(data)
+        Ok(SecondScore::from(data))
     }
 }
 
@@ -88,8 +89,8 @@ mod test {
     fn test_second_score_parser() {
         use super::{Parse, SecondScore};
 
-        let html_page = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
-        let origin: SecondScore = Parse::from_html(html_page.as_str());
+        let html_page = std::fs::read_to_string("html/第二课堂得分页面.html")?;
+        let origin: SecondScore = Parse::from_html(html_page.as_str()).unwrap();
         let target = SecondScore {
             effect: 6.96,
             total: 10.62,
