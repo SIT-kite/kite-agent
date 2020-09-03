@@ -7,12 +7,12 @@ use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 use crate::service::ResponseResult;
-pub use agent::{MessageCallback, MessageCallbackFn};
 pub use process::on_new_request;
 use tokio::io::{AsyncReadExt, BufReader};
 
 use crate::error::Result;
 use tokio::net::tcp::OwnedReadHalf;
+use tokio::sync::broadcast;
 
 /// Message callback function
 pub type MessageCallbackFn<O> = fn(Request, AgentData) -> O;
@@ -39,6 +39,11 @@ where
     message_callback: Option<MessageCallback<O>>,
 }
 
+struct HaltChannel {
+    sender: broadcast::Sender<()>,
+    receiver: broadcast::Receiver<()>,
+}
+
 /// Agent node in campus side.
 pub struct Agent<O>
 where
@@ -50,6 +55,8 @@ where
     host_addr: String,
     /// Callback structure, with callback function point and parameter.
     message_callback: Arc<MessageCallback<O>>,
+    /// Halt channel
+    halt: Option<HaltChannel>,
 }
 
 /// Host request

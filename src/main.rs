@@ -36,12 +36,22 @@ async fn main() {
         let storage = session_storage.clone();
 
         tokio::spawn(async move {
-            let mut agent = AgentBuilder::new(local_name)
-                .host(remote_server)
-                .set_callback(on_new_request, storage)
-                .build();
+            loop {
+                let mut agent = AgentBuilder::new(local_name.clone())
+                    .host(remote_server.clone())
+                    .set_callback(on_new_request, storage.clone())
+                    .build();
 
-            agent.start().await;
+                match agent.start().await {
+                    Ok(_) => {
+                        agent.join().await;
+                        println!("The host disconnected.");
+                    }
+                    Err(e) => println!("Could not connect to the host. Wait for the next try."),
+                }
+                println!("Wait for 30 secs.");
+                tokio::time::delay_for(Duration::from_secs(30)).await;
+            }
         });
     }
 
