@@ -11,7 +11,8 @@
 | 6 | 个人教学计划完成情况.html | 无需评教查看成绩 | GET | [Link](http://ems.sit.edu.cn:85/student/graduate/viewcreditdetail.jsp?) |
 | 7 | 课程列表页面.html | 课程列表。注意，部分字符串格式不正确，可能需要人工处理 | POST | [Link](http://ems.sit.edu.cn:85/student/selCourse/mycourselist.jsp)<br>yearTerm=2018春<br>&kcxu=<br>&kcdm=<br>&kcmc= |
 | 8 | 我的课表页面.html | 课表页面。直接从“课程详细信息”中提取课程列表、然后查询该课程时间即可，不要直接解析上方课表。 | POST | [Link](http://ems.sit.edu.cn:85/student/selCourse/syllabuslist.jsp)<br>yearTerm=2019春<br>&cType=2（2为实践课）<br>&yearTerm2=2019-2020%B5%DA1%D1%A7%C6%DA |
-| 9 | 教学计划查询页面 | 教学计划查询页面，注意，HTML 页面中有大量错误。课程类别范围为1~7，在HTML中有规定，可以硬编码。 | GET | [Link](http://ems.sit.edu.cn:85/student/course.jsp)<br>majorId=B110101<br>&enterYear=2019<br>&courseBigSortId=1（课程类别） |
+| 9 | 教学计划查询页面.html | 教学计划查询页面，注意，HTML 页面中有大量错误。课程类别范围为1~7，在HTML中有规定，可以硬编码。 | GET | [Link](http://ems.sit.edu.cn:85/student/course.jsp)<br>majorId=B110101<br>&enterYear=2019<br>&courseBigSortId=1（课程类别） |
+| 10 | 第二课堂详情页面.html | 如题 | GET | [Link](http://sc.sit.edu.cn/public/activity/activityDetail.action?activityId=) |
 
 **注意**
 
