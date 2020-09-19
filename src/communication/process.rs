@@ -33,6 +33,7 @@ async fn dispatch_command(seq: u64, request: RequestPayload, parameter: AgentDat
         RequestPayload::ElectricityBill(r) => r.process(parameter).await,
         RequestPayload::ActivityList(r) => r.process(parameter).await,
         RequestPayload::ScoreList(r) => r.process(parameter).await,
+        RequestPayload::ActivityDetail(r) => r.process(parameter).await,
     }
     .into();
 

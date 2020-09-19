@@ -12,11 +12,12 @@ pub use error::{ActionError, ErrorResponse};
 pub use bill::ElectricityBillRequest;
 pub use course::CourseScoreRequest;
 pub use report::AgentInfoRequest;
+pub use sc::ActivityDetailRequest;
 pub use sc::ActivityListRequest;
 
-use crate::parser::Activity;
 use crate::parser::CourseScore;
 use crate::parser::ElectricityBill;
+use crate::parser::{Activity, ActivityDetail};
 use report::AgentInfo;
 
 /// Response payload
@@ -26,6 +27,7 @@ pub enum RequestPayload {
     ElectricityBill(ElectricityBillRequest),
     ActivityList(ActivityListRequest),
     ScoreList(CourseScoreRequest),
+    ActivityDetail(ActivityDetailRequest),
 }
 
 /// Response payload
@@ -35,6 +37,7 @@ pub enum ResponsePayload {
     ElectricityBill(ElectricityBill),
     ActivityList(Vec<Activity>),
     ScoreList(Vec<CourseScore>),
+    ActivityDetail(ActivityDetail),
 }
 
 /// Concat parameters to a url-formed string.

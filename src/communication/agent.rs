@@ -208,7 +208,7 @@ where
     }
 
     pub async fn join(&mut self) {
-        if let Some(mut channel) = self.halt.clone() {
+        if let Some(channel) = self.halt.clone() {
             let mut rx = channel.receiver;
 
             rx.recv().await;
