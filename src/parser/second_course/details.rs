@@ -1,11 +1,11 @@
 use crate::error::Result;
-use crate::parser::{ParserError, TryParse};
+use crate::parser::{Parse, ParserError};
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
 /// Activity link, used for list recent activities.
-#[derive(Debug)]
+#[derive(serde::Serialize, Debug)]
 pub struct ActivityDetail {
     /// Activity id
     pub id: String,
@@ -41,8 +41,8 @@ fn regex_find_one(re: Regex, text: &str) -> Result<String> {
         .and_then(|cap| Ok(cap.get(1).unwrap().as_str().trim().to_string()))
 }
 
-impl TryParse for ActivityDetail {
-    fn try_from_html(html_page: &str) -> Result<ActivityDetail> {
+impl Parse for ActivityDetail {
+    fn from_html(html_page: &str) -> Result<ActivityDetail> {
         let document = Html::parse_document(html_page);
 
         // It is not difficult to find that the entire page is in a div container which is of class "box-1"

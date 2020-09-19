@@ -1,5 +1,5 @@
-use super::Parse;
 use crate::error::Result;
+use crate::parser::Parse;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
@@ -117,14 +117,14 @@ impl Parse for Vec<CourseDetail> {
 
 #[cfg(test)]
 mod test {
+    use crate::parser::Parse;
 
     #[test]
     fn test_course_detail_parser() {
-        use super::Parse;
         use super::{CourseDetail, CourseTime};
 
         let content = std::fs::read_to_string("html/课程列表页面.html").unwrap();
-        let courses: Vec<CourseDetail> = Parse::from_html(content.as_ref());
+        let courses: Vec<CourseDetail> = Parse::from_html(content.as_ref()).unwrap();
 
         assert_eq!(courses.len(), 3159);
         assert_eq!(

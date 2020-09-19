@@ -2,6 +2,7 @@ use crate::ConsoleResult;
 use kite_agent::service::ActivityListRequest;
 use kite_agent::service::CourseScoreRequest;
 use kite_agent::service::ElectricityBillRequest;
+use kite_agent::service::ActivityDetailRequest;
 use kite_agent::service::ResponsePayload;
 use kite_agent::{AgentData, SessionStorage};
 use prettytable::{Cell, Row, Table};
@@ -16,6 +17,8 @@ pub enum PageCommand {
     GetRecentActivities(GetRecentActivities),
     /// Query score history.
     GetScoreList(GetScoreList),
+    /// Get activity details.
+    GetActivityDetail(GetActivityDetail),
 }
 
 impl PageCommand {
@@ -24,6 +27,7 @@ impl PageCommand {
             PageCommand::QueryElectricityBill(query) => query.process(sessions).await,
             PageCommand::GetRecentActivities(query) => query.process(sessions).await,
             PageCommand::GetScoreList(query) => query.process(sessions).await,
+            PageCommand::GetActivityDetail(query) => query.process(sessions).await,
         }
     }
 }
@@ -143,3 +147,32 @@ impl GetScoreList {
         Ok(())
     }
 }
+
+
+#[derive(StructOpt)]
+pub struct GetActivityDetail {
+    #[structopt(long)]
+    pub id: String,
+}
+
+impl GetActivityDetail {
+    pub async fn process(self, sessions: SessionStorage) -> ConsoleResult<()> {
+        let request = ActivityDetailRequest {
+            id: self.id,
+        };
+
+        let response = request
+            .process(AgentData {
+                agent: String::new(),
+                local_addr: String::new(),
+                parameter: sessions,
+            })
+            .await?;
+
+        if let ResponsePayload::ActivityDetail(detail) = response {
+            println!("{:#?}", detail);
+        }
+        Ok(())
+    }
+}
+

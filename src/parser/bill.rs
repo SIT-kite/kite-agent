@@ -49,8 +49,8 @@ mod test {
 
     #[test]
     pub fn test_electricity_bill_parser() {
-        let file = std::fs::read_to_string("html/电费查询页面.html")?;
-        let bill: ElectricityBill = Parse::from_html(file.as_ref())?;
+        let file = std::fs::read_to_string("html/电费查询页面.html").unwrap();
+        let bill: ElectricityBill = Parse::from_html(file.as_ref()).unwrap();
 
         assert_eq!(
             bill,

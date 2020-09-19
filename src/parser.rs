@@ -16,12 +16,6 @@ pub trait Parse {
         Self: std::marker::Sized;
 }
 
-pub trait TryParse {
-    fn try_from_html(html_page: &str) -> Result<Self>
-    where
-        Self: std::marker::Sized;
-}
-
 #[derive(thiserror::Error, Debug)]
 pub enum ParserError {
     #[error("找不到对应元素: {0}")]

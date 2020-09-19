@@ -89,7 +89,7 @@ mod test {
     fn test_second_score_parser() {
         use super::{Parse, SecondScore};
 
-        let html_page = std::fs::read_to_string("html/第二课堂得分页面.html")?;
+        let html_page = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
         let origin: SecondScore = Parse::from_html(html_page.as_str()).unwrap();
         let target = SecondScore {
             effect: 6.96,

@@ -77,7 +77,7 @@ mod test {
     #[test]
     fn test_course_plan_parser() {
         let html_page = std::fs::read_to_string("html/教学计划查询页面.html").unwrap();
-        let course_plans: Vec<PlannedCourse> = Parse::from_html(html_page.as_str());
+        let course_plans: Vec<PlannedCourse> = Parse::from_html(html_page.as_str()).unwrap();
 
         let target = PlannedCourse {
             code: "B123001".to_string(),
