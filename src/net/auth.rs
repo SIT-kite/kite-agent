@@ -80,18 +80,6 @@ fn identify_captcha(image_content: Vec<u8>) -> Result<String> {
     Ok(clean_verify_code(&text))
 }
 
-pub async fn try_get_captcha(client: &mut Client, user_name: &str) -> Result<Option<String>> {
-    let need_captcha = check_need_captcha(client, user_name).await?;
-
-    if need_captcha {
-        let image = fetch_image(client).await?;
-        let captcha_text = identify_captcha(image)?;
-
-        return Ok(Some(captcha_text));
-    }
-    Ok(None)
-}
-
 /// Login on campus official auth-server with student id and password.
 /// Return string of cookies on `.sit.edu.cn`.
 pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
@@ -104,13 +92,17 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
     let index_html = first_response.text().await?;
     let aes_key = regex_find!(&index_html, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
 
-    let mut max_captcha_try_count = 3;
-    while max_captcha_try_count > 0 {
-        let captcha = try_get_captcha(&mut client, user_name).await?.unwrap_or_default();
-        let response = client
-            .post(LOGIN_URL)
-            .header("content-type", "application/x-www-form-urlencoded")
-            .text(&make_parameter!(
+    let need_captcha = check_need_captcha(&mut client, user_name).await?;
+    let mut captcha = String::new();
+    if need_captcha {
+        let image = fetch_image(&mut client).await?;
+        captcha = identify_captcha(image)?;
+    }
+
+    let response = client
+        .post(LOGIN_URL)
+        .header("content-type", "application/x-www-form-urlencoded")
+        .text(&make_parameter!(
             "username" => user_name,
             "password" => &urlencoding::encode(&generate_passwd_string(&password.to_string(), &aes_key)),
             "dllt" => "userNamePasswordLogin",
@@ -120,34 +112,28 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
             "captchaResponse" => &captcha,
             "lt" => &regex_find!(&index_html, r#"<input type="hidden" name="lt" value="(.*?)"/>"#).unwrap()
         ))
-            .send()
-            .await?;
+        .send()
+        .await?;
 
-        // Login successfully.
-        if response.status() == StatusCode::FOUND {
-            let mut new_session = Session::new(user_name, password);
+    // Login successfully.
+    if response.status() == StatusCode::FOUND {
+        let mut new_session = Session::new(user_name, password);
 
-            new_session.sync_cookies("authserver.sit.edu.cn", response.cookies());
-            return Ok(new_session);
-        }
-        // Password error or wrong verification code.
-        if response.status() == StatusCode::OK {
-            let response_text = response.text().await?;
+        new_session.sync_cookies("authserver.sit.edu.cn", response.cookies());
+        return Ok(new_session);
+    }
+    // Password error
+    if response.status() == StatusCode::OK {
+        let response_text = response.text().await?;
 
-            if response_text.contains("您提供的用户名或者密码有误") {
-                return Err(ActionError::LoginFailed.into());
-            } else if response_text.contains("无效的验证码") {
-                // Try again
-                max_captcha_try_count -= 1;
-                continue;
-            } else if response_text.contains("该账号已经被锁定") {
-                return Err(ActionError::UserLocked.into());
-            } else {
-                break;
-            }
+        if response_text.contains("请输入验证码") {
+            return Err(ActionError::LoginFailed.into());
+        } else if response_text.contains("您提供的用户名或者密码有误") {
+            return Err(ActionError::LoginFailed.into());
+        } else if response_text.contains("无效的验证码") {
+            return Err(ActionError::WrongCaptcha.into());
         }
     }
-
     return Err(ActionError::Unknown.into());
 }
 

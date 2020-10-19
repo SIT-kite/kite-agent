@@ -13,8 +13,8 @@ pub enum ActionError {
     Unknown = 52,
     #[error("无法获取验证码")]
     FailToGetCaptcha = 53,
-    #[error("账户被锁定")]
-    UserLocked = 54,
+    #[error("验证码错误")]
+    WrongCaptcha = 54,
 }
 
 /// Error code and message to response
