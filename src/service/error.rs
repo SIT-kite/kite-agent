@@ -9,6 +9,12 @@ pub enum ActionError {
     LoginFailed = 50,
     #[error("找不到可用的会话")]
     NoSessionAvailable = 51,
+    #[error("未知错误")]
+    Unknown = 52,
+    #[error("无法获取验证码")]
+    FailToGetCaptcha = 53,
+    #[error("验证码错误")]
+    WrongCaptcha = 54,
 }
 
 /// Error code and message to response
