@@ -1,1 +1,7 @@
+# HTML files and the related file downlaoded by Firefox
 *_files/
+# Table data
+*.csv
+
+# Some configuration, like urls and strings must be protected -_)
+agent_config.py
