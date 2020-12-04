@@ -20,6 +20,10 @@ INSERT_SQL = \
 # SQL statement for querying stored rooms
 QUERY_ROOM_SQL = \
     '''SELECT name FROM dormitory.rooms;'''
+# SQL statement for update
+UPDATE_SQL = \
+    '''UPDATE dormitory.balance SET base_balance = %s, elec_balance = %s, total_balance = %s, ts = now() WHERE room = %s;'''
+
 
 def get_all_room_balance():
     """
@@ -56,7 +60,7 @@ def convert_all_room_balance(original_list: list):
     """
     Convert the balance string to float
     """
-    return [(i['RoomName'], i['BaseBalance'], i['ElecBalance'], i['Balance'])
+    return [(i['BaseBalance'], i['ElecBalance'], i['Balance'], i['RoomName'])
             for i in original_list]
 
 
@@ -96,9 +100,9 @@ if __name__ == '__main__':
     cur = conn.cursor()
     # Get rooms from database and filter the room balance data. Remove the virtual and dead rooms in them.
     rooms = pull_valid_rooms(cur)
-    g_balance_list = list(filter(lambda x: x[0] in rooms, g_balance_list))
+    g_balance_list = list(filter(lambda x: x[3] in rooms, g_balance_list))
 
-    cur.executemany(INSERT_SQL, g_balance_list)
+    cur.executemany(UPDATE_SQL, g_balance_list)
 
     # Commit to db and close the connection
     conn.commit()
