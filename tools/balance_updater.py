@@ -1,5 +1,5 @@
 """
-    定时更新电费数据
+    更新电费数据
     本文件作为 kite-agent (https://github.com/sunnysab/kite-agent) 的一部分发布，仅供学习和交流使用。
 
     sunnysab (C) 2020
@@ -17,7 +17,9 @@ import agent_config as config
 # SQL statement for inserting data
 INSERT_SQL = \
     '''INSERT INTO dormitory.balance (room, base_balance, elec_balance, total_balance) VALUES (%s, %s, %s, %s);'''
-
+# SQL statement for querying stored rooms
+QUERY_ROOM_SQL = \
+    '''SELECT name FROM dormitory.rooms;'''
 
 def get_all_room_balance():
     """
@@ -72,25 +74,29 @@ def save_room_log(balance_list: list, logfile: str):
     # End of with
 
 
-def is_valid_room_name(room_name: str) -> bool:
-    return room_name.startswith('10') and room_name.isnumeric()
-
-
-def filter_invalid_room_name(original_list: list) -> list:
-    return list(filter(lambda x: is_valid_room_name(x[0]), original_list))
+def pull_valid_rooms(cursor):
+    """
+    Pull valid rooms from postgresql database.
+    :return: A set of string for rooms.
+    """
+    cursor.execute(QUERY_ROOM_SQL)
+    rows = cursor.fetchall()
+    return set([row[0] for row in rows])
 
 
 if __name__ == '__main__':
     # Get balance list and save to file for backing up.
     g_balance_list = convert_all_room_balance(get_all_room_balance())
-    g_balance_list = filter_invalid_room_name(g_balance_list)
-
     save_room_log(g_balance_list, generate_logfile_name())
 
     # Connect to database
     conn = psycopg2.connect(database=config.DATABASE_NAME, user=config.DATABASE_USER,
                             password=config.DATABASE_PASSWD, host=config.DATABASE_HOST, port=config.DATABASE_PORT)
-    cur = conn.cursor()  # Get cursor
+    # Get cursor
+    cur = conn.cursor()
+    # Get rooms from database and filter the room balance data. Remove the virtual and dead rooms in them.
+    rooms = pull_valid_rooms(cur)
+    g_balance_list = list(filter(lambda x: x[0] in rooms, g_balance_list))
 
     cur.executemany(INSERT_SQL, g_balance_list)
 
