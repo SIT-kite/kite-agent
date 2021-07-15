@@ -71,7 +71,7 @@ where
     /// Unpack binary request payload, do the command, then pack and send response to host.
     async fn dispatch_message(
         request: Request,
-        mut socket_tx: mpsc::Sender<Response>,
+        socket_tx: mpsc::Sender<Response>,
         on_message: Arc<MessageCallback<O>>,
     ) -> Result<()> {
         // Get callback function pointer and parameter.
@@ -88,7 +88,7 @@ where
     /// Unpack WebSocket message, match types and respond correctly.
     async fn process_message(
         request: Request,
-        mut response_tx: mpsc::Sender<Response>,
+        response_tx: mpsc::Sender<Response>,
         on_message: Arc<MessageCallback<O>>,
     ) -> Result<()> {
         // Resolve request message, and response.
@@ -212,7 +212,7 @@ where
             let mut rx = channel.receiver;
 
             rx.recv().await;
-            tokio::time::delay_for(Duration::from_secs(1)).await;
+            tokio::time::sleep(Duration::from_secs(1)).await;
             self.halt = None;
 
             return;

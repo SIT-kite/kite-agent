@@ -50,12 +50,12 @@ async fn main() {
                     Err(e) => println!("Could not connect to the host. Wait for the next try."),
                 }
                 println!("Wait for 30 secs.");
-                tokio::time::delay_for(Duration::from_secs(30)).await;
+                tokio::time::sleep(Duration::from_secs(30)).await;
             }
         });
     }
 
     loop {
-        tokio::time::delay_for(Duration::from_secs(1)).await;
+        tokio::time::sleep(Duration::from_secs(1)).await;
     }
 }
