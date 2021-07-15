@@ -41,11 +41,38 @@
  - Linux x86_64
  - Linux on Arm
  
- ## 运行
+## 运行
  
  请先确保系统中已预装有 rust 编程环境（rustc、cargo等），并已连接上互联网。
  ```bash
 cargo run 
+```
+
+### 运行命令行工具
+
+命令行工具在项目中作为 examples 发布，你可以在 `examples/console` 中找到它。
+
+使用方法：
+```shell
+# 编译
+cargo build --examples
+
+cd target/debug/examples
+# 查看缓存的 OA 账户
+./console session list
+# 添加账户
+./console session insert --account 学号 --credential 密码
+# 查看最近的第二课堂活动
+./console page get-recent-activities
+```
+
+如果提示找不到配置文件, 你可以将项目根目录下的 `kite.toml` 拷贝过去。在配置文件中你可以控制程序使用的代理，以便调试。
+
+查看使用方式：
+```shell
+./console help
+# 或对子命令查看帮助：
+./console page help
 ```
 
 ## 贡献者
