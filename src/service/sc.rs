@@ -1,12 +1,13 @@
 use super::ResponseResult;
+use crate::agent::SharedData;
 use crate::make_parameter;
 use crate::net::{domain, Client, ClientBuilder};
 use crate::parser::{Activity, ActivityDetail, Parse};
-use crate::service::{ActionError, ResponsePayload};
+use crate::service::{ActionError, DoRequest, ResponsePayload};
 use reqwest::{Response as HttpResponse, StatusCode};
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct ActivityListRequest {
     /// Count of activities per page.
     pub count: u16,
@@ -39,9 +40,10 @@ async fn get_with_auto_redirect(client: &mut Client, start_page: &str) -> HttpRe
     response
 }
 
-impl ActivityListRequest {
+#[async_trait::async_trait]
+impl DoRequest for ActivityListRequest {
     /// Fetch and parse activity list page.
-    pub async fn process(self, parameter: AgentData) -> ResponseResult {
+    async fn process(self, parameter: SharedData) -> ResponseResult {
         let mut session_storage = parameter.parameter;
         let session = session_storage
             .choose_randomly()?
@@ -85,7 +87,7 @@ impl ActivityListRequest {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct ActivityDetailRequest {
     /// Activity id in sc.sit.edu.cn
     pub id: String,
@@ -93,7 +95,7 @@ pub struct ActivityDetailRequest {
 
 impl ActivityDetailRequest {
     /// Fetch and parse activity detail page.
-    pub async fn process(self, parameter: AgentData) -> ResponseResult {
+    pub async fn process(self, parameter: SharedData) -> ResponseResult {
         let mut session_storage = parameter.parameter;
         let session = session_storage
             .choose_randomly()?

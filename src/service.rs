@@ -11,23 +11,31 @@ pub use report::AgentInfoRequest;
 pub use sc::ActivityDetailRequest;
 pub use sc::ActivityListRequest;
 
+use crate::agent::SharedData;
 use crate::parser::{Activity, ActivityDetail};
 use report::AgentInfo;
 
 /// Response payload
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub enum RequestPayload {
+    None,
     AgentInfo(AgentInfoRequest),
     ActivityList(ActivityListRequest),
     ActivityDetail(ActivityDetailRequest),
 }
 
 /// Response payload
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub enum ResponsePayload {
+    None,
     Credential(AgentInfo),
     ActivityList(Vec<Activity>),
     ActivityDetail(ActivityDetail),
+}
+
+#[async_trait::async_trait]
+pub trait DoRequest {
+    async fn process(self, parameter: SharedData) -> ResponseResult;
 }
 
 /// Concat parameters to a url-formed string.
