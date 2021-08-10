@@ -7,6 +7,9 @@ use tokio_tower::multiplex;
 use tokio_tower::multiplex::Server;
 
 use crate::service::{RequestPayload, ResponsePayload, ResponseResult};
+use std::future::Future;
+use std::task::{Context, Poll};
+use tower::Service;
 
 #[derive(Debug, Deserialize)]
 pub struct RequestFrame {
@@ -61,14 +64,31 @@ impl<T: core::fmt::Debug> From<T> for Tagged<T> {
     }
 }
 
-async fn handler(req: Tagged<RequestFrame>) -> Result<Tagged<ResponseFrame>, anyhow::Error> {
-    let tag = req.tag;
-    println!("Received frame: {:?}, tag = {}", &req.v, tag);
+#[derive(Debug)]
+struct KiteService;
 
-    let mut response = Tagged::<ResponseFrame>::from(ResponseFrame::default());
+impl Service<Tagged<RequestFrame>> for KiteService {
+    type Response = Tagged<ResponseFrame>;
+    type Error = anyhow::Error;
+    type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
 
-    response.tag = tag;
-    Ok(response)
+    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        Poll::Ready(Ok(()))
+    }
+
+    fn call(&mut self, req: Tagged<RequestFrame>) -> Self::Future {
+        let f = async move {
+            let tag = req.tag;
+            println!("Received frame: {:?}, tag = {}", &req.v, tag);
+
+            let mut response = Tagged::<ResponseFrame>::from(ResponseFrame::default());
+
+            response.tag = tag;
+            Ok(response)
+        };
+
+        Box::pin(f)
+    }
 }
 
 #[tokio::main]
@@ -81,11 +101,7 @@ pub async fn main() {
     loop {
         let (socket, _) = listener.accept().await.unwrap();
 
-        let server = Server::new(
-            AsyncBincodeStream::from(socket).for_async(),
-            tower::service_fn(handler),
-        )
-        .await;
+        let server = Server::new(AsyncBincodeStream::from(socket).for_async(), KiteService).await;
 
         if let Err(e) = server {
             eprintln!("Server error: {:?}", e);
