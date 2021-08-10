@@ -13,7 +13,7 @@ use jemallocator::Jemalloc;
 #[global_allocator]
 static GLOBAL: Jemalloc = Jemalloc;
 
-mod communication;
+mod agent;
 mod config;
 mod error;
 mod net;
@@ -21,8 +21,8 @@ mod parser;
 mod service;
 
 use crate::net::SessionStorage;
-use communication::on_new_request;
-use communication::AgentBuilder;
+use agent::on_new_request;
+use agent::AgentBuilder;
 use config::CONFIG;
 use tokio::time::Duration;
 

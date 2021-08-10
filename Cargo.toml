@@ -26,6 +26,11 @@ tokio = { version = "1", features = ["full"] }
 futures-util = "0.3"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.5"
+tower = { version = "0.4", features = ["full"] }
+tokio-tower = "0.5"
+async-bincode = "0.6"
+slab = "0.4"
+async-trait = "0.1"
 
 # Network related
 scraper = "0.12"

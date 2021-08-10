@@ -88,9 +88,9 @@ impl SessionStorage {
 }
 
 // Note: You should not implement Default for SessionStorage. If you write code like this:
-// AgentData {
+// SharedData {
 //     parameter: SessionStorage,
-//     ..AgentData::default(),
+//     ..SharedData::default(),
 // }
 // The default function will open database file separately, which may lead to:
 // `The process cannot access the file because another process has locked a portion of the file.`

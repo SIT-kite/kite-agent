@@ -1,10 +1,10 @@
 use crate::service::{ResponsePayload, ResponseResult};
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct AgentInfoRequest;
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct AgentInfo {
     pub name: String,
 }

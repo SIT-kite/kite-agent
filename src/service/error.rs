@@ -18,7 +18,7 @@ pub enum ActionError {
 }
 
 /// Error code and message to response
-#[derive(Debug, thiserror::Error)]
+#[derive(Debug, serde::Serialize, thiserror::Error)]
 #[error("{} ({})", msg, code)]
 pub struct ErrorResponse {
     pub code: u16,

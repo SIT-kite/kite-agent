@@ -4,7 +4,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate num_derive;
 
-mod communication;
+mod agent;
 mod config;
 mod error;
 mod net;

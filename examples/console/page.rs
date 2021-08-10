@@ -1,10 +1,8 @@
 use crate::ConsoleResult;
-use kite_agent::service::ActivityListRequest;
-use kite_agent::service::CourseScoreRequest;
-use kite_agent::service::ElectricityBillRequest;
 use kite_agent::service::ActivityDetailRequest;
+use kite_agent::service::ActivityListRequest;
 use kite_agent::service::ResponsePayload;
-use kite_agent::{AgentData, SessionStorage};
+use kite_agent::{SessionStorage, SharedData};
 use prettytable::{Cell, Row, Table};
 use structopt::StructOpt;
 
@@ -45,7 +43,7 @@ impl QueryElectricityBill {
         let mut table = Table::new();
         let request = ElectricityBillRequest { room: self.room };
         let response = request
-            .process(AgentData {
+            .process(SharedData {
                 agent: "".to_string(),
                 local_addr: "".to_string(),
                 parameter: sessions.clone(),
@@ -85,7 +83,7 @@ impl GetRecentActivities {
         };
 
         let response = request
-            .process(AgentData {
+            .process(SharedData {
                 agent: "".to_string(),
                 local_addr: "".to_string(),
                 parameter: sessions.clone(),
@@ -126,7 +124,7 @@ impl GetScoreList {
         };
 
         let response = request
-            .process(AgentData {
+            .process(SharedData {
                 agent: String::new(),
                 local_addr: String::new(),
                 parameter: sessions,
@@ -148,7 +146,6 @@ impl GetScoreList {
     }
 }
 
-
 #[derive(StructOpt)]
 pub struct GetActivityDetail {
     #[structopt(long)]
@@ -157,12 +154,10 @@ pub struct GetActivityDetail {
 
 impl GetActivityDetail {
     pub async fn process(self, sessions: SessionStorage) -> ConsoleResult<()> {
-        let request = ActivityDetailRequest {
-            id: self.id,
-        };
+        let request = ActivityDetailRequest { id: self.id };
 
         let response = request
-            .process(AgentData {
+            .process(SharedData {
                 agent: String::new(),
                 local_addr: String::new(),
                 parameter: sessions,
@@ -175,4 +170,3 @@ impl GetActivityDetail {
         Ok(())
     }
 }
-
