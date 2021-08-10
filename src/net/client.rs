@@ -8,7 +8,7 @@ use chrono::Utc;
 /// determine whether the path is relative or absolute.
 pub fn domain(url: &str) -> Option<String> {
     let regex = regex::Regex::new(r"http[s]?://([a-zA-Z\.0-9]+)(:[0-9]+)?/").unwrap();
-    regex.captures(url).and_then(|x| Some(x[1].to_string()))
+    regex.captures(url).map(|x| x[1].to_string())
 }
 
 /// Create a client with config

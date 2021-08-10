@@ -73,7 +73,7 @@ fn identify_captcha(image_content: Vec<u8>) -> Result<String> {
         dimension.0 as i32,
         dimension.1 as i32,
         1,
-        1 * dimension.0 as i32,
+        dimension.0 as i32,
         "num",
     )?;
 
@@ -126,20 +126,19 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
     if response.status() == StatusCode::OK {
         let response_text = response.text().await?;
 
-        if response_text.contains("请输入验证码") {
-            return Err(ActionError::LoginFailed.into());
-        } else if response_text.contains("您提供的用户名或者密码有误") {
+        if response_text.contains("请输入验证码") || response_text.contains("您提供的用户名或者密码有误")
+        {
             return Err(ActionError::LoginFailed.into());
         } else if response_text.contains("无效的验证码") {
             return Err(ActionError::WrongCaptcha.into());
         }
     }
-    return Err(ActionError::Unknown.into());
+    Err(ActionError::Unknown.into())
 }
 
 /// When submit password to `authserver.sit.edu.cn`, it's required to do AES and base64 algorithm with
 /// origin password. We use a key from HTML (generated and changed by `JSESSIONID`) to help with.
-pub fn generate_passwd_string(clear_password: &String, key: &String) -> String {
+pub fn generate_passwd_string(clear_password: &str, key: &str) -> String {
     use block_modes::block_padding::Pkcs7;
     use block_modes::{BlockMode, Cbc};
     type Aes128Cbc = Cbc<aes::Aes128, Pkcs7>;

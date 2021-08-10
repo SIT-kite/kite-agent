@@ -130,6 +130,6 @@ impl ActivityDetailRequest {
         session_storage.insert(client.session())?;
 
         let activity: ActivityDetail = Parse::from_html(&html)?;
-        Ok(ResponsePayload::ActivityDetail(activity))
+        Ok(ResponsePayload::ActivityDetail(Box::from(activity)))
     }
 }

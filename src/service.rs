@@ -30,7 +30,7 @@ pub enum ResponsePayload {
     None,
     Credential(AgentInfo),
     ActivityList(Vec<Activity>),
-    ActivityDetail(ActivityDetail),
+    ActivityDetail(Box<ActivityDetail>),
 }
 
 #[async_trait::async_trait]

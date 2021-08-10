@@ -69,8 +69,8 @@ impl Parse for SecondScore {
             .iter()
             .map(|r| {
                 r.captures_iter(hide_score_text.as_str())
+                    .next()
                     .map(|c| c.get(1).unwrap().as_str().to_string())
-                    .nth(0)
                     .unwrap()
             })
             .collect::<Vec<String>>();

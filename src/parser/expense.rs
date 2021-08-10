@@ -46,14 +46,14 @@ impl Parse for Vec<ExpenseRecord> {
 
         let current_page = current_page_re
             .captures_iter(pages_information.as_str())
+            .next()
             .map(|c| c.get(1).unwrap().as_str().to_string())
-            .nth(0)
             .unwrap_or_default();
 
         let total_pages = total_pages_pages_re
             .captures_iter(pages_information.as_str())
+            .next()
             .map(|c| c.get(1).unwrap().as_str().to_string())
-            .nth(0)
             .unwrap_or_default();
 
         // Expense record.
@@ -96,9 +96,9 @@ impl From<Vec<String>> for ExpenseRecord {
             code: fields[0].parse().unwrap_or_default(),
             name: fields[1].parse().unwrap_or_default(),
             date: NaiveDate::parse_from_str(fields[2].as_str(), "%Y-%m-%d")
-                .unwrap_or(NaiveDate::parse_from_str("1970-01-01", "%Y-%m-%d").unwrap()),
+                .unwrap_or_else(|_| NaiveDate::parse_from_str("1970-01-01", "%Y-%m-%d").unwrap()),
             time: NaiveTime::parse_from_str(fields[3].as_str(), "%H:%M:%S")
-                .unwrap_or(NaiveTime::parse_from_str("00:00:00", "%H:%M:%S").unwrap()),
+                .unwrap_or_else(|_| NaiveTime::parse_from_str("00:00:00", "%H:%M:%S").unwrap()),
             amount: fields[4].parse().unwrap_or_default(),
             address: fields[5].parse().unwrap_or_default(),
             page_info: PageInfo {

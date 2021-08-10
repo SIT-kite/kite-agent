@@ -37,8 +37,8 @@ pub struct ActivityDetail {
 #[inline]
 fn regex_find_one(re: Regex, text: &str) -> Result<String> {
     re.captures(text)
-        .ok_or(ParserError::RegexErr(format!("表达式 {}", re.as_str())).into())
-        .and_then(|cap| Ok(cap.get(1).unwrap().as_str().trim().to_string()))
+        .map(|cap| cap.get(1).unwrap().as_str().trim().to_string())
+        .ok_or_else(|| ParserError::RegexErr(format!("表达式 {}", re.as_str())).into())
 }
 
 impl Parse for ActivityDetail {
@@ -50,19 +50,19 @@ impl Parse for ActivityDetail {
         // So our goal is clear now.
         let frame: ElementRef = document
             .select(&Selector::parse(".box-1").unwrap())
-            .nth(0)
-            .ok_or(ParserError::NoSuchElement(String::from(".box-1")))?;
+            .next()
+            .ok_or_else(|| ParserError::NoSuchElement(String::from(".box-1")))?;
 
         // Title
         let title = frame
             .select(&Selector::parse("h1").unwrap())
-            .nth(0)
+            .next()
             .unwrap()
             .inner_html();
         // Banner
         let banner = frame
             .select(&Selector::parse("div[style=\" color:#7a7a7a; text-align:center\"]").unwrap())
-            .nth(0)
+            .next()
             .unwrap()
             .inner_html()
             .replace("&nbsp;", "")
@@ -70,7 +70,7 @@ impl Parse for ActivityDetail {
         // Description
         let body = frame
             .select(&Selector::parse("div[style=\"padding:30px 50px; font-size:14px;\"]").unwrap())
-            .nth(0)
+            .next()
             .unwrap()
             .text()
             .collect::<Vec<&str>>()
@@ -78,11 +78,11 @@ impl Parse for ActivityDetail {
             .replace("\u{a0}", "");
 
         let sign_end_time = Regex::new(r"刷卡时间段：(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+).*--至--.*(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+)").unwrap()
-            .captures(banner.as_ref()).ok_or(ParserError::RegexErr(String::from("解析刷卡时间")))?;
+            .captures(banner.as_ref()).ok_or_else(|| ParserError::RegexErr(String::from("解析刷卡时间")))?;
 
         Ok(ActivityDetail {
             id: regex_find_one(Regex::new(r"活动编号：(\d{7})")?, &banner)?,
-            title: title,
+            title,
             start_time: NaiveDateTime::parse_from_str(
                 &regex_find_one(
                     Regex::new(r"活动开始时间：(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+)")?,
@@ -110,7 +110,7 @@ impl Parse for ActivityDetail {
             description: Regex::new("[\n\t ]*")
                 .unwrap()
                 .replace(body.as_ref(), "\n")
-                .split("\n")
+                .split('\n')
                 .map(|x| x.trim().to_string())
                 .filter(|x| !x.is_empty())
                 .collect(),

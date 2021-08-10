@@ -1,6 +1,5 @@
 //! This module provides ability to test network connectivity and try to connect the campus network.
 
-use lazy_static;
 use rand::{seq::SliceRandom, thread_rng};
 
 use super::user_agent;
@@ -32,7 +31,7 @@ lazy_static! {
 }
 
 /// Campus network portal address.
-pub const PORTAL_ADDRESS: &'static str = "http://172.16.8.70";
+pub const PORTAL_ADDRESS: &str = "http://172.16.8.70";
 
 /// Get a random test url and its expected response.
 fn get_test_page() -> &'static NetworkTestPage {

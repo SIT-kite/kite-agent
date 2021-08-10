@@ -15,7 +15,7 @@ pub struct Activity {
 
 impl Parse for Vec<Activity> {
     fn from_html(html_page: &str) -> Result<Self> {
-        let document = Html::parse_document(html_page.as_ref());
+        let document = Html::parse_document(html_page);
         let selector = Selector::parse(".ul_7 li > a").unwrap();
         let re = Regex::new(r"(\d){7}")?;
 
@@ -25,7 +25,7 @@ impl Parse for Vec<Activity> {
                 let link = each_line.value().attr("href").unwrap();
 
                 Activity {
-                    title: each_line.inner_html().trim().replace("·\n", "").to_string(),
+                    title: each_line.inner_html().trim().replace("·\n", ""),
                     id: String::from(if let Some(id) = re.find(link) {
                         id.as_str()
                     } else {
@@ -49,7 +49,7 @@ pub struct JoinedActivity {
 
 impl Parse for Vec<JoinedActivity> {
     fn from_html(html_page: &str) -> Result<Self> {
-        let document = Html::parse_document(html_page.as_ref());
+        let document = Html::parse_document(html_page);
         let selector = Selector::parse("table[width=\"100%\"] > tbody > tr").unwrap();
 
         let activities = document
