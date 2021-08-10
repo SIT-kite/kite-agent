@@ -31,6 +31,7 @@ impl Default for ResponseFrame {
 
 #[derive(Debug, Clone)]
 pub struct SharedData {
+    pub node: String,
     pub session: SessionStorage,
 }
 
@@ -83,11 +84,18 @@ impl Service<Tagged<RequestFrame>> for KiteService {
     }
 
     fn call(&mut self, req: Tagged<RequestFrame>) -> Self::Future {
+        // Note: Maybe improve performance
+        let data = self.shared_data.clone();
+
         let f = async move {
             let tag = req.tag;
             println!("Received frame: {:?}, tag = {}", &req.v, tag);
 
-            let mut response = Tagged::<ResponseFrame>::from(ResponseFrame::default());
+            let request_frame = req.v;
+            let response_frame = ResponseFrame {
+                payload: request_frame.payload.dispatch(data).await,
+            };
+            let mut response = Tagged::<ResponseFrame>::from(response_frame);
 
             response.tag = tag;
             Ok(response)

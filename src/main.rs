@@ -26,10 +26,17 @@ use net::SessionStorage;
 
 #[tokio::main]
 async fn main() {
-    let session_storage = SessionStorage::new().unwrap();
+    let storage = SessionStorage::new().unwrap();
 
-    let remote_server = CONFIG.server.addr.clone();
-    let storage = session_storage.clone();
+    let remote_server = &CONFIG.server.addr;
+    let node_name = &CONFIG.agent.name;
 
-    run(remote_server, SharedData { session: storage }).await;
+    run(
+        remote_server.clone(),
+        SharedData {
+            node: node_name.clone(),
+            session: storage,
+        },
+    )
+    .await;
 }

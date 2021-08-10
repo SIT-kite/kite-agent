@@ -35,7 +35,7 @@ pub enum ResponsePayload {
 
 #[async_trait::async_trait]
 pub trait DoRequest {
-    async fn process(self, parameter: SharedData) -> ResponseResult;
+    async fn process(self, data: SharedData) -> ResponseResult;
 }
 
 /// Concat parameters to a url-formed string.
@@ -52,3 +52,14 @@ macro_rules! make_parameter {
 
 // Result has two sides, Ok(ResponsePayload) and Err(ResponseError)
 pub type ResponseResult = std::result::Result<ResponsePayload, ErrorResponse>;
+
+impl RequestPayload {
+    pub(crate) async fn dispatch(self, data: SharedData) -> ResponseResult {
+        match self {
+            RequestPayload::None => Ok(ResponsePayload::None),
+            RequestPayload::AgentInfo(r) => r.process(data).await,
+            RequestPayload::ActivityList(r) => r.process(data).await,
+            RequestPayload::ActivityDetail(r) => r.process(data).await,
+        }
+    }
+}

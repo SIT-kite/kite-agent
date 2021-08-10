@@ -93,9 +93,10 @@ pub struct ActivityDetailRequest {
     pub id: String,
 }
 
-impl ActivityDetailRequest {
+#[async_trait::async_trait]
+impl DoRequest for ActivityDetailRequest {
     /// Fetch and parse activity detail page.
-    pub async fn process(self, data: SharedData) -> ResponseResult {
+    async fn process(self, data: SharedData) -> ResponseResult {
         let mut session_storage = data.session;
         let session = session_storage
             .choose_randomly()?
