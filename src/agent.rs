@@ -2,22 +2,22 @@ use std::pin::Pin;
 
 use async_bincode::AsyncBincodeStream;
 use serde::{Deserialize, Serialize};
-use tokio::net::TcpListener;
 use tokio_tower::multiplex;
 use tokio_tower::multiplex::Server;
 
 use crate::service::{RequestPayload, ResponsePayload, ResponseResult};
+use crate::SessionStorage;
 use std::future::Future;
 use std::task::{Context, Poll};
 use tower::Service;
 
 #[derive(Debug, Deserialize)]
-pub struct RequestFrame {
+struct RequestFrame {
     payload: RequestPayload,
 }
 
 #[derive(Debug, Serialize)]
-pub struct ResponseFrame {
+struct ResponseFrame {
     payload: ResponseResult,
 }
 
@@ -29,10 +29,14 @@ impl Default for ResponseFrame {
     }
 }
 
-pub struct SharedData {}
+#[derive(Debug, Clone)]
+pub struct SharedData {
+    pub session: SessionStorage,
+}
+
 #[derive(Debug, Default)]
 // only pub because we use it to figure out the error type for ViewError
-pub struct Tagger(slab::Slab<()>);
+struct Tagger(slab::Slab<()>);
 
 impl<Request: core::fmt::Debug, Response: core::fmt::Debug>
     multiplex::TagStore<Tagged<Request>, Tagged<Response>> for Tagger
@@ -50,7 +54,7 @@ impl<Request: core::fmt::Debug, Response: core::fmt::Debug>
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct Tagged<T>
+struct Tagged<T>
 where
     T: core::fmt::Debug,
 {
@@ -64,8 +68,10 @@ impl<T: core::fmt::Debug> From<T> for Tagged<T> {
     }
 }
 
-#[derive(Debug)]
-struct KiteService;
+#[derive(Debug, Clone)]
+struct KiteService {
+    shared_data: SharedData,
+}
 
 impl Service<Tagged<RequestFrame>> for KiteService {
     type Response = Tagged<ResponseFrame>;
@@ -91,20 +97,22 @@ impl Service<Tagged<RequestFrame>> for KiteService {
     }
 }
 
-#[tokio::main]
-pub async fn main() {
-    // Bind a server socket
-    let listener = TcpListener::bind("127.0.0.1:17653").await.unwrap();
+pub async fn run(server_addr: String, shared_data: SharedData) {
+    println!("Connecting to server: {}", server_addr);
+    // Create a socket and connect to server.
+    let socket = tokio::net::TcpStream::connect(server_addr)
+        .await
+        .expect("Failed to connect to server.");
 
-    println!("listening on {:?}", listener.local_addr());
+    println!("Connected.");
 
-    loop {
-        let (socket, _) = listener.accept().await.unwrap();
+    let server = Server::new(
+        AsyncBincodeStream::from(socket).for_async(),
+        KiteService { shared_data },
+    )
+    .await;
 
-        let server = Server::new(AsyncBincodeStream::from(socket).for_async(), KiteService).await;
-
-        if let Err(e) = server {
-            eprintln!("Server error: {:?}", e);
-        }
+    if let Err(e) = server {
+        eprintln!("Server error: {:?}", e);
     }
 }

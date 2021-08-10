@@ -43,8 +43,8 @@ async fn get_with_auto_redirect(client: &mut Client, start_page: &str) -> HttpRe
 #[async_trait::async_trait]
 impl DoRequest for ActivityListRequest {
     /// Fetch and parse activity list page.
-    async fn process(self, parameter: SharedData) -> ResponseResult {
-        let mut session_storage = parameter.parameter;
+    async fn process(self, data: SharedData) -> ResponseResult {
+        let mut session_storage = data.session;
         let session = session_storage
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;
@@ -95,8 +95,8 @@ pub struct ActivityDetailRequest {
 
 impl ActivityDetailRequest {
     /// Fetch and parse activity detail page.
-    pub async fn process(self, parameter: SharedData) -> ResponseResult {
-        let mut session_storage = parameter.parameter;
+    pub async fn process(self, data: SharedData) -> ResponseResult {
+        let mut session_storage = data.session;
         let session = session_storage
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;

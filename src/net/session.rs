@@ -10,7 +10,7 @@ const SESSION_KEY_FORMAT: &str = "s:";
 
 pub enum SessionError {}
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct SessionStorage {
     /// Sled handle
     db: sled::Db,
