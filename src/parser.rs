@@ -1,12 +1,8 @@
-mod bill;
-mod course;
 mod expense;
 mod second_course;
 
 use crate::error::Result;
 
-pub use bill::ElectricityBill;
-pub use course::{CourseDetail, CourseScore, PlannedCourse, SelectedCourse};
 pub use expense::ExpenseRecord;
 pub use second_course::{Activity, ActivityDetail, JoinedActivity, SecondScore};
 

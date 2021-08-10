@@ -1,5 +1,4 @@
 use super::ResponseResult;
-use crate::communication::AgentData;
 use crate::make_parameter;
 use crate::net::{domain, Client, ClientBuilder};
 use crate::parser::{Activity, ActivityDetail, Parse};
