@@ -73,6 +73,7 @@ impl DoRequest for ActivityListRequest {
                 .await?;
 
             html = response.text().await?;
+            // Note: the server do return "languge" rather than "language"
             if html.starts_with("<script languge='javascript'>") && html.len() < 500 {
                 client.session_mut().login().await?;
             } else {

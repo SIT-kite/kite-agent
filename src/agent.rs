@@ -105,10 +105,10 @@ impl Service<Tagged<RequestFrame>> for KiteService {
     }
 }
 
-pub async fn run(server_addr: String, shared_data: SharedData) {
-    println!("Connecting to server: {}", server_addr);
+pub async fn run(server_address: String, shared_data: SharedData) {
+    println!("Connecting to server: {}", server_address);
     // Create a socket and connect to server.
-    let socket = tokio::net::TcpStream::connect(server_addr)
+    let socket = tokio::net::TcpStream::connect(server_address)
         .await
         .expect("Failed to connect to server.");
 

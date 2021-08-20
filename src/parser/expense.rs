@@ -19,7 +19,7 @@ pub struct ExpenseRecord {
     pub amount: f32,
     /// Expense address.
     pub address: String,
-    /// The pageinfo for current record.
+    /// Page information for current record.
     pub page_info: PageInfo,
 }
 
@@ -63,7 +63,7 @@ impl Parse for Vec<ExpenseRecord> {
             .unwrap();
 
         // Records
-        let mut datas = frame
+        let mut items = frame
             .select(&Selector::parse("tr").unwrap())
             .map(|e| {
                 e.select(&Selector::parse("td>div[align=center]").unwrap())
@@ -75,13 +75,13 @@ impl Parse for Vec<ExpenseRecord> {
             .collect::<Vec<Vec<String>>>();
 
         // Add page info.
-        datas.iter_mut().for_each(|v| {
+        items.iter_mut().for_each(|v| {
             v.push(current_page.clone());
             v.push(total_pages.clone());
         });
 
         // Vec<ExpenseRecord>.
-        let res = datas
+        let res = items
             .iter()
             .map(|v| ExpenseRecord::from(v.clone()))
             .collect::<Vec<ExpenseRecord>>();

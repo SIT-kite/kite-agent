@@ -151,7 +151,7 @@ impl<'a> RequestBuilder<'a> {
 
         // Use reqwest send the request
         let response = self.request_builder.send().await?;
-        // Update cookies in session. Use Clinet::session to acquire.
+        // Update cookies in session. Use Client::session to acquire.
         self.session.sync_cookies(&self.domain, response.cookies());
         self.session.last_update = Utc::now().naive_local();
 

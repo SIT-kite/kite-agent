@@ -11,7 +11,7 @@ pub struct NetworkTestPage {
     pub expected_response: &'static str,
 }
 
-/* Defualt configuration */
+/* Default configuration */
 lazy_static! {
     /// Test page provided by the public service which are always available and return 200 OK.
     pub static ref TEST_PAGES: Vec<NetworkTestPage> = vec![
