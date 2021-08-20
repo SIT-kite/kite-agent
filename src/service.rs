@@ -19,6 +19,7 @@ use report::AgentInfo;
 #[derive(Debug, Deserialize)]
 pub enum RequestPayload {
     None,
+    Ping(String),
     AgentInfo(AgentInfoRequest),
     ActivityList(ActivityListRequest),
     ActivityDetail(ActivityDetailRequest),
@@ -28,6 +29,7 @@ pub enum RequestPayload {
 #[derive(Debug, Serialize)]
 pub enum ResponsePayload {
     None,
+    Pong(String),
     Credential(AgentInfo),
     ActivityList(Vec<Activity>),
     ActivityDetail(Box<ActivityDetail>),
@@ -57,6 +59,7 @@ impl RequestPayload {
     pub(crate) async fn dispatch(self, data: SharedData) -> ResponseResult {
         match self {
             RequestPayload::None => Ok(ResponsePayload::None),
+            RequestPayload::Ping(r) => Ok(ResponsePayload::Pong(r)),
             RequestPayload::AgentInfo(r) => r.process(data).await,
             RequestPayload::ActivityList(r) => r.process(data).await,
             RequestPayload::ActivityDetail(r) => r.process(data).await,

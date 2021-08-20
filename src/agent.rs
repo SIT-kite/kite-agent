@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use tokio_tower::multiplex;
 use tokio_tower::multiplex::Server;
 
+use crate::error::{AgentError, Result};
 use crate::service::{RequestPayload, ResponsePayload, ResponseResult};
 use crate::SessionStorage;
 use std::future::Future;
@@ -77,9 +78,9 @@ struct KiteService {
 impl Service<Tagged<RequestFrame>> for KiteService {
     type Response = Tagged<ResponseFrame>;
     type Error = anyhow::Error;
-    type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
+    type Future = Pin<Box<dyn Future<Output = std::result::Result<Self::Response, Self::Error>>>>;
 
-    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+    fn poll_ready(&mut self, _cx: &mut Context<'_>) -> Poll<std::result::Result<(), Self::Error>> {
         Poll::Ready(Ok(()))
     }
 
@@ -105,22 +106,22 @@ impl Service<Tagged<RequestFrame>> for KiteService {
     }
 }
 
-pub async fn run(server_address: String, shared_data: SharedData) {
+pub async fn run(server_address: String, shared_data: SharedData) -> Result<()> {
     println!("Connecting to server: {}", server_address);
     // Create a socket and connect to server.
     let socket = tokio::net::TcpStream::connect(server_address)
         .await
-        .expect("Failed to connect to server.");
+        .map_err(|_| AgentError::ConnectionFailure)?;
 
     println!("Connected.");
 
-    let server = Server::new(
+    Server::new(
         AsyncBincodeStream::from(socket).for_async(),
         KiteService { shared_data },
     )
-    .await;
+    .await
+    .map_err(|e| AgentError::Server(e.to_string()))?;
 
-    if let Err(e) = server {
-        eprintln!("Server error: {:?}", e);
-    }
+    println!("Disconnected.");
+    Ok(())
 }
