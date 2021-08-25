@@ -19,6 +19,7 @@ mod error;
 mod net;
 mod parser;
 pub mod service;
+mod zftool;
 
 use agent::{run, SharedData};
 use config::CONFIG;
