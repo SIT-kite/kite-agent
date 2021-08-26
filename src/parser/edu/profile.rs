@@ -1,5 +1,5 @@
-use crate::zftool::parsers::ParserError;
-use crate::zftool::Result;
+use crate::error::Result;
+use crate::parser::ParserError;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

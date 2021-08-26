@@ -1,8 +1,9 @@
-use crate::zftool::parsers::{get_f32, get_str, Semester};
-use crate::zftool::Result;
+use crate::error::Result;
+use crate::parser::edu::{get_f32, get_str, Semester};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Score {
     /// 成绩
     score: f32,

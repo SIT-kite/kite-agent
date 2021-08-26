@@ -16,9 +16,11 @@ pub use score::Score;
 pub use select_course::SelectCourse;
 pub use timetable::Course;
 
+use crate::parser::ParserError;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Clone)]
+#[derive(Clone, Debug, Deserialize)]
 pub enum SchoolYear {
     AllYear,
     SomeYear(i32),
@@ -33,7 +35,7 @@ impl ToString for SchoolYear {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum Semester {
     All = 0,
     FirstTerm = 1,
@@ -68,12 +70,4 @@ pub fn get_str(x: Option<&Value>) -> String {
 
 pub fn get_f32(x: Option<&Value>) -> f32 {
     get_str(x).parse().unwrap()
-}
-
-#[derive(Debug, thiserror::Error)]
-pub enum ParserError {
-    #[error("Profile element is wrong!!")]
-    MissingField,
-    #[error("Invalid semester valid given.")]
-    SemesterError,
 }

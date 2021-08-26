@@ -1,5 +1,5 @@
-use crate::zftool::parsers::{get_f32, get_str};
-use crate::zftool::Result;
+use crate::error::Result;
+use crate::parser::edu::{get_f32, get_str};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;

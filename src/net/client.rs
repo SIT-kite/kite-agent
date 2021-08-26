@@ -1,7 +1,10 @@
 use super::Session;
 use crate::config::CONFIG;
+use crate::config::USERAGENT;
 use crate::error::Result;
 use chrono::Utc;
+use reqwest::header::{COOKIE, USER_AGENT};
+use reqwest::{Response, StatusCode};
 
 /// Get domain by url. The url must be started with `http://` or `https://` and a splash needed to
 /// after the domain. The function used to get domain and pick cookies from cookie store by name, or
@@ -64,8 +67,8 @@ impl ClientBuilder {
 /// Http(s) Client, with cookie store.
 pub struct Client {
     /// User config, session store
-    session: Session,
-    client: reqwest::Client,
+    pub(crate) session: Session,
+    pub(crate) client: reqwest::Client,
 }
 
 impl Client {
@@ -79,7 +82,7 @@ impl Client {
         }
     }
 
-    /// Create a get request
+    /// Create a post request
     pub fn post(&mut self, url: &str) -> RequestBuilder {
         RequestBuilder {
             session: &mut self.session,
@@ -89,6 +92,29 @@ impl Client {
         }
     }
 
+    pub(crate) async fn get_url(&mut self, url: &str, data: &[(&str, String)]) -> Result<Response> {
+        let response = self
+            .client
+            .get(url)
+            .form(data)
+            .header(USER_AGENT, USERAGENT)
+            .header(COOKIE, self.session.get_cookie_string("jwxt.sit.edu.cn"))
+            .send()
+            .await?;
+        Ok(response)
+    }
+
+    pub(crate) async fn post_url(&mut self, url: &str, data: &[(&str, String)]) -> Result<Response> {
+        let response = self
+            .client
+            .post(url)
+            .form(data)
+            .header(USER_AGENT, USERAGENT)
+            .header(COOKIE, self.session.get_cookie_string("jwxt.sit.edu.cn"))
+            .send()
+            .await?;
+        Ok(response)
+    }
     /// Get session reference
     pub fn session(&self) -> &Session {
         &self.session

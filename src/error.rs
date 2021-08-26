@@ -8,3 +8,11 @@ pub enum AgentError {
     #[error("连接错误: {}", 0)]
     Server(String),
 }
+
+#[derive(Debug, thiserror::Error)]
+pub enum ZfError {
+    #[error("Session error : {0}.")]
+    SessionError(String),
+    #[error("Can't get public key")]
+    PublicKeyError,
+}

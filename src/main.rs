@@ -19,12 +19,11 @@ mod error;
 mod net;
 mod parser;
 pub mod service;
-mod zftool;
 
 use agent::{run, SharedData};
 use config::CONFIG;
-use futures_util::core_reexport::time::Duration;
 use net::SessionStorage;
+use tokio::time::Duration;
 
 fn worker_thread(storage: SessionStorage) {
     let runtime = tokio::runtime::Builder::new_current_thread()
