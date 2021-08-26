@@ -1,25 +1,25 @@
-mod edu;
-mod error;
-pub mod report;
-mod sc;
+use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-pub use crate::net::auth::portal_login;
 pub use error::{ActionError, ErrorResponse};
-
+use report::AgentInfo;
 pub use report::AgentInfoRequest;
 pub use sc::ActivityDetailRequest;
 pub use sc::ActivityListRequest;
 
 use crate::agent::SharedData;
+pub use crate::net::auth::portal_login;
 use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score};
 use crate::service::edu::client::{
     ClassRequest, CourseRequest, GroupTimeTableRequest, MajorRequest, ProfileRequest, ScoreRequest,
     TimeTableRequest,
 };
-use report::AgentInfo;
-use std::collections::HashMap;
+
+mod edu;
+mod error;
+pub mod report;
+mod sc;
 
 /// Response payload
 #[derive(Debug, Deserialize)]

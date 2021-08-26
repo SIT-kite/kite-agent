@@ -1,10 +1,14 @@
-use super::Session;
+use std::fs::ReadDir;
+
+use chrono::Utc;
+use reqwest::header::{HeaderValue, COOKIE, USER_AGENT};
+use reqwest::{Method, Response, StatusCode};
+
 use crate::config::CONFIG;
 use crate::config::USERAGENT;
 use crate::error::Result;
-use chrono::Utc;
-use reqwest::header::{COOKIE, USER_AGENT};
-use reqwest::{Response, StatusCode};
+
+use super::Session;
 
 /// Get domain by url. The url must be started with `http://` or `https://` and a splash needed to
 /// after the domain. The function used to get domain and pick cookies from cookie store by name, or
@@ -14,173 +18,50 @@ pub fn domain(url: &str) -> Option<String> {
     regex.captures(url).map(|x| x[1].to_string())
 }
 
-/// Create a client with config
-pub struct ClientBuilder {
-    /// User config, session store
-    session: Session,
-    /// Reqwest client builder
-    client_builder: reqwest::ClientBuilder,
+fn is_request_redirecting(status: reqwest::StatusCode) -> bool {
+    status == StatusCode::MOVED_PERMANENTLY || status == StatusCode::PERMANENT_REDIRECT
 }
 
-impl ClientBuilder {
-    /// Create a client builder with user session
-    pub fn new(session: Session) -> Self {
-        Self {
-            session,
-            client_builder: reqwest::ClientBuilder::new(),
+#[inline]
+pub async fn send_request(
+    mut session: Session,
+    mut client: reqwest::Client,
+    mut request: reqwest::Request,
+) -> Result<Response> {
+    let mut next_hop = request.url().to_string();
+    let domain = domain(&next_hop).expect("Could not parse domain.");
+
+    let mut max_req_count = 10;
+
+    loop {
+        // Query cookie store
+        let cookies = session.get_cookie_string(&domain);
+        if !cookies.is_empty() {
+            request
+                .headers_mut()
+                .append("Cookies", HeaderValue::from_str(&cookies)?);
         }
-    }
+        let mut request = request.try_clone().unwrap();
+        *request.method_mut() = reqwest::Method::GET;
+        let response = client.execute(request).await?;
+        session.sync_cookies(&domain, response.cookies());
 
-    /// Allow auto redirect.
-    pub fn redirect(mut self, auto_redirect: bool) -> Self {
-        if !auto_redirect {
-            self.client_builder = self.client_builder.redirect(reqwest::redirect::Policy::none());
+        if max_req_count <= 0 || !is_request_redirecting(response.status()) {
+            return Ok(response);
         }
-        self
-    }
-
-    /// Set proxy for http and https
-    pub fn proxy(mut self, proxy: &str) -> Self {
-        if !proxy.is_empty() {
-            self.client_builder = self.client_builder.proxy(reqwest::Proxy::all(proxy).unwrap());
-        }
-        self
-    }
-
-    /// Validate and build a client
-    pub fn build(mut self) -> Client {
-        // If global proxy is configured, set the global proxy
-        // Note: add new proxy will push it to a proxy chain managed by reqwest library, and the global
-        // proxy will be the last proxy in that chain.
-        if let Some(proxy_string) = &CONFIG.agent.proxy {
-            self = self.proxy(proxy_string.as_str());
-        }
-
-        let client = self.client_builder.build().unwrap();
-        Client {
-            session: self.session,
-            client,
-        }
-    }
-}
-
-/// Http(s) Client, with cookie store.
-pub struct Client {
-    /// User config, session store
-    pub(crate) session: Session,
-    pub(crate) client: reqwest::Client,
-}
-
-impl Client {
-    /// Create a get request
-    pub fn get(&mut self, url: &str) -> RequestBuilder {
-        RequestBuilder {
-            session: &mut self.session,
-            domain: domain(url).unwrap(),
-            request_builder: self.client.get(url),
-            payload: Vec::new(),
-        }
-    }
-
-    /// Create a post request
-    pub fn post(&mut self, url: &str) -> RequestBuilder {
-        RequestBuilder {
-            session: &mut self.session,
-            domain: domain(url).unwrap(),
-            request_builder: self.client.post(url),
-            payload: Vec::new(),
-        }
-    }
-
-    pub(crate) async fn get_url(&mut self, url: &str, data: &[(&str, String)]) -> Result<Response> {
-        let response = self
-            .client
-            .get(url)
-            .form(data)
-            .header(USER_AGENT, USERAGENT)
-            .header(COOKIE, self.session.get_cookie_string("jwxt.sit.edu.cn"))
-            .send()
-            .await?;
-        Ok(response)
-    }
-
-    pub(crate) async fn post_url(&mut self, url: &str, data: &[(&str, String)]) -> Result<Response> {
-        let response = self
-            .client
-            .post(url)
-            .form(data)
-            .header(USER_AGENT, USERAGENT)
-            .header(COOKIE, self.session.get_cookie_string("jwxt.sit.edu.cn"))
-            .send()
-            .await?;
-        Ok(response)
-    }
-    /// Get session reference
-    pub fn session(&self) -> &Session {
-        &self.session
-    }
-
-    /// Get session's mut reference
-    pub fn session_mut(&mut self) -> &mut Session {
-        &mut self.session
-    }
-}
-
-pub struct RequestBuilder<'a> {
-    /// User account and session
-    session: &'a mut Session,
-    /// Current request domain
-    domain: String,
-    /// Reqwest request builder
-    request_builder: reqwest::RequestBuilder,
-    /// Text payload
-    payload: Vec<u8>,
-}
-
-impl<'a> RequestBuilder<'a> {
-    /// Set request header
-    pub fn header(mut self, key: &str, value: &str) -> Self {
-        self.request_builder = self.request_builder.header(key, value);
-        self
-    }
-
-    /// Set the form as the payload
-    pub fn form(mut self, text: &'a str) -> Self {
-        self.payload = text.as_bytes().to_vec();
-        self.header("content-type", "application/x-www-form-urlencoded")
-    }
-
-    /// Set a text as the payload
-    pub fn text(mut self, text: &'a str) -> Self {
-        self.payload = text.as_bytes().to_vec();
-        self
-    }
-
-    /// Set binary payload
-    pub fn binary(mut self, content: &[u8]) -> Self {
-        self.payload = content.to_vec();
-        self
-    }
-
-    /// Send request
-    pub async fn send(mut self) -> Result<reqwest::Response> {
-        if !self.payload.is_empty() {
-            // Note: performance issue.
-            self.request_builder = self.request_builder.body(self.payload.to_vec());
+        // Now the status code is 301 or 302.
+        if let Some(new_url) = response.headers().get("Location") {
+            let url = new_url.to_str().unwrap();
+            next_hop = if domain(url).is_none() {
+                // Relative path
+                format!("http://{}/{}", domain, url)
+            } else {
+                url.to_string()
+            }
+        } else {
+            return Ok(response);
         }
 
-        // If cookie store is not empty, add cookie string in header.
-        if !self.session.cookies.is_empty() {
-            let cookie_str = self.session.get_cookie_string(&self.domain);
-            self = self.header("cookie", &cookie_str);
-        }
-
-        // Use reqwest send the request
-        let response = self.request_builder.send().await?;
-        // Update cookies in session. Use Client::session to acquire.
-        self.session.sync_cookies(&self.domain, response.cookies());
-        self.session.last_update = Utc::now().naive_local();
-
-        Ok(response)
+        max_req_count -= 1;
     }
 }

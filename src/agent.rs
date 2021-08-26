@@ -1,16 +1,16 @@
+use std::future::Future;
 use std::pin::Pin;
+use std::task::{Context, Poll};
 
 use async_bincode::AsyncBincodeStream;
 use serde::{Deserialize, Serialize};
 use tokio_tower::multiplex;
 use tokio_tower::multiplex::Server;
+use tower::Service;
 
 use crate::error::{AgentError, Result};
 use crate::service::{RequestPayload, ResponsePayload, ResponseResult};
 use crate::SessionStorage;
-use std::future::Future;
-use std::task::{Context, Poll};
-use tower::Service;
 
 #[derive(Debug, Deserialize)]
 struct RequestFrame {
@@ -33,6 +33,7 @@ impl Default for ResponseFrame {
 #[derive(Debug, Clone)]
 pub struct SharedData {
     pub node: String,
+    pub client: reqwest::Client,
     pub session: SessionStorage,
 }
 

@@ -1,17 +1,22 @@
 #![allow(dead_code)]
 
-// Jemallocator support.
-#[cfg(not(target_env = "msvc"))]
-use jemallocator::Jemalloc;
-
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: Jemalloc = Jemalloc;
-
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate num_derive;
+
+// Jemallocator support.
+#[cfg(not(target_env = "msvc"))]
+use jemallocator::Jemalloc;
+use tokio::time::Duration;
+
+use agent::{run, SharedData};
+use config::CONFIG;
+use net::SessionStorage;
+
+#[cfg(not(target_env = "msvc"))]
+#[global_allocator]
+static GLOBAL: Jemalloc = Jemalloc;
 
 mod agent;
 mod config;
@@ -20,12 +25,7 @@ mod net;
 mod parser;
 pub mod service;
 
-use agent::{run, SharedData};
-use config::CONFIG;
-use net::SessionStorage;
-use tokio::time::Duration;
-
-fn worker_thread(storage: SessionStorage) {
+fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -33,6 +33,7 @@ fn worker_thread(storage: SessionStorage) {
 
     loop {
         let storage = storage.clone();
+        let client = client.clone();
 
         // Run on current thread.
         runtime.block_on(async move {
@@ -50,6 +51,7 @@ fn worker_thread(storage: SessionStorage) {
                             SharedData {
                                 node: node_name.clone(),
                                 session: storage,
+                                client,
                             },
                         )
                         .await
@@ -67,14 +69,18 @@ fn worker_thread(storage: SessionStorage) {
 }
 
 fn main() {
+    let http_client = reqwest::ClientBuilder::new()
+        .build()
+        .expect("Could not init http client.");
     let storage = SessionStorage::new().expect("Fail to load SessionStorage.");
     let mut worker_threads = Vec::new();
 
     for _ in 0..CONFIG.server.conn {
+        let client = client.clone();
         let storage = storage.clone();
 
         let worker = std::thread::spawn(move || {
-            worker_thread(storage);
+            worker_thread(storage, client);
         });
         worker_threads.push(worker);
     }

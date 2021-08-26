@@ -1,11 +1,13 @@
-use super::ResponseResult;
-use crate::agent::SharedData;
-use crate::make_parameter;
-use crate::net::{domain, Client, ClientBuilder};
-use crate::parser::{Activity, ActivityDetail, Parse};
-use crate::service::{ActionError, DoRequest, ResponsePayload};
 use reqwest::{Response as HttpResponse, StatusCode};
 use serde::Deserialize;
+
+use crate::agent::SharedData;
+use crate::make_parameter;
+use crate::net::{domain, ClientBuilder, UserClient};
+use crate::parser::{Activity, ActivityDetail, Parse};
+use crate::service::{ActionError, DoRequest, ResponsePayload};
+
+use super::ResponseResult;
 
 #[derive(Debug, Deserialize)]
 pub struct ActivityListRequest {
@@ -18,7 +20,7 @@ pub struct ActivityListRequest {
 const COOKIE_PAGE: &str =
     "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
 
-async fn get_with_auto_redirect(client: &mut Client, start_page: &str) -> HttpResponse {
+async fn get_with_auto_redirect(client: &mut UserClient, start_page: &str) -> HttpResponse {
     let mut remain_redirect = 10;
     let mut next_hop = start_page.to_string();
     let mut response = client.get(&next_hop).send().await.unwrap();

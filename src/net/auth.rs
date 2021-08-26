@@ -1,9 +1,11 @@
-use super::client::ClientBuilder;
+use reqwest::StatusCode;
+
 use crate::error::Result;
 use crate::make_parameter;
-use crate::net::{Client, Session};
+use crate::net::{Session, UserClient};
 use crate::service::ActionError;
-use reqwest::StatusCode;
+
+use super::client::ClientBuilder;
 
 /// Login page.
 #[allow(dead_code)]
@@ -23,7 +25,7 @@ macro_rules! regex_find {
 }
 
 /// Check whether captcha is need or not.
-pub async fn check_need_captcha(client: &mut Client, account: &str) -> Result<bool> {
+pub async fn check_need_captcha(client: &mut UserClient, account: &str) -> Result<bool> {
     let check_result = client
         .get(&format!(
             "{}?{}",
@@ -41,7 +43,7 @@ pub async fn check_need_captcha(client: &mut Client, account: &str) -> Result<bo
 }
 
 /// Fetch captcha image.
-pub async fn fetch_image(client: &mut Client) -> Result<Vec<u8>> {
+pub async fn fetch_image(client: &mut UserClient) -> Result<Vec<u8>> {
     let captcha = client.get(CAPTCHA_URL).send().await?;
 
     if captcha.status() != StatusCode::OK {
