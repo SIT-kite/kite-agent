@@ -81,7 +81,7 @@ pub struct ClassRequest {
 #[async_trait]
 impl DoRequest for ClassRequest {
     async fn process(self, data: SharedData) -> ResponseResult {
-        let session = data.session.query(self.account.as_str())?;
+        let session = data.session_store.query(self.account.as_str())?;
         match session {
             // If the session is available, should first verify the password is true or not
             Some(s) => {
@@ -114,7 +114,7 @@ pub struct CourseRequest {
 #[async_trait]
 impl DoRequest for CourseRequest {
     async fn process(self, data: SharedData) -> ResponseResult {
-        let session = data.session.query(self.account.as_str())?;
+        let session = data.session_store.query(self.account.as_str())?;
         let entrance_year = self.entrance_year.as_deref();
         match session {
             // If the session is available, should first verify the password is true or not
@@ -160,7 +160,7 @@ pub struct MajorRequest {
 #[async_trait]
 impl DoRequest for MajorRequest {
     async fn process(self, data: SharedData) -> ResponseResult {
-        let session = data.session.query(self.account.as_str())?;
+        let session = data.session_store.query(self.account.as_str())?;
         match session {
             // If the session is available, should first verify the password is true or not
             Some(s) => {

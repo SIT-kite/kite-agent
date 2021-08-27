@@ -34,7 +34,7 @@ impl Default for ResponseFrame {
 pub struct SharedData {
     pub node: String,
     pub client: reqwest::Client,
-    pub session: SessionStorage,
+    pub session_store: SessionStorage,
 }
 
 #[derive(Debug, Default)]

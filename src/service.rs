@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 pub use error::{ActionError, ErrorResponse};
@@ -11,10 +9,6 @@ pub use sc::ActivityListRequest;
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
 use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score};
-use crate::service::edu::client::{
-    ClassRequest, CourseRequest, GroupTimeTableRequest, MajorRequest, ProfileRequest, ScoreRequest,
-    TimeTableRequest,
-};
 
 mod edu;
 mod error;

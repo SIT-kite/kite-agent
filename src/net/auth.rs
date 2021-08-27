@@ -1,11 +1,11 @@
-use reqwest::StatusCode;
+use reqwest::{Request, StatusCode};
 
 use crate::error::Result;
 use crate::make_parameter;
-use crate::net::{Session, UserClient};
 use crate::service::ActionError;
 
-use super::client::ClientBuilder;
+use super::client::is_request_redirecting;
+use super::{Session, UserClient};
 
 /// Login page.
 #[allow(dead_code)]
@@ -26,16 +26,15 @@ macro_rules! regex_find {
 
 /// Check whether captcha is need or not.
 pub async fn check_need_captcha(client: &mut UserClient, account: &str) -> Result<bool> {
-    let check_result = client
-        .get(&format!(
-            "{}?{}",
-            NEED_CAPTCHA_URL,
-            make_parameter!(
+    let url = format!(
+        "{}?{}",
+        NEED_CAPTCHA_URL,
+        make_parameter!(
             "username" => account,
             "pwdEncrypt2" => "pwdEncryptSalt")
-        ))
-        .send()
-        .await?;
+    );
+    let request = Request::new(reqwest::Method::GET, url.parse()?);
+    let check_result = client.send(request).await?;
 
     let result_text = check_result.text().await?;
     println!("result_text = {}", result_text);
@@ -44,7 +43,8 @@ pub async fn check_need_captcha(client: &mut UserClient, account: &str) -> Resul
 
 /// Fetch captcha image.
 pub async fn fetch_image(client: &mut UserClient) -> Result<Vec<u8>> {
-    let captcha = client.get(CAPTCHA_URL).send().await?;
+    let request = Request::new(reqwest::Method::GET, CAPTCHA_URL.parse()?);
+    let captcha = client.send(request).await?;
 
     if captcha.status() != StatusCode::OK {
         return Err(ActionError::FailToGetCaptcha.into());
@@ -84,14 +84,17 @@ fn identify_captcha(image_content: Vec<u8>) -> Result<String> {
 
 /// Login on campus official auth-server with student id and password.
 /// Return string of cookies on `.sit.edu.cn`.
-pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
-    let mut client = ClientBuilder::new(Session::new(user_name, password))
-        .redirect(false)
-        .build();
+pub async fn portal_login(
+    raw_client: &reqwest::Client,
+    user_name: &str,
+    password: &str,
+) -> Result<Session> {
+    let mut client = UserClient::new(Session::new(user_name, password), &raw_client);
 
     // Request login page to get encrypt key and so on.
-    let first_response = client.get(LOGIN_URL).send().await?;
-    let index_html = first_response.text().await?;
+    let index_request = Request::new(reqwest::Method::GET, LOGIN_URL.parse()?);
+    let index_response = client.send(index_request).await?;
+    let index_html = index_response.text().await?;
     let aes_key = regex_find!(&index_html, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
 
     let need_captcha = check_need_captcha(&mut client, user_name).await?;
@@ -101,35 +104,38 @@ pub async fn portal_login(user_name: &str, password: &str) -> Result<Session> {
         captcha = identify_captcha(image)?;
     }
 
-    let response = client
+    let login_request = client
+        .raw_client
         .post(LOGIN_URL)
         .header("content-type", "application/x-www-form-urlencoded")
-        .text(&make_parameter!(
-            "username" => user_name,
-            "password" => &urlencoding::encode(&generate_passwd_string(&password.to_string(), &aes_key)),
-            "dllt" => "userNamePasswordLogin",
-            "execution" => "e1s1",
-            "_eventId" => "submit",
-            "rmShown" => "1",
-            "captchaResponse" => &captcha,
-            "lt" => &regex_find!(&index_html, r#"<input type="hidden" name="lt" value="(.*?)"/>"#).unwrap()
-        ))
-        .send()
-        .await?;
+        .form(&[
+            ("username", user_name),
+            (
+                "password",
+                &generate_passwd_string(&password.to_string(), &aes_key),
+            ),
+            ("dllt", "userNamePasswordLogin"),
+            ("execution", "e1s1"),
+            ("_eventId", "submit"),
+            ("rmShown", "1"),
+            ("captchaResponse", &captcha),
+            (
+                "lt",
+                &regex_find!(&index_html, r#"<input type="hidden" name="lt" value="(.*?)"/>"#).unwrap(),
+            ),
+        ])
+        .build()?;
+    let response = client.send(login_request).await?;
 
     // Login successfully.
-    if response.status() == StatusCode::FOUND {
-        let mut new_session = Session::new(user_name, password);
-
-        new_session.sync_cookies("authserver.sit.edu.cn", response.cookies());
-        return Ok(new_session);
+    if is_request_redirecting(response.status()) {
+        return Ok(client.session);
     }
     // Password error
     if response.status() == StatusCode::OK {
         let response_text = response.text().await?;
 
-        if response_text.contains("请输入验证码") || response_text.contains("您提供的用户名或者密码有误")
-        {
+        if response_text.contains("您提供的用户名或者密码有误") {
             return Err(ActionError::LoginFailed.into());
         } else if response_text.contains("无效的验证码") {
             return Err(ActionError::WrongCaptcha.into());

@@ -50,7 +50,7 @@ fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
                             remote_server.clone(),
                             SharedData {
                                 node: node_name.clone(),
-                                session: storage,
+                                session_store: storage,
                                 client,
                             },
                         )
@@ -76,7 +76,7 @@ fn main() {
     let mut worker_threads = Vec::new();
 
     for _ in 0..CONFIG.server.conn {
-        let client = client.clone();
+        let client = http_client.clone();
         let storage = storage.clone();
 
         let worker = std::thread::spawn(move || {

@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::agent::SharedData;
 use crate::make_parameter;
-use crate::net::{domain, ClientBuilder, UserClient};
+use crate::net::{parse_domain, UserClient};
 use crate::parser::{Activity, ActivityDetail, Parse};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
@@ -20,33 +20,11 @@ pub struct ActivityListRequest {
 const COOKIE_PAGE: &str =
     "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
 
-async fn get_with_auto_redirect(client: &mut UserClient, start_page: &str) -> HttpResponse {
-    let mut remain_redirect = 10;
-    let mut next_hop = start_page.to_string();
-    let mut response = client.get(&next_hop).send().await.unwrap();
-
-    while remain_redirect > 0 && response.status() == StatusCode::FOUND {
-        let redirect_url = response.headers().get("location");
-        if redirect_url.is_none() {
-            return response;
-        }
-        let t = redirect_url.unwrap().to_str().unwrap().to_string();
-        next_hop = if domain(&t).is_none() {
-            format!("http://{}/{}", domain(&next_hop).unwrap(), t)
-        } else {
-            t
-        };
-        response = client.get(&next_hop).send().await.unwrap();
-        remain_redirect -= 1;
-    }
-    response
-}
-
 #[async_trait::async_trait]
 impl DoRequest for ActivityListRequest {
     /// Fetch and parse activity list page.
     async fn process(self, data: SharedData) -> ResponseResult {
-        let mut session_storage = data.session;
+        let mut session_storage = data.session_store;
         let session = session_storage
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;
@@ -100,7 +78,7 @@ pub struct ActivityDetailRequest {
 impl DoRequest for ActivityDetailRequest {
     /// Fetch and parse activity detail page.
     async fn process(self, data: SharedData) -> ResponseResult {
-        let mut session_storage = data.session;
+        let mut session_storage = data.session_store;
         let session = session_storage
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;

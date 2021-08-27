@@ -1,17 +1,18 @@
 use rand::rngs::OsRng;
-use reqwest::{Client, Request};
+use reqwest::Client;
 use rsa::{BigUint, PaddingScheme, PublicKey, RsaPublicKey};
 use urlencoding::encode;
 
-use crate::config::url;
-use crate::error::ZfError;
+use crate::error::{Result, ZfError};
 use crate::net::Session;
 
+use super::url;
+
 lazy_static::lazy_static! {
-    static ref CSRF_TOKEN_REGEX: Regex = Regex::new(
+    static ref CSRF_TOKEN_REGEX: regex::Regex = regex::Regex::new(
             "<input type=\"hidden\" id=\"csrftoken\" name=\"csrftoken\" value=\"(.*)\"/>",
         ).expect("Invalid CSRF_TOKEN_REGEX");
-    static ref LOGIN_ERR_MSG_SELECTOR: Selector =
+    static ref LOGIN_ERR_MSG_SELECTOR: scraper::Selector =
         Selector::parse("div#home.tab-pane.in.active p#tips.bg_danger.sl_danger")
         .expect("Invalid LOGIN_ERR_MSG_SELECTOR.");
 }
@@ -39,7 +40,6 @@ pub async fn get_rsa_public_key(client: Client) -> anyhow::Result<(Vec<u8>, Vec<
     let resp = client
         .client
         .get(url::RSA_PUBLIC_KEY)
-        .header(USER_AGENT, USERAGENT)
         .header(COOKIE, session.get_cookie_string("jwxt.sit.edu.cn"))
         .send()
         .await?;
@@ -71,7 +71,7 @@ fn parse_err_message(content: &str) -> String {
     err_node.trim().to_string()
 }
 
-pub async fn login(client: &mut Client, session: &mut Session) -> Result<String> {
+pub async fn login(client: &mut UserClient) -> Result<String> {
     session.cookies.clear();
 
     let login_page = client.client.get(url::HOME).send().await?;

@@ -1,4 +1,4 @@
-pub use client::{domain, ClientBuilder, RequestBuilder, UserClient};
+pub use client::{parse_domain, UserClient};
 pub use session::AccountCookies;
 pub use session::{Session, SessionStorage};
 

@@ -1,9 +1,11 @@
-use crate::config::CONFIG;
-use crate::error::Result;
+use std::collections::HashMap;
+
 use chrono::{NaiveDateTime, Utc};
 use reqwest::cookie::Cookie;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
+use crate::config::CONFIG;
+use crate::error::Result;
 
 /// Session structure key format in relation.
 const SESSION_KEY_FORMAT: &str = "s:";
@@ -135,9 +137,9 @@ impl Session {
         Ok(true)
     }
 
-    pub async fn login(&mut self) -> Result<()> {
+    pub async fn login(&mut self, client: &reqwest::Client) -> Result<()> {
         self.cookies.clear();
-        self.cookies = crate::service::portal_login(&self.account, &self.password)
+        self.cookies = crate::service::portal_login(client, &self.account, &self.password)
             .await?
             .cookies;
         self.last_update = Utc::now().naive_local();
