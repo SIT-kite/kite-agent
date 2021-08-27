@@ -6,8 +6,11 @@ mod auth;
 mod env;
 mod user;
 
+pub use env::{ClassRequest, CourseRequest, MajorRequest};
+pub use user::{ProfileRequest, ScoreRequest, TimeTableRequest};
+
 /// URL probably used in the module.
-mod url {
+pub(crate) mod url {
     use const_format::concatcp;
 
     /// Server address for 正方教务系统

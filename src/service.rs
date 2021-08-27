@@ -1,14 +1,16 @@
 use serde::{Deserialize, Serialize};
 
+use crate::agent::SharedData;
+pub use crate::net::auth::portal_login;
+use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score};
+pub use edu::{
+    ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreRequest, TimeTableRequest,
+};
 pub use error::{ActionError, ErrorResponse};
 use report::AgentInfo;
 pub use report::AgentInfoRequest;
 pub use sc::ActivityDetailRequest;
 pub use sc::ActivityListRequest;
-
-use crate::agent::SharedData;
-pub use crate::net::auth::portal_login;
-use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score};
 
 mod edu;
 mod error;

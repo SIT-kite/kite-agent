@@ -1,18 +1,17 @@
-use rand::rngs::OsRng;
-use reqwest::Client;
-use rsa::{BigUint, PaddingScheme, PublicKey, RsaPublicKey};
-use urlencoding::encode;
-
-use crate::error::{Result, ZfError};
-use crate::net::Session;
-
 use super::url;
+use crate::error::{Result, ZfError};
+use crate::net::UserClient;
+use base64::{decode, encode};
+use rand::rngs::OsRng;
+use rsa::{BigUint, PaddingScheme, PublicKey, RsaPublicKey};
+use scraper::{Html, Selector};
+use std::ops::Deref;
 
 lazy_static::lazy_static! {
     static ref CSRF_TOKEN_REGEX: regex::Regex = regex::Regex::new(
             "<input type=\"hidden\" id=\"csrftoken\" name=\"csrftoken\" value=\"(.*)\"/>",
         ).expect("Invalid CSRF_TOKEN_REGEX");
-    static ref LOGIN_ERR_MSG_SELECTOR: scraper::Selector =
+    static ref LOGIN_ERR_MSG_SELECTOR: Selector =
         Selector::parse("div#home.tab-pane.in.active p#tips.bg_danger.sl_danger")
         .expect("Invalid LOGIN_ERR_MSG_SELECTOR.");
 }
@@ -29,20 +28,15 @@ pub fn encrypt_in_rsa(message: &[u8], public_key: Vec<u8>, exponent: Vec<u8>) ->
     Ok(encode(enc_data))
 }
 
-pub async fn get_rsa_public_key(client: Client) -> anyhow::Result<(Vec<u8>, Vec<u8>)> {
+pub async fn get_rsa_public_key(client: &mut UserClient) -> anyhow::Result<(Vec<u8>, Vec<u8>)> {
     #[derive(Debug, serde::Deserialize)]
     struct RsaPublicKey {
         modulus: String,
         exponent: String,
     }
-    let session = client.session();
 
-    let resp = client
-        .client
-        .get(url::RSA_PUBLIC_KEY)
-        .header(COOKIE, session.get_cookie_string("jwxt.sit.edu.cn"))
-        .send()
-        .await?;
+    let res = client.raw_client.get(url::RSA_PUBLIC_KEY).build()?;
+    let resp = client.send(res).await?;
 
     let public_key = resp.json::<RsaPublicKey>().await?;
     let modulus = decode(public_key.modulus)?;
@@ -60,10 +54,9 @@ pub fn get_csrf_token(login_page: &str) -> anyhow::Result<String> {
 }
 
 fn parse_err_message(content: &str) -> String {
-    use scraper::{Html, Selector};
     let document = Html::parse_document(content);
     let err_node: String = document
-        .select(LOGIN_ERR_MSG_SELECTOR.as_ref())
+        .select(LOGIN_ERR_MSG_SELECTOR.deref())
         .next()
         .unwrap()
         .text()
@@ -72,10 +65,10 @@ fn parse_err_message(content: &str) -> String {
 }
 
 pub async fn login(client: &mut UserClient) -> Result<String> {
-    session.cookies.clear();
+    client.session.cookies.clear();
 
-    let login_page = client.client.get(url::HOME).send().await?;
-    session.sync_cookies("jwxt.sit.edu.cn", login_page.cookies());
+    let login = client.raw_client.get(url::HOME).build()?;
+    let login_page = client.send(login).await?;
 
     let text = login_page.text().await?;
     let token = get_csrf_token(&text)?;
@@ -88,8 +81,8 @@ pub async fn login(client: &mut UserClient) -> Result<String> {
             ("yhm", &client.session.account.as_str()),
             ("mm", &encrypted_passwd),
         ];
-
-        let final_response = post_with_auto_redirect(&mut client, url::LOGIN, &params).await?;
+        let response_f = client.raw_client.post(url::LOGIN).form(&params).build()?;
+        let final_response = client.send(response_f).await?;
         return if final_response.url().to_string().starts_with(url::LOGIN) {
             let text = final_response.text().await?;
             let error = parse_err_message(&text);

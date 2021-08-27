@@ -2,11 +2,11 @@ use async_trait::async_trait;
 use serde::Deserialize;
 
 use crate::agent::SharedData;
-use crate::error::Result;
-use crate::net::client::{default_response_hook, Action};
+
+use crate::net::client::default_response_hook;
 use crate::net::{Session, UserClient};
 use crate::parser::*;
-use crate::service::{portal_login, DoRequest, ResponsePayload, ResponseResult};
+use crate::service::{DoRequest, ResponsePayload, ResponseResult};
 
 use super::make_sure_active;
 use super::url;
@@ -20,7 +20,7 @@ pub struct ProfileRequest {
 #[async_trait]
 impl DoRequest for ProfileRequest {
     async fn process(self, mut data: SharedData) -> ResponseResult {
-        let mut session = data
+        let session = data
             .session_store
             .query(&self.account)?
             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
@@ -33,7 +33,7 @@ impl DoRequest for ProfileRequest {
         let response = client.send(request).await?;
 
         // Save session after the last response is received.
-        data.session_store.insert(&session);
+        data.session_store.insert(&client.session);
 
         let text = response.text().await?;
         let profile = parse_profile_page(&text)?;
@@ -52,7 +52,7 @@ pub struct TimeTableRequest {
 #[async_trait]
 impl DoRequest for TimeTableRequest {
     async fn process(self, mut data: SharedData) -> ResponseResult {
-        let mut session = data
+        let session = data
             .session_store
             .query(&self.account)?
             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
@@ -66,11 +66,11 @@ impl DoRequest for TimeTableRequest {
             ("xqm", self.semester.to_raw().to_string()),
         ];
 
-        let request = client.raw_client.post(url::TIME_TABLE).build()?;
+        let request = client.raw_client.post(url::TIME_TABLE).form(&params).build()?;
         let response = client.send(request).await?;
 
         // Save session after the last response is received.
-        data.session_store.insert(&session);
+        data.session_store.insert(&client.session);
 
         let text = response.text().await?;
         Ok(ResponsePayload::TimeTable(parse_timetable_page(&text)?))
@@ -88,7 +88,7 @@ pub struct ScoreRequest {
 #[async_trait]
 impl DoRequest for ScoreRequest {
     async fn process(self, mut data: SharedData) -> ResponseResult {
-        let mut session = data
+        let session = data
             .session_store
             .query(&self.account)?
             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
@@ -107,7 +107,7 @@ impl DoRequest for ScoreRequest {
         let response = client.send(request).await?;
 
         // Save session after the last response is received.
-        data.session_store.insert(&session);
+        data.session_store.insert(&client.session);
 
         let text = response.text().await?;
         Ok(ResponsePayload::Score(parse_score_list_page(&text)?))

@@ -1,13 +1,13 @@
-use reqwest::{Response as HttpResponse, StatusCode};
-use serde::Deserialize;
-
+use super::edu::url;
+use super::ResponseResult;
 use crate::agent::SharedData;
+use crate::error::Result;
 use crate::make_parameter;
-use crate::net::{parse_domain, UserClient};
+use crate::net::client::default_response_hook;
+use crate::net::UserClient;
 use crate::parser::{Activity, ActivityDetail, Parse};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
-
-use super::ResponseResult;
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct ActivityListRequest {
@@ -20,49 +20,45 @@ pub struct ActivityListRequest {
 const COOKIE_PAGE: &str =
     "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
 
+async fn make_sure_active(client: &mut UserClient) -> Result<()> {
+    let home_request = client.raw_client.get(COOKIE_PAGE).build()?;
+    let response = client.send(home_request).await?;
+    if response.url().as_str() == COOKIE_PAGE {
+        client.login_with_session().await?;
+        let request = client.raw_client.get(url::SSO_REDIRECT).build()?;
+        let _ = client.send(request).await?;
+    }
+    Ok(())
+}
+
 #[async_trait::async_trait]
 impl DoRequest for ActivityListRequest {
     /// Fetch and parse activity list page.
-    async fn process(self, data: SharedData) -> ResponseResult {
-        let mut session_storage = data.session_store;
-        let session = session_storage
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data
+            .session_store
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;
-        let mut client = ClientBuilder::new(session).redirect(false).build();
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
 
-        let mut try_count = 2;
-        let mut html = String::new();
+        make_sure_active(&mut client).await?;
 
-        while try_count > 0 {
-            let t = client.session().query_cookie("sc.sit.edu.cn", "JSESSIONID");
-            if t.is_none() {
-                get_with_auto_redirect(&mut client, COOKIE_PAGE).await;
-            }
-
-            let response = client
-                .get(&format!(
-                    "http://sc.sit.edu.cn/public/activity/activityList.action?{}",
-                    make_parameter!(
-                    "pageNo" => &self.index.to_string(),
-                    "pageSize" => &self.count.to_string(),
+        let request = client
+            .raw_client
+            .get(&format!(
+                "http://sc.sit.edu.cn/public/activity/activityList.action?{}",
+                make_parameter!("pageNo" => &self.index.to_string(),"pageSize" => &self.count.to_string(),
                     "categoryId" => "",
                     "activityName" => ""
-                    )
-                ))
-                .send()
-                .await?;
+                )
+            ))
+            .build()?;
+        let response = client.send(request).await?;
 
-            html = response.text().await?;
-            // Note: the server do return "languge" rather than "language"
-            if html.starts_with("<script languge='javascript'>") && html.len() < 500 {
-                client.session_mut().login().await?;
-            } else {
-                break;
-            }
-            try_count -= 1;
-        }
-        session_storage.insert(client.session())?;
+        data.session_store.insert(&client.session);
 
+        let html = response.text().await?;
         let activities: Vec<Activity> = Parse::from_html(&html)?;
         Ok(ResponsePayload::ActivityList(activities))
     }
@@ -77,39 +73,28 @@ pub struct ActivityDetailRequest {
 #[async_trait::async_trait]
 impl DoRequest for ActivityDetailRequest {
     /// Fetch and parse activity detail page.
-    async fn process(self, data: SharedData) -> ResponseResult {
-        let mut session_storage = data.session_store;
-        let session = session_storage
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data
+            .session_store
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;
-        let mut client = ClientBuilder::new(session).redirect(false).build();
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
 
-        let mut try_count = 2;
-        let mut html = String::new();
+        make_sure_active(&mut client).await?;
 
-        while try_count > 0 {
-            let t = client.session().query_cookie("sc.sit.edu.cn", "JSESSIONID");
-            if t.is_none() {
-                get_with_auto_redirect(&mut client, COOKIE_PAGE).await;
-            }
+        let request = client
+            .raw_client
+            .get(&format!(
+                "http://sc.sit.edu.cn/public/activity/activityDetail.action?activityId={}",
+                self.id
+            ))
+            .build()?;
+        let response = client.send(request).await?;
 
-            let response = client
-                .get(&format!(
-                    "http://sc.sit.edu.cn/public/activity/activityDetail.action?activityId={}",
-                    self.id
-                ))
-                .send()
-                .await?;
+        let html = response.text().await?;
 
-            html = response.text().await?;
-            if html.starts_with("<script languge='javascript'>") && html.len() < 500 {
-                client.session_mut().login().await?;
-            } else {
-                break;
-            }
-            try_count -= 1;
-        }
-        session_storage.insert(client.session())?;
+        data.session_store.insert(&client.session)?;
 
         let activity: ActivityDetail = Parse::from_html(&html)?;
         Ok(ResponsePayload::ActivityDetail(Box::from(activity)))
