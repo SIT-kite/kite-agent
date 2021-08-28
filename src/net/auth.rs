@@ -103,11 +103,9 @@ pub async fn portal_login(
         let image = fetch_image(&mut client).await?;
         captcha = identify_captcha(image)?;
     }
-
     let login_request = client
         .raw_client
         .post(LOGIN_URL)
-        .header("content-type", "application/x-www-form-urlencoded")
         .form(&[
             ("username", user_name),
             (
@@ -126,7 +124,6 @@ pub async fn portal_login(
         ])
         .build()?;
     let response = client.send(login_request).await?;
-
     // Login successfully.
     if is_request_redirecting(response.status()) {
         return Ok(client.session);
@@ -134,13 +131,13 @@ pub async fn portal_login(
     // Password error
     if response.status() == StatusCode::OK {
         let response_text = response.text().await?;
-
         if response_text.contains("您提供的用户名或者密码有误") {
             return Err(ActionError::LoginFailed.into());
         } else if response_text.contains("无效的验证码") {
             return Err(ActionError::WrongCaptcha.into());
         }
     }
+
     Err(ActionError::Unknown.into())
 }
 

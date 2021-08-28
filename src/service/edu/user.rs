@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::agent::SharedData;
 
@@ -17,31 +17,31 @@ pub struct ProfileRequest {
     pub passwd: String,
 }
 
-#[async_trait]
-impl DoRequest for ProfileRequest {
-    async fn process(self, mut data: SharedData) -> ResponseResult {
-        let session = data
-            .session_store
-            .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
-        let mut client = UserClient::new(session, &data.client);
-        client.set_response_hook(Some(default_response_hook));
+// #[async_trait]
+// impl DoRequest for ProfileRequest {
+//     async fn process(self, mut data: SharedData) -> ResponseResult {
+//         let session = data
+//             .session_store
+//             .query(&self.account)?
+//             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+//         let mut client = UserClient::new(session, &data.client);
+//         client.set_response_hook(Some(default_response_hook));
+//
+//         make_sure_active(&mut client).await?;
+//
+//         let request = data.client.get(url::PROFILE).build()?;
+//         let response = client.send(request).await?;
+//
+//         // Save session after the last response is received.
+//         data.session_store.insert(&client.session);
+//
+//         let text = response.text().await?;
+//         let profile = parse_profile_page(&text)?;
+//         Ok(ResponsePayload::Profile(profile))
+//     }
+// }
 
-        make_sure_active(&mut client).await?;
-
-        let request = data.client.get(url::PROFILE).build()?;
-        let response = client.send(request).await?;
-
-        // Save session after the last response is received.
-        data.session_store.insert(&client.session);
-
-        let text = response.text().await?;
-        let profile = parse_profile_page(&text)?;
-        Ok(ResponsePayload::Profile(profile))
-    }
-}
-
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct TimeTableRequest {
     pub account: String,
     pub passwd: String,
@@ -85,31 +85,31 @@ pub struct ScoreRequest {
     pub semester: Semester,
 }
 
-#[async_trait]
-impl DoRequest for ScoreRequest {
-    async fn process(self, mut data: SharedData) -> ResponseResult {
-        let session = data
-            .session_store
-            .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
-        let mut client = UserClient::new(session, &data.client);
-        client.set_response_hook(Some(default_response_hook));
-
-        make_sure_active(&mut client).await?;
-
-        let params = [
-            ("xnm", self.school_year.to_string()),
-            ("xqm", self.semester.to_raw().to_string()),
-            ("queryModel.showCount", "5000".to_string()),
-        ];
-
-        let request = data.client.post(url::SCORE_LIST).form(&params).build()?;
-        let response = client.send(request).await?;
-
-        // Save session after the last response is received.
-        data.session_store.insert(&client.session);
-
-        let text = response.text().await?;
-        Ok(ResponsePayload::Score(parse_score_list_page(&text)?))
-    }
-}
+// #[async_trait]
+// impl DoRequest for ScoreRequest {
+//     async fn process(self, mut data: SharedData) -> ResponseResult {
+//         let session = data
+//             .session_store
+//             .query(&self.account)?
+//             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+//         let mut client = UserClient::new(session, &data.client);
+//         client.set_response_hook(Some(default_response_hook));
+//
+//         make_sure_active(&mut client).await?;
+//
+//         let params = [
+//             ("xnm", self.school_year.to_string()),
+//             ("xqm", self.semester.to_raw().to_string()),
+//             ("queryModel.showCount", "5000".to_string()),
+//         ];
+//
+//         let request = data.client.post(url::SCORE_LIST).form(&params).build()?;
+//         let response = client.send(request).await?;
+//
+//         // Save session after the last response is received.
+//         data.session_store.insert(&client.session);
+//
+//         let text = response.text().await?;
+//         Ok(ResponsePayload::Score(parse_score_list_page(&text)?))
+//     }
+// }

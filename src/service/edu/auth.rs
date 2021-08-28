@@ -78,7 +78,7 @@ pub async fn login(client: &mut UserClient) -> Result<String> {
         let params = [
             ("csrftoken", token.as_str()),
             ("language", "zh_CN"),
-            ("yhm", &client.session.account.as_str()),
+            ("yhm", &client.session.account),
             ("mm", &encrypted_passwd),
         ];
         let response_f = client.raw_client.post(url::LOGIN).form(&params).build()?;

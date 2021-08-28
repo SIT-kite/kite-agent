@@ -20,7 +20,7 @@ use crate::parser::ParserError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum SchoolYear {
     AllYear,
     SomeYear(i32),

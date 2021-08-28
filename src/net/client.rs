@@ -61,23 +61,22 @@ impl UserClient {
         loop {
             /* Parse domain and load cookies from session */
             complete_url = request.url().to_string();
+
             let domain = parse_domain(&complete_url).expect("Could not parse domain.");
             let cookies = self.session.get_cookie_string(&domain);
+
             if !cookies.is_empty() {
                 request
                     .headers_mut()
-                    .append("Cookies", HeaderValue::from_str(&cookies)?);
+                    .append("cookie", HeaderValue::from_str(&cookies)?);
             }
 
             /* Call request hook */
             self.request_hook.map(|hook| hook(&mut request));
-
             /* Execute request */
             let mut response = self.raw_client.execute(request).await?;
-
             /* Store new cookies to session */
             self.session.sync_cookies(&domain, response.cookies());
-
             /* Call response hook */
             match self
                 .response_hook
@@ -88,7 +87,9 @@ impl UserClient {
                     complete_url = next_hop;
                     request = self.raw_client.get(&complete_url).build()?;
                 }
-                Action::Done => return Ok(response),
+                Action::Done => {
+                    return Ok(response);
+                }
             }
         }
         /* Unreachable. */

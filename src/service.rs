@@ -26,11 +26,11 @@ pub enum RequestPayload {
     ActivityList(ActivityListRequest),
     ActivityDetail(ActivityDetailRequest),
     MajorList(MajorRequest),
-    ClassList(ClassRequest),
-    CourseList(CourseRequest),
-    Profile(ProfileRequest),
+    // ClassList(ClassRequest),
+    // CourseList(CourseRequest),
+    // Profile(ProfileRequest),
     TimeTable(TimeTableRequest),
-    Score(ScoreRequest),
+    // Score(ScoreRequest),
 }
 
 /// Response payload
@@ -42,11 +42,11 @@ pub enum ResponsePayload {
     ActivityList(Vec<Activity>),
     ActivityDetail(Box<ActivityDetail>),
     MajorList(Vec<Major>),
-    ClassList(Vec<Class>),
-    CourseList(Vec<Course>),
-    Profile(Profile),
+    // ClassList(Vec<Class>),
+    // CourseList(Vec<Course>),
+    // Profile(Profile),
     TimeTable(Vec<Course>),
-    Score(Vec<Score>),
+    // Score(Vec<Score>),
 }
 
 #[async_trait::async_trait]
@@ -78,11 +78,11 @@ impl RequestPayload {
             RequestPayload::ActivityList(r) => r.process(data).await,
             RequestPayload::ActivityDetail(r) => r.process(data).await,
             RequestPayload::MajorList(r) => r.process(data).await,
-            RequestPayload::ClassList(r) => r.process(data).await,
-            RequestPayload::CourseList(r) => r.process(data).await,
-            RequestPayload::Profile(r) => r.process(data).await,
+            // RequestPayload::ClassList(r) => r.process(data).await,
+            // RequestPayload::CourseList(r) => r.process(data).await,
+            // RequestPayload::Profile(r) => r.process(data).await,
             RequestPayload::TimeTable(r) => r.process(data).await,
-            RequestPayload::Score(r) => r.process(data).await,
+            // RequestPayload::Score(r) => r.process(data).await,
         }
     }
 }

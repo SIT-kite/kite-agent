@@ -56,7 +56,7 @@ impl DoRequest for ActivityListRequest {
             .build()?;
         let response = client.send(request).await?;
 
-        data.session_store.insert(&client.session);
+        data.session_store.insert(&client.session)?;
 
         let html = response.text().await?;
         let activities: Vec<Activity> = Parse::from_html(&html)?;

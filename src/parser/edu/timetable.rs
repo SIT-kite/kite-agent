@@ -11,7 +11,7 @@ lazy_static::lazy_static! {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Course {
     /// 课程名称
-    pub(crate) course_name: String,
+    course_name: String,
     /// 星期
     day: i32,
     /// 节次
