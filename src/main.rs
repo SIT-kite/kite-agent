@@ -69,13 +69,16 @@ fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
 }
 
 fn main() {
-    let http_client = reqwest::ClientBuilder::new()
-        .redirect(reqwest::redirect::Policy::none())
-        // .proxy(reqwest::Proxy::http("http://10.1.160.251:8888/").unwrap())
-        // .proxy(reqwest::Proxy::https("http://10.1.160.251:8888/").unwrap())
-        .danger_accept_invalid_certs(true)
-        .build()
-        .expect("Could not init http client.");
+    let mut builder = reqwest::ClientBuilder::new().redirect(reqwest::redirect::Policy::none());
+
+    if let Some(proxy) = &CONFIG.agent.proxy {
+        let err_msg = "Invalid proxy settings.";
+        builder = builder
+            .proxy(reqwest::Proxy::http(proxy).expect(err_msg))
+            .proxy(reqwest::Proxy::https(proxy).expect(err_msg))
+            .danger_accept_invalid_certs(true);
+    }
+    let http_client = builder.build().expect("Could not init http client.");
     let storage = SessionStorage::new().expect("Fail to load SessionStorage.");
     let mut worker_threads = Vec::new();
 

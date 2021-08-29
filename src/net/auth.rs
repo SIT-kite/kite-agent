@@ -89,7 +89,7 @@ pub async fn portal_login(
     user_name: &str,
     password: &str,
 ) -> Result<Session> {
-    let mut client = UserClient::new(Session::new(user_name, password), &raw_client);
+    let mut client = UserClient::new(Session::new(user_name, password), raw_client);
 
     // Request login page to get encrypt key and so on.
     let index_request = Request::new(reqwest::Method::GET, LOGIN_URL.parse()?);

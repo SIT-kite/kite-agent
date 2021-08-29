@@ -2,7 +2,6 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::agent::SharedData;
-
 use crate::net::client::default_response_hook;
 use crate::net::{Session, UserClient};
 use crate::parser::*;
@@ -70,7 +69,7 @@ impl DoRequest for TimeTableRequest {
         let response = client.send(request).await?;
 
         // Save session after the last response is received.
-        data.session_store.insert(&client.session);
+        data.session_store.insert(&client.session)?;
 
         let text = response.text().await?;
         Ok(ResponsePayload::TimeTable(parse_timetable_page(&text)?))

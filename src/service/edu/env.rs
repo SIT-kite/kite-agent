@@ -1,13 +1,14 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 
-use super::url;
 use crate::agent::SharedData;
 use crate::net::client::default_response_hook;
 use crate::net::{Session, UserClient};
 use crate::parser::*;
 use crate::service::edu::make_sure_active;
 use crate::service::{DoRequest, ResponsePayload, ResponseResult};
+
+use super::url;
 
 #[derive(Debug, Deserialize)]
 pub struct ClassRequest {
@@ -132,7 +133,7 @@ impl DoRequest for MajorRequest {
         let request = client.raw_client.get(url::MAJOR_LIST).build()?;
         let response = client.send(request).await?;
 
-        data.session_store.insert(&client.session);
+        data.session_store.insert(&client.session)?;
 
         let text = response.text().await?;
         Ok(ResponsePayload::MajorList(parse_major_list_page(&text)?))

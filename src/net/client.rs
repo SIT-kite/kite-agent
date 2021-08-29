@@ -55,7 +55,7 @@ impl UserClient {
     }
 
     pub async fn send(&mut self, request: reqwest::Request) -> Result<Response> {
-        let mut complete_url = String::new();
+        let mut complete_url;
         let mut request = request;
 
         loop {
@@ -72,7 +72,9 @@ impl UserClient {
             }
 
             /* Call request hook */
-            self.request_hook.map(|hook| hook(&mut request));
+            if let Some(hook) = self.request_hook {
+                hook(&mut request);
+            }
             /* Execute request */
             let mut response = self.raw_client.execute(request).await?;
             /* Store new cookies to session */

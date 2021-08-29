@@ -1,13 +1,12 @@
+pub use env::{ClassRequest, CourseRequest, MajorRequest};
+pub use user::{ProfileRequest, ScoreRequest, TimeTableRequest};
+
 use crate::error::Result;
-use crate::net::client::{default_response_hook, Action};
 use crate::net::UserClient;
 
 mod auth;
 mod env;
 mod user;
-
-pub use env::{ClassRequest, CourseRequest, MajorRequest};
-pub use user::{ProfileRequest, ScoreRequest, TimeTableRequest};
 
 /// URL probably used in the module.
 pub(crate) mod url {
@@ -42,11 +41,6 @@ pub(crate) mod url {
     pub const CLASS_LIST: &str = concatcp!(HOME, "/jwglxt/xtgl/comm_cxBjdmList.html?gnmkdm=N214505");
     /// Suggested course and time table
     pub const SUGGESTED_COURSE: &str = concatcp!(HOME, "/jwglxt/kbdy/bjkbdy_cxBjKb.html?gnmkdm=N214505");
-}
-
-fn edu_response_hook(response: &mut reqwest::Response) -> Action {
-    let default_action = default_response_hook(response);
-    default_action
 }
 
 async fn make_sure_active(client: &mut UserClient) -> Result<()> {
