@@ -77,6 +77,8 @@ fn main() {
             .proxy(reqwest::Proxy::http(proxy).expect(err_msg))
             .proxy(reqwest::Proxy::https(proxy).expect(err_msg))
             .danger_accept_invalid_certs(true);
+
+        println!("Load proxy: {}", proxy);
     }
     let http_client = builder.build().expect("Could not init http client.");
     let storage = SessionStorage::new().expect("Fail to load SessionStorage.");

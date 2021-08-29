@@ -1,24 +1,24 @@
+use serde::{Deserialize, Serialize};
+use serde_json::Value;
+
+pub use classes::{parse_class_list_page, parse_major_list_page};
+pub use classes::{Class, Major};
+pub use profile::parse_profile_page;
+pub use profile::Profile;
+pub use score::Score;
+pub use score::{calculate_gpa, parse_score_list_page};
+pub use select_course::parse_available_course_page;
+pub use select_course::SelectCourse;
+pub use timetable::parse_timetable_page;
+pub use timetable::Course;
+
+use crate::parser::ParserError;
+
 mod classes;
 mod profile;
 mod score;
 mod select_course;
 mod timetable;
-
-pub use classes::{parse_class_list_page, parse_major_list_page};
-pub use profile::parse_profile_page;
-pub use score::{calculate_gpa, parse_score_list_page};
-pub use select_course::parse_available_course_page;
-pub use timetable::parse_timetable_page;
-
-pub use classes::{Class, Major};
-pub use profile::Profile;
-pub use score::Score;
-pub use select_course::SelectCourse;
-pub use timetable::Course;
-
-use crate::parser::ParserError;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub enum SchoolYear {
@@ -69,5 +69,6 @@ pub fn get_str(x: Option<&Value>) -> String {
 }
 
 pub fn get_f32(x: Option<&Value>) -> f32 {
-    get_str(x).parse().unwrap()
+    // Some value may be '无', use default if the parse() could not be done properly.
+    get_str(x).parse().unwrap_or_default()
 }
