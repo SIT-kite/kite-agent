@@ -84,31 +84,31 @@ pub struct ScoreRequest {
     pub semester: Semester,
 }
 
-// #[async_trait]
-// impl DoRequest for ScoreRequest {
-//     async fn process(self, mut data: SharedData) -> ResponseResult {
-//         let session = data
-//             .session_store
-//             .query(&self.account)?
-//             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
-//         let mut client = UserClient::new(session, &data.client);
-//         client.set_response_hook(Some(default_response_hook));
-//
-//         make_sure_active(&mut client).await?;
-//
-//         let params = [
-//             ("xnm", self.school_year.to_string()),
-//             ("xqm", self.semester.to_raw().to_string()),
-//             ("queryModel.showCount", "5000".to_string()),
-//         ];
-//
-//         let request = data.client.post(url::SCORE_LIST).form(&params).build()?;
-//         let response = client.send(request).await?;
-//
-//         // Save session after the last response is received.
-//         data.session_store.insert(&client.session);
-//
-//         let text = response.text().await?;
-//         Ok(ResponsePayload::Score(parse_score_list_page(&text)?))
-//     }
-// }
+#[async_trait]
+impl DoRequest for ScoreRequest {
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data
+            .session_store
+            .query(&self.account)?
+            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
+
+        make_sure_active(&mut client).await?;
+
+        let params = [
+            ("xnm", self.school_year.to_string()),
+            ("xqm", self.semester.to_raw().to_string()),
+            ("queryModel.showCount", "5000".to_string()),
+        ];
+
+        let request = data.client.post(url::SCORE_LIST).form(&params).build()?;
+        let response = client.send(request).await?;
+
+        // Save session after the last response is received.
+        data.session_store.insert(&client.session);
+
+        let text = response.text().await?;
+        Ok(ResponsePayload::Score(parse_score_list_page(&text)?))
+    }
+}

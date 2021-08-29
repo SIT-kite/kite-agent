@@ -65,7 +65,7 @@ impl Semester {
 }
 
 pub fn get_str(x: Option<&Value>) -> String {
-    String::from(x.map(|m| m.as_str().unwrap()).unwrap_or_default())
+    String::from(x.map(|m| m.as_str().unwrap().trim()).unwrap_or_default())
 }
 
 pub fn get_f32(x: Option<&Value>) -> f32 {

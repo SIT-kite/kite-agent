@@ -30,7 +30,7 @@ pub enum RequestPayload {
     // CourseList(CourseRequest),
     // Profile(ProfileRequest),
     TimeTable(TimeTableRequest),
-    // Score(ScoreRequest),
+    Score(ScoreRequest),
 }
 
 /// Response payload
@@ -46,7 +46,7 @@ pub enum ResponsePayload {
     // CourseList(Vec<Course>),
     // Profile(Profile),
     TimeTable(Vec<Course>),
-    // Score(Vec<Score>),
+    Score(Vec<Score>),
 }
 
 #[async_trait::async_trait]
@@ -82,7 +82,7 @@ impl RequestPayload {
             // RequestPayload::CourseList(r) => r.process(data).await,
             // RequestPayload::Profile(r) => r.process(data).await,
             RequestPayload::TimeTable(r) => r.process(data).await,
-            // RequestPayload::Score(r) => r.process(data).await,
+            RequestPayload::Score(r) => r.process(data).await,
         }
     }
 }

@@ -109,8 +109,14 @@ pub fn trans_to_i32(s: Vec<i32>) -> i32 {
     }
     binary_number
 }
+
 fn split_string(s: String) -> Vec<String> {
-    let result: Vec<String> = s.split(',').map(ToString::to_string).collect();
+    let mut result;
+    if s.is_empty() {
+        result = Vec::new();
+    } else {
+        result = s.split(',').map(ToString::to_string).collect();
+    }
     result
 }
 
@@ -122,7 +128,7 @@ pub fn parse_timetable_page(page: &str) -> Result<Vec<Course>> {
         for each_course in course {
             let week_i32 = trans_to_i32(expand_weeks_collect(get_str(each_course.get("zcd")).as_str()));
             let time_i32 = trans_to_i32(expand_time_collect(get_str(each_course.get("jcs")).as_str()));
-
+            let class = split_string(get_str(each_course.get("jxbzc")));
             result.push(Course {
                 course_name: get_str(each_course.get("kcmc")),
                 day: trans_week(get_str(each_course.get("xqjmc")).as_str()),
@@ -135,7 +141,7 @@ pub fn parse_timetable_page(page: &str) -> Result<Vec<Course>> {
                 hours: get_f32(each_course.get("zxs")),
                 dyn_class_id: get_str(each_course.get("jxbmc")),
                 course_id: get_str(each_course.get("kch")),
-                prefered_class: split_string(get_str(each_course.get("jxbzc"))),
+                prefered_class: class,
             })
         }
         return Ok(result);
