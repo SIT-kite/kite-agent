@@ -15,9 +15,9 @@ pub struct Course {
     /// 星期
     day: i32,
     /// 节次
-    time_index: Vec<String>,
+    time_index: i32,
     /// 周次
-    weeks: Vec<String>,
+    week: i32,
     /// 教室
     place: String,
     /// 教师
@@ -49,15 +49,13 @@ fn trans_week(week_day: &str) -> i32 {
     }
 }
 
-pub fn expand_weeks_str(week_string: &str) -> Vec<String> {
+pub fn expand_weeks_collect(week_string: &str) -> Vec<i32> {
     let check_time_index = |x: &str| -> i32 {
         if let Ok(x) = x.parse() {
             return x;
         }
         0
     };
-
-    let transform_number = |x: i32| -> String { x.to_string() };
 
     let mut weeks = Vec::new();
     week_string.split(',').for_each(|week_string| {
@@ -70,25 +68,24 @@ pub fn expand_weeks_str(week_string: &str) -> Vec<String> {
             let mut min = check_time_index(range.get(1).unwrap().as_str());
             let max = check_time_index(range.get(3).unwrap().as_str());
             while min < max + 1 {
-                weeks.push(transform_number(min));
+                weeks.push(min);
                 min += step;
             }
         } else {
-            weeks.push(week_string.replace("周", ""));
+            weeks.push((week_string.replace("周", "")).parse().unwrap());
         }
     });
 
     weeks
 }
 
-pub fn expand_time_index(time_string: &str) -> Vec<String> {
+pub fn expand_time_collect(time_string: &str) -> Vec<i32> {
     let check_time_index = |x: &str| -> i32 {
         if let Ok(x) = x.parse() {
             return x;
         }
         0
     };
-    let transform_number = |x: i32| -> String { x.to_string() };
 
     let mut indices = Vec::new();
     if time_string.contains('-') {
@@ -96,15 +93,22 @@ pub fn expand_time_index(time_string: &str) -> Vec<String> {
             let (range_left, range_right) = (check_time_index(min), check_time_index(max));
             let ranges = range_left..(range_right + 1);
             for range in ranges {
-                indices.push(transform_number(range));
+                indices.push(range);
             }
         }
     } else {
-        indices.push(String::from(time_string));
+        indices.push(time_string.parse().unwrap());
     }
     indices
 }
 
+pub fn trans_to_i32(s: Vec<i32>) -> i32 {
+    let mut binary_number = 0;
+    for number in s {
+        binary_number |= 1 << number;
+    }
+    binary_number
+}
 fn split_string(s: String) -> Vec<String> {
     let result: Vec<String> = s.split(',').map(ToString::to_string).collect();
     result
@@ -116,11 +120,14 @@ pub fn parse_timetable_page(page: &str) -> Result<Vec<Course>> {
     if let Some(course) = course_list.as_array() {
         let mut result = Vec::new();
         for each_course in course {
+            let week_i32 = trans_to_i32(expand_weeks_collect(get_str(each_course.get("zcd")).as_str()));
+            let time_i32 = trans_to_i32(expand_time_collect(get_str(each_course.get("jcs")).as_str()));
+
             result.push(Course {
                 course_name: get_str(each_course.get("kcmc")),
                 day: trans_week(get_str(each_course.get("xqjmc")).as_str()),
-                time_index: expand_time_index(get_str(each_course.get("jcs")).as_str()),
-                weeks: expand_weeks_str(get_str(each_course.get("zcd")).as_str()),
+                time_index: time_i32,
+                week: week_i32,
                 place: get_str(each_course.get("cdmc")),
                 teacher: split_string(get_str(each_course.get("xm"))),
                 campus: get_str(each_course.get("xqmc")),
