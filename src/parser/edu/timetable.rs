@@ -1,8 +1,9 @@
-use crate::error::Result;
-use crate::parser::edu::{str_to_f32, str_to_i32, vec_to_i32};
 use regex::Regex;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
+
+use crate::error::Result;
+use crate::parser::edu::{str_to_f32, str_to_i32, vec_to_i32};
 
 lazy_static::lazy_static! {
     static ref WEEK_REGEX: Regex = Regex::new(r"(\d{1,2})(:?-(\d{1,2}))?").unwrap();
@@ -37,7 +38,7 @@ pub struct Course {
     #[serde(rename(deserialize = "zxs"), deserialize_with = "str_to_i32")]
     /// 学时
     hours: i32,
-    #[serde(rename(deserialize = "jxbmc"))]
+    #[serde(rename(deserialize = "jxbmc"), deserialize_with = "str_trim")]
     /// 教学班
     dyn_class_id: String,
     #[serde(rename(deserialize = "kch"))]
@@ -149,9 +150,17 @@ fn str_to_vec_string<'de, D>(deserializer: D) -> std::result::Result<Vec<String>
 where
     D: Deserializer<'de>,
 {
-    let s = Option::<String>::deserialize(deserializer)?.unwrap_or_default();
+    let s = String::deserialize(deserializer)?;
     let i = split_string(&s);
     Ok(i)
+}
+
+fn str_trim<'de, D>(deserializer: D) -> std::result::Result<String, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    Ok(s.trim().to_string())
 }
 
 pub fn parse_timetable_page(page: &str) -> Result<Vec<Course>> {
