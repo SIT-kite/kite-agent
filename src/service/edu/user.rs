@@ -106,7 +106,7 @@ impl DoRequest for ScoreRequest {
         let response = client.send(request).await?;
 
         // Save session after the last response is received.
-        data.session_store.insert(&client.session);
+        data.session_store.insert(&client.session)?;
 
         let text = response.text().await?;
         Ok(ResponsePayload::Score(parse_score_list_page(&text)?))

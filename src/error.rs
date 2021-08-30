@@ -5,8 +5,8 @@ pub type Result<T> = std::result::Result<T, anyhow::Error>;
 pub enum AgentError {
     #[error("无法连接到 kite-server")]
     ConnectionFailure,
-    #[error("连接错误: {}", 0)]
-    Server(String),
+    #[error("服务错误: {0}")]
+    Service(String),
 }
 
 #[derive(Debug, thiserror::Error)]

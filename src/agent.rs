@@ -121,7 +121,7 @@ pub async fn run(server_address: String, shared_data: SharedData) -> Result<()> 
         KiteService { shared_data },
     )
     .await
-    .map_err(|e| AgentError::Server(e.to_string()))?;
+    .map_err(|e| AgentError::Service(e.to_string()))?;
 
     println!("Disconnected.");
     Ok(())

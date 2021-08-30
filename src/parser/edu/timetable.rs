@@ -107,14 +107,12 @@ fn expand_time_collect(time_string: &str) -> Vec<i32> {
     indices
 }
 
-fn split_string(s: &String) -> Vec<String> {
-    let mut result;
+fn split_string(s: &str) -> Vec<String> {
     if s.is_empty() {
-        result = Vec::new();
+        Vec::new()
     } else {
-        result = s.split(',').map(ToString::to_string).collect();
+        s.split(',').map(ToString::to_string).collect()
     }
-    result
 }
 
 fn weeks_to_i32<'de, D>(deserializer: D) -> std::result::Result<i32, D::Error>
@@ -167,7 +165,7 @@ pub fn parse_timetable_page(page: &str) -> Result<Vec<Course>> {
     let json_page: Value = serde_json::from_str(page)?;
     json_page["kbList"].as_array().map_or(Ok(vec![]), |course_list| {
         let result: std::result::Result<Vec<_>, serde_json::Error> = course_list
-            .into_iter()
+            .iter()
             .map(|course| serde_json::from_value::<Course>(course.clone()))
             .collect();
         Ok(result?)
