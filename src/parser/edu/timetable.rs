@@ -1,7 +1,7 @@
 use crate::error::Result;
-use crate::parser::edu::{get_f32, get_str};
+use crate::parser::edu::{str_to_f32, str_to_i32, vec_to_i32};
 use regex::Regex;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 lazy_static::lazy_static! {
@@ -10,30 +10,39 @@ lazy_static::lazy_static! {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Course {
+    #[serde(rename(deserialize = "kcmc"))]
     /// 课程名称
     course_name: String,
+    #[serde(rename(deserialize = "xqjmc"), deserialize_with = "day_to_i32")]
     /// 星期
     day: i32,
+    #[serde(rename(deserialize = "jcs"), deserialize_with = "index_time_to_i32")]
     /// 节次
     time_index: i32,
+    #[serde(rename(deserialize = "zcd"), deserialize_with = "weeks_to_i32")]
     /// 周次
     week: i32,
+    #[serde(rename(deserialize = "cdmc"))]
     /// 教室
     place: String,
+    #[serde(rename(deserialize = "xm"), deserialize_with = "str_to_vec_string")]
     /// 教师
     teacher: Vec<String>,
+    #[serde(rename(deserialize = "xqmc"))]
     /// 校区
     campus: String,
+    #[serde(rename(deserialize = "xf"), deserialize_with = "str_to_f32")]
     /// 学分
     credit: f32,
+    #[serde(rename(deserialize = "zxs"), deserialize_with = "str_to_i32")]
     /// 学时
-    hours: f32,
+    hours: i32,
+    #[serde(rename(deserialize = "jxbmc"))]
     /// 教学班
     dyn_class_id: String,
+    #[serde(rename(deserialize = "kch"))]
     /// 课程代码
     course_id: String,
-    /// 陪课班
-    prefered_class: Vec<String>,
 }
 
 fn trans_week(week_day: &str) -> i32 {
@@ -49,7 +58,7 @@ fn trans_week(week_day: &str) -> i32 {
     }
 }
 
-pub fn expand_weeks_collect(week_string: &str) -> Vec<i32> {
+fn expand_weeks_collect(week_string: &str) -> Vec<i32> {
     let check_time_index = |x: &str| -> i32 {
         if let Ok(x) = x.parse() {
             return x;
@@ -79,13 +88,8 @@ pub fn expand_weeks_collect(week_string: &str) -> Vec<i32> {
     weeks
 }
 
-pub fn expand_time_collect(time_string: &str) -> Vec<i32> {
-    let check_time_index = |x: &str| -> i32 {
-        if let Ok(x) = x.parse() {
-            return x;
-        }
-        0
-    };
+fn expand_time_collect(time_string: &str) -> Vec<i32> {
+    let check_time_index = |x: &str| -> i32 { x.parse().unwrap_or_default() };
 
     let mut indices = Vec::new();
     if time_string.contains('-') {
@@ -102,15 +106,7 @@ pub fn expand_time_collect(time_string: &str) -> Vec<i32> {
     indices
 }
 
-pub fn trans_to_i32(s: Vec<i32>) -> i32 {
-    let mut binary_number = 0;
-    for number in s {
-        binary_number |= 1 << number;
-    }
-    binary_number
-}
-
-fn split_string(s: String) -> Vec<String> {
+fn split_string(s: &String) -> Vec<String> {
     let mut result;
     if s.is_empty() {
         result = Vec::new();
@@ -120,31 +116,51 @@ fn split_string(s: String) -> Vec<String> {
     result
 }
 
+fn weeks_to_i32<'de, D>(deserializer: D) -> std::result::Result<i32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    let x = expand_weeks_collect(&s);
+    let i = vec_to_i32(x);
+    Ok(i)
+}
+
+fn day_to_i32<'de, D>(deserializer: D) -> std::result::Result<i32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    let i = trans_week(&s);
+    Ok(i)
+}
+
+fn index_time_to_i32<'de, D>(deserializer: D) -> std::result::Result<i32, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    let x = expand_time_collect(&s);
+    let i = vec_to_i32(x);
+    Ok(i)
+}
+
+fn str_to_vec_string<'de, D>(deserializer: D) -> std::result::Result<Vec<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = Option::<String>::deserialize(deserializer)?.unwrap_or_default();
+    let i = split_string(&s);
+    Ok(i)
+}
+
 pub fn parse_timetable_page(page: &str) -> Result<Vec<Course>> {
     let json_page: Value = serde_json::from_str(page)?;
-    let course_list = json_page["kbList"].clone();
-    if let Some(course) = course_list.as_array() {
-        let mut result = Vec::new();
-        for each_course in course {
-            let week_i32 = trans_to_i32(expand_weeks_collect(get_str(each_course.get("zcd")).as_str()));
-            let time_i32 = trans_to_i32(expand_time_collect(get_str(each_course.get("jcs")).as_str()));
-            let class = split_string(get_str(each_course.get("jxbzc")));
-            result.push(Course {
-                course_name: get_str(each_course.get("kcmc")),
-                day: trans_week(get_str(each_course.get("xqjmc")).as_str()),
-                time_index: time_i32,
-                week: week_i32,
-                place: get_str(each_course.get("cdmc")),
-                teacher: split_string(get_str(each_course.get("xm"))),
-                campus: get_str(each_course.get("xqmc")),
-                credit: get_f32(each_course.get("xf")),
-                hours: get_f32(each_course.get("zxs")),
-                dyn_class_id: get_str(each_course.get("jxbmc")),
-                course_id: get_str(each_course.get("kch")),
-                prefered_class: class,
-            })
-        }
-        return Ok(result);
-    }
-    Ok(vec![])
+    json_page["kbList"].as_array().map_or(Ok(vec![]), |course_list| {
+        let result: std::result::Result<Vec<_>, serde_json::Error> = course_list
+            .into_iter()
+            .map(|course| serde_json::from_value::<Course>(course.clone()))
+            .collect();
+        Ok(result?)
+    })
 }

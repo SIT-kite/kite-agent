@@ -1,22 +1,29 @@
 use crate::error::Result;
-use crate::parser::edu::{get_f32, get_str, Semester};
+use crate::parser::edu::{str_to_f32, str_to_semester, Semester};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Score {
+    #[serde(rename(deserialize = "cj"), deserialize_with = "str_to_f32")]
     /// 成绩
     score: f32,
+    #[serde(rename(deserialize = "kcmc"))]
     /// 课程
     course: String,
+    #[serde(rename(deserialize = "kch"))]
     /// 课程代码
     course_id: String,
+    #[serde(rename(deserialize = "jxb_id"))]
     /// 班级
     class_id: String,
+    #[serde(rename(deserialize = "xnmmc"))]
     /// 学年
     school_year: String,
+    #[serde(rename(deserialize = "xqm"), deserialize_with = "str_to_semester")]
     /// 学期
     semester: Semester,
+    #[serde(rename(deserialize = "xf"), deserialize_with = "str_to_f32")]
     /// 学分
     credit: f32,
 }
@@ -27,15 +34,7 @@ pub fn parse_score_list_page(page: &str) -> Result<Vec<Score>> {
     let result = json_page["items"].as_array().map(|course_list| {
         course_list
             .iter()
-            .map(|course| Score {
-                score: get_f32(course.get("cj")),
-                course: get_str(course.get("kcmc")),
-                course_id: get_str(course.get("kch")),
-                class_id: get_str(course.get("jxb_id")),
-                school_year: get_str(course.get("xnmmc")),
-                semester: Semester::from_raw(&get_str(course.get("xqm"))).unwrap(),
-                credit: get_f32(course.get("xf")),
-            })
+            .map(|course| serde_json::from_value::<Score>(course.clone()).unwrap())
             .collect()
     });
     match result {
