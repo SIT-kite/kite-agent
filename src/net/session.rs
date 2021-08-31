@@ -16,17 +16,23 @@ pub enum SessionError {}
 pub struct SessionStorage {
     /// Sled handle
     db: sled::Db,
+    rng: rand::rngs::SmallRng,
 }
 
 impl SessionStorage {
     /// Create a session database client.
     pub fn new() -> Result<Self> {
+        use rand::SeedableRng;
+
         let db = sled::Config::new()
             .mode(sled::Mode::HighThroughput)
             .path(&CONFIG.agent.db)
             .open()?;
+        // Note: get rand seed is a high cost operation, so we share it in session storage.
+        let os_rng = rand::rngs::OsRng::default();
+        let rng = rand::rngs::SmallRng::from_rng(os_rng)?;
 
-        Ok(Self { db })
+        Ok(Self { db, rng })
     }
 
     /// Query session by user.
@@ -69,8 +75,9 @@ impl SessionStorage {
     }
     /// Choose a session data randomly.
     pub fn choose_randomly(&mut self) -> Result<Option<Session>> {
-        // TODO: handle error
-        if let Some(Ok((_, session))) = self.db.iter().next() {
+        use rand::prelude::IteratorRandom;
+
+        if let Some(Ok((_, session))) = self.db.iter().choose(&mut self.rng) {
             let content = session.to_vec();
             let session = bincode::deserialize::<Session>(&content)?;
 
