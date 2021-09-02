@@ -1,8 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::agent::SharedData;
-pub use crate::net::auth::portal_login;
-use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score, ScScoreItem};
+use auth::{PortalAuthRequest, PortalAuthResponse};
 pub use edu::{
     ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreRequest, TimeTableRequest,
 };
@@ -11,8 +9,13 @@ use report::AgentInfo;
 pub use report::AgentInfoRequest;
 pub use sc::ActivityDetailRequest;
 pub use sc::ActivityListRequest;
-use crate::service::sc::ScScoreItemRequest;
+use sc::ScScoreItemRequest;
 
+use crate::agent::SharedData;
+pub use crate::net::auth::portal_login;
+use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, ScScoreItem, Score};
+
+mod auth;
 mod edu;
 mod error;
 pub mod report;
@@ -24,6 +27,7 @@ pub enum RequestPayload {
     None,
     Ping(String),
     AgentInfo(AgentInfoRequest),
+    PortalAuth(PortalAuthRequest),
     ActivityList(ActivityListRequest),
     ActivityDetail(ActivityDetailRequest),
     ScoreDetail(ScScoreItemRequest),
@@ -41,6 +45,7 @@ pub enum ResponsePayload {
     None,
     Pong(String),
     Credential(AgentInfo),
+    PortalAuth(PortalAuthResponse),
     ActivityList(Vec<Activity>),
     ActivityDetail(Box<ActivityDetail>),
     ScoreDetail(Vec<ScScoreItem>),
@@ -78,9 +83,10 @@ impl RequestPayload {
             RequestPayload::None => Ok(ResponsePayload::None),
             RequestPayload::Ping(r) => Ok(ResponsePayload::Pong(r)),
             RequestPayload::AgentInfo(r) => r.process(data).await,
+            RequestPayload::PortalAuth(r) => r.process(data).await,
             RequestPayload::ActivityList(r) => r.process(data).await,
             RequestPayload::ActivityDetail(r) => r.process(data).await,
-            RequestPayload::ScoreDetail(r) => r.process(data).await?,
+            RequestPayload::ScoreDetail(r) => r.process(data).await,
             RequestPayload::MajorList(r) => r.process(data).await,
             // RequestPayload::ClassList(r) => r.process(data).await,
             // RequestPayload::CourseList(r) => r.process(data).await,

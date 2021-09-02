@@ -89,56 +89,67 @@ pub async fn portal_login(
     user_name: &str,
     password: &str,
 ) -> Result<Session> {
-    let mut client = UserClient::new(Session::new(user_name, password), raw_client);
+    let mut try_count = 4;
 
-    // Request login page to get encrypt key and so on.
-    let index_request = Request::new(reqwest::Method::GET, LOGIN_URL.parse()?);
-    let index_response = client.send(index_request).await?;
-    let index_html = index_response.text().await?;
-    let aes_key = regex_find!(&index_html, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
+    let session = Session::new(user_name, password);
+    let mut client = UserClient::new(session, raw_client);
 
-    let need_captcha = check_need_captcha(&mut client, user_name).await?;
-    let mut captcha = String::new();
-    if need_captcha {
-        let image = fetch_image(&mut client).await?;
-        captcha = identify_captcha(image)?;
-    }
-    let login_request = client
-        .raw_client
-        .post(LOGIN_URL)
-        .form(&[
-            ("username", user_name),
-            (
-                "password",
-                &generate_passwd_string(&password.to_string(), &aes_key),
-            ),
-            ("dllt", "userNamePasswordLogin"),
-            ("execution", "e1s1"),
-            ("_eventId", "submit"),
-            ("rmShown", "1"),
-            ("captchaResponse", &captcha),
-            (
-                "lt",
-                &regex_find!(&index_html, r#"<input type="hidden" name="lt" value="(.*?)"/>"#).unwrap(),
-            ),
-        ])
-        .build()?;
-    let response = client.send(login_request).await?;
-    // Login successfully.
-    if is_request_redirecting(response.status()) {
-        return Ok(client.session);
-    }
-    // Password error
-    if response.status() == StatusCode::OK {
-        let response_text = response.text().await?;
-        if response_text.contains("您提供的用户名或者密码有误") {
-            return Err(ActionError::LoginFailed.into());
-        } else if response_text.contains("无效的验证码") {
-            return Err(ActionError::WrongCaptcha.into());
+    while try_count > 0 {
+        client.session.cookies.clear();
+
+        // Request login page to get encrypt key and so on.
+        let index_request = Request::new(reqwest::Method::GET, LOGIN_URL.parse()?);
+        let index_response = client.send(index_request).await?;
+        let index_html = index_response.text().await?;
+        let aes_key = regex_find!(&index_html, r#"var pwdDefaultEncryptSalt = "(.*?)";"#).unwrap();
+
+        let need_captcha = check_need_captcha(&mut client, user_name).await?;
+        let mut captcha = String::new();
+        if need_captcha {
+            let image = fetch_image(&mut client).await?;
+            captcha = identify_captcha(image)?;
         }
-    }
+        let login_request = client
+            .raw_client
+            .post(LOGIN_URL)
+            .form(&[
+                ("username", user_name),
+                (
+                    "password",
+                    &generate_passwd_string(&password.to_string(), &aes_key),
+                ),
+                ("dllt", "userNamePasswordLogin"),
+                ("execution", "e1s1"),
+                ("_eventId", "submit"),
+                ("rmShown", "1"),
+                ("captchaResponse", &captcha),
+                (
+                    "lt",
+                    &regex_find!(&index_html, r#"<input type="hidden" name="lt" value="(.*?)"/>"#)
+                        .unwrap(),
+                ),
+            ])
+            .build()?;
 
-    Err(ActionError::Unknown.into())
+        let response = client.send(login_request).await?;
+        // Login successfully.
+        if is_request_redirecting(response.status()) {
+            return Ok(client.session);
+        }
+        // Password error
+        if response.status() == StatusCode::OK {
+            let response_text = response.text().await?;
+            if response_text.contains("您提供的用户名或者密码有误") {
+                // If successfully authenticated or password wrong, break.
+                return Err(ActionError::LoginFailed.into());
+            } else {
+                // Else, captcha wrong, or other error, make a captcha challenge again.
+            }
+        }
+
+        try_count -= 1;
+    }
+    return Err(ActionError::Unknown.into());
 }
 
 /// When submit password to `authserver.sit.edu.cn`, it's required to do AES and base64 algorithm with

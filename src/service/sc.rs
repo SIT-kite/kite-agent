@@ -1,13 +1,15 @@
-use super::edu::url;
-use super::ResponseResult;
+use serde::Deserialize;
+
 use crate::agent::SharedData;
 use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
-use crate::net::{UserClient, Session};
-use crate::parser::{Activity, ActivityDetail, Parse, ScoreItem, get_score_detail};
+use crate::net::{Session, UserClient};
+use crate::parser::{get_score_detail, Activity, ActivityDetail, Parse, ScScoreItem};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
-use serde::Deserialize;
+
+use super::edu::url;
+use super::ResponseResult;
 
 #[derive(Debug, Deserialize)]
 pub struct ActivityListRequest {
@@ -110,7 +112,7 @@ pub struct ScScoreItemRequest {
 }
 
 #[async_trait::async_trait]
-impl DoRequest for ScoreItemRequest {
+impl DoRequest for ScScoreItemRequest {
     async fn process(self, mut data: SharedData) -> ResponseResult {
         let session = data
             .session_store

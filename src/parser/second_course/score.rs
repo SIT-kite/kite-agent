@@ -1,9 +1,10 @@
-use crate::error::Result;
-use crate::parser::Parse;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
-use crate::service::{DoRequest, ResponseResult};
+
 use crate::agent::SharedData;
+use crate::error::Result;
+use crate::parser::Parse;
+use crate::service::{DoRequest, ResponseResult};
 
 const CLASSIFICATION: &[&str] = &[
     "主题报告",
@@ -103,13 +104,13 @@ impl Parse for ScScoreSummary {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize)]
 pub struct ScScoreItem {
     pub activity_id: i32,
     pub amount: f32,
 }
 
-fn map_detail(list: ElementRef) -> Result<ScoreItem> {
+fn map_detail(list: ElementRef) -> Result<ScScoreItem> {
     let id: Option<i32> = list
         .select(&ID_DETAIL)
         .next()
@@ -121,13 +122,13 @@ fn map_detail(list: ElementRef) -> Result<ScoreItem> {
         .and_then(|x| Some(x.inner_html().parse().unwrap_or_default()));
 
     // TODO: Add error handler.
-    Ok(ScoreItem {
+    Ok(ScScoreItem {
         activity_id: id.unwrap_or_default(),
         amount: add_score.unwrap_or_default(),
     })
 }
 
-fn filter_zero_score(x: &Result<ScoreItem>) -> bool {
+fn filter_zero_score(x: &Result<ScScoreItem>) -> bool {
     if let Ok(e) = x {
         e.amount > 0.01
     } else {
@@ -135,7 +136,7 @@ fn filter_zero_score(x: &Result<ScoreItem>) -> bool {
     }
 }
 
-pub fn get_score_detail(html_page: &str) -> Result<Vec<ScoreItem>> {
+pub fn get_score_detail(html_page: &str) -> Result<Vec<ScScoreItem>> {
     let document = Html::parse_document(html_page);
 
     document
@@ -144,7 +145,6 @@ pub fn get_score_detail(html_page: &str) -> Result<Vec<ScoreItem>> {
         .filter(filter_zero_score)
         .collect()
 }
-
 
 #[cfg(test)]
 mod test {
