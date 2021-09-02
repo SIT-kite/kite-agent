@@ -20,6 +20,8 @@ pub struct ActivityListRequest {
 const COOKIE_PAGE: &str =
     "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
 
+const SCORE_DETAIL: &str = "http://sc.sit.edu.cn/public/pcenter/scoreDetail.action";
+
 async fn make_sure_active(client: &mut UserClient) -> Result<()> {
     let home_request = client.raw_client.get(COOKIE_PAGE).build()?;
     let response = client.send(home_request).await?;
