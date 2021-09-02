@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
-use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score};
+use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, Score, ScScoreItem};
 pub use edu::{
     ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreRequest, TimeTableRequest,
 };
@@ -11,6 +11,7 @@ use report::AgentInfo;
 pub use report::AgentInfoRequest;
 pub use sc::ActivityDetailRequest;
 pub use sc::ActivityListRequest;
+use crate::service::sc::ScScoreItemRequest;
 
 mod edu;
 mod error;
@@ -25,6 +26,7 @@ pub enum RequestPayload {
     AgentInfo(AgentInfoRequest),
     ActivityList(ActivityListRequest),
     ActivityDetail(ActivityDetailRequest),
+    ScoreDetail(ScScoreItemRequest),
     MajorList(MajorRequest),
     // ClassList(ClassRequest),
     // CourseList(CourseRequest),
@@ -41,6 +43,7 @@ pub enum ResponsePayload {
     Credential(AgentInfo),
     ActivityList(Vec<Activity>),
     ActivityDetail(Box<ActivityDetail>),
+    ScoreDetail(Vec<ScScoreItem>),
     MajorList(Vec<Major>),
     // ClassList(Vec<Class>),
     // CourseList(Vec<Course>),
@@ -77,6 +80,7 @@ impl RequestPayload {
             RequestPayload::AgentInfo(r) => r.process(data).await,
             RequestPayload::ActivityList(r) => r.process(data).await,
             RequestPayload::ActivityDetail(r) => r.process(data).await,
+            RequestPayload::ScoreDetail(r) => r.process(data).await?,
             RequestPayload::MajorList(r) => r.process(data).await,
             // RequestPayload::ClassList(r) => r.process(data).await,
             // RequestPayload::CourseList(r) => r.process(data).await,

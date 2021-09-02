@@ -10,7 +10,7 @@ pub use edu::{
 };
 pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, SelectCourse, Semester};
 pub use expense::ExpenseRecord;
-pub use second_course::{Activity, ActivityDetail, JoinedActivity, ScScoreSummary};
+pub use second_course::{Activity, ActivityDetail, JoinedActivity, ScScoreSummary, ScScoreItem, get_score_detail};
 
 pub trait Parse {
     fn from_html(html_page: &str) -> Result<Self>

@@ -4,8 +4,8 @@ use crate::agent::SharedData;
 use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
-use crate::net::UserClient;
-use crate::parser::{Activity, ActivityDetail, Parse};
+use crate::net::{UserClient, Session};
+use crate::parser::{Activity, ActivityDetail, Parse, ScoreItem, get_score_detail};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 use serde::Deserialize;
 
@@ -100,5 +100,35 @@ impl DoRequest for ActivityDetailRequest {
 
         let activity: ActivityDetail = Parse::from_html(&html)?;
         Ok(ResponsePayload::ActivityDetail(Box::from(activity)))
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ScScoreItemRequest {
+    pub account: String,
+    pub passwd: String,
+}
+
+#[async_trait::async_trait]
+impl DoRequest for ScoreItemRequest {
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data
+            .session_store
+            .query(&self.account)?
+            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
+
+        make_sure_active(&mut client).await?;
+
+        let request = client.raw_client.get(SCORE_DETAIL).build()?;
+        let response = client.send(request).await?;
+
+        let html = response.text().await?;
+
+        data.session_store.insert(&client.session)?;
+
+        let score = get_score_detail(&html)?;
+        Ok(ResponsePayload::ScoreDetail(score))
     }
 }

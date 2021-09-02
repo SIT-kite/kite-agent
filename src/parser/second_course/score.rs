@@ -2,6 +2,8 @@ use crate::error::Result;
 use crate::parser::Parse;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
+use crate::service::{DoRequest, ResponseResult};
+use crate::agent::SharedData;
 
 const CLASSIFICATION: &[&str] = &[
     "主题报告",
@@ -102,7 +104,7 @@ impl Parse for ScScoreSummary {
 }
 
 #[derive(Debug, Clone)]
-pub struct ScoreItem {
+pub struct ScScoreItem {
     pub activity_id: i32,
     pub amount: f32,
 }
@@ -133,7 +135,7 @@ fn filter_zero_score(x: &Result<ScoreItem>) -> bool {
     }
 }
 
-fn get_score_detail(html_page: &str) -> Result<Vec<ScoreItem>> {
+pub fn get_score_detail(html_page: &str) -> Result<Vec<ScoreItem>> {
     let document = Html::parse_document(html_page);
 
     document
@@ -142,6 +144,7 @@ fn get_score_detail(html_page: &str) -> Result<Vec<ScoreItem>> {
         .filter(filter_zero_score)
         .collect()
 }
+
 
 #[cfg(test)]
 mod test {
