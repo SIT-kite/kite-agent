@@ -7,13 +7,13 @@ pub use edu::{
 pub use error::{ActionError, ErrorResponse};
 use report::AgentInfo;
 pub use report::AgentInfoRequest;
-pub use sc::ActivityDetailRequest;
-pub use sc::ActivityListRequest;
-use sc::ScScoreItemRequest;
+pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScScoreItemRequest};
 
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
-use crate::parser::{Activity, ActivityDetail, Class, Course, Major, Profile, ScScoreItem, Score};
+use crate::parser::{
+    Activity, ActivityDetail, Class, Course, Major, Profile, ScActivityItem, ScScoreItem, Score,
+};
 
 mod auth;
 mod edu;
@@ -31,6 +31,7 @@ pub enum RequestPayload {
     ActivityList(ActivityListRequest),
     ActivityDetail(ActivityDetailRequest),
     ScScoreDetail(ScScoreItemRequest),
+    ScActivityDetail(ScActivityRequest),
     MajorList(MajorRequest),
     // ClassList(ClassRequest),
     // CourseList(CourseRequest),
@@ -49,6 +50,7 @@ pub enum ResponsePayload {
     ActivityList(Vec<Activity>),
     ActivityDetail(Box<ActivityDetail>),
     ScScoreDetail(Vec<ScScoreItem>),
+    ScActivityDetail(Vec<ScActivityItem>),
     MajorList(Vec<Major>),
     // ClassList(Vec<Class>),
     // CourseList(Vec<Course>),
@@ -87,6 +89,7 @@ impl RequestPayload {
             RequestPayload::ActivityList(r) => r.process(data).await,
             RequestPayload::ActivityDetail(r) => r.process(data).await,
             RequestPayload::ScScoreDetail(r) => r.process(data).await,
+            RequestPayload::ScActivityDetail(r) => r.process(data).await,
             RequestPayload::MajorList(r) => r.process(data).await,
             // RequestPayload::ClassList(r) => r.process(data).await,
             // RequestPayload::CourseList(r) => r.process(data).await,

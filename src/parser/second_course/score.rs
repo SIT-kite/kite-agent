@@ -1,10 +1,9 @@
+use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
-use crate::agent::SharedData;
 use crate::error::Result;
 use crate::parser::Parse;
-use crate::service::{DoRequest, ResponseResult};
 
 const CLASSIFICATION: &[&str] = &[
     "主题报告",
@@ -30,6 +29,14 @@ lazy_static! {
     static ref TOTAL_SCORE: Selector =
         Selector::parse("#content-box > div.user-info > div:nth-child(2) > font").unwrap();
     static ref SPAN_SCORE: Selector = Selector::parse("#span_score").unwrap();
+    static ref ACTIVITY_DETAIL: Selector = Selector::parse(
+        "#content-box > div:nth-child(12) > div.table_style_4 > form > table > tbody > tr"
+    )
+    .unwrap();
+    static ref ACTIVITY_ID_DETAIL: Selector = Selector::parse("td:nth-child(2)").unwrap();
+    static ref TIME_DETAL: Selector = Selector::parse("td:nth-child(4)").unwrap();
+    static ref STATUS_DETAIL: Selector = Selector::parse("td:nth-child(5)").unwrap();
+    static ref ACTIVITY_ID: Regex = Regex::new(r"activityId=(\d+)").unwrap();
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -110,13 +117,13 @@ pub struct ScScoreItem {
     pub amount: f32,
 }
 
-fn map_detail(list: ElementRef) -> Result<ScScoreItem> {
-    let id: Option<i32> = list
+fn score_map_detail(item: ElementRef) -> Result<ScScoreItem> {
+    let id: Option<i32> = item
         .select(&ID_DETAIL)
         .next()
         .and_then(|x| Some(x.inner_html().parse().unwrap_or_default()));
 
-    let add_score: Option<f32> = list
+    let add_score: Option<f32> = item
         .select(&SCORE_DETAIL)
         .next()
         .and_then(|x| Some(x.inner_html().parse().unwrap_or_default()));
@@ -141,11 +148,64 @@ pub fn get_score_detail(html_page: &str) -> Result<Vec<ScScoreItem>> {
 
     document
         .select(&SCORE_DETAIL_PAGE)
-        .map(map_detail)
+        .map(score_map_detail)
         .filter(filter_zero_score)
         .collect()
 }
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct ScActivityItem {
+    pub activity_id: i32,
+    pub time: NaiveDateTime,
+    pub status: String,
+}
+
+fn activity_map_detail(item: ElementRef) -> Result<ScActivityItem> {
+    let activity_id: Option<i32> = item.select(&ACTIVITY_ID_DETAIL).next().and_then(|x| {
+        ACTIVITY_ID.captures(x.inner_html().as_str()).map(|m| {
+            m.get(1)
+                .unwrap()
+                .as_str()
+                .trim()
+                .to_string()
+                .parse()
+                .unwrap_or_default()
+        })
+    });
+
+    let time: Option<NaiveDateTime> = item.select(&TIME_DETAL).next().and_then(|x| {
+        Some(NaiveDateTime::parse_from_str(x.inner_html().as_str(), "%Y-%m-%d %H:%M:%S").unwrap())
+    });
+
+    let status: Option<String> = item
+        .select(&STATUS_DETAIL)
+        .next()
+        .and_then(|x| Some(String::from(x.inner_html().trim())));
+
+    Ok(ScActivityItem {
+        activity_id: activity_id.unwrap_or_default(),
+        time: time.unwrap(),
+        status: status.unwrap_or_default(),
+    })
+}
+
+fn filter_delete_activity(x: &Result<ScActivityItem>) -> bool {
+    if let Ok(e) = x {
+        e.activity_id != 0
+    } else {
+        false
+    }
+}
+
+pub fn get_activity_detail(html_page: &str) -> Result<Vec<ScActivityItem>> {
+    let document = Html::parse_document(html_page);
+
+    document
+        .select(&ACTIVITY_DETAIL)
+        .map(activity_map_detail)
+        .filter(filter_delete_activity)
+        .collect()
+}
 #[cfg(test)]
 mod test {
     #[test]
@@ -173,6 +233,14 @@ mod test {
         use crate::parser::second_course::score::get_score_detail;
         let html_page = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
         let detail = get_score_detail(&html_page);
+        println!("{:?}", detail);
+    }
+
+    #[test]
+    fn test_activity_detail() {
+        use crate::parser::second_course::score::get_activity_detail;
+        let html_page = std::fs::read_to_string("html/第二课堂得分活动页面.html").unwrap();
+        let detail = get_activity_detail(&html_page);
         println!("{:?}", detail);
     }
 }

@@ -5,7 +5,7 @@ use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
 use crate::net::{Session, UserClient};
-use crate::parser::{get_score_detail, Activity, ActivityDetail, Parse, ScScoreItem};
+use crate::parser::{get_activity_detail, get_score_detail, Activity, ActivityDetail, Parse};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
 use super::edu::url;
@@ -23,6 +23,9 @@ const COOKIE_PAGE: &str =
     "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
 
 const SCORE_DETAIL: &str = "http://sc.sit.edu.cn/public/pcenter/scoreDetail.action";
+
+const ACTIVITY_DETAIL: &str =
+    "http://sc.sit.edu.cn/public/pcenter/activityOrderList.action?pageSize=200";
 
 async fn make_sure_active(client: &mut UserClient) -> Result<()> {
     let home_request = client.raw_client.get(COOKIE_PAGE).build()?;
@@ -132,5 +135,35 @@ impl DoRequest for ScScoreItemRequest {
 
         let score = get_score_detail(&html)?;
         Ok(ResponsePayload::ScScoreDetail(score))
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ScActivityRequest {
+    pub account: String,
+    pub passwd: String,
+}
+
+#[async_trait::async_trait]
+impl DoRequest for ScActivityRequest {
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data
+            .session_store
+            .query(&self.account)?
+            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
+
+        make_sure_active(&mut client).await?;
+
+        let request = client.raw_client.get(ACTIVITY_DETAIL).build()?;
+        let response = client.send(request).await?;
+
+        let html = response.text().await?;
+
+        data.session_store.insert(&client.session)?;
+
+        let activity = get_activity_detail(&html)?;
+        Ok(ResponsePayload::ScActivityDetail(activity))
     }
 }

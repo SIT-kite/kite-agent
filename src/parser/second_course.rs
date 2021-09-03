@@ -4,4 +4,4 @@ mod score;
 
 pub use details::ActivityDetail;
 pub use list::{Activity, JoinedActivity};
-pub use score::{ScScoreSummary, ScScoreItem, get_score_detail};
+pub use score::{get_activity_detail, get_score_detail, ScActivityItem, ScScoreItem, ScScoreSummary};
