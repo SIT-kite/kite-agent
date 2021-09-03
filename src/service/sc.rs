@@ -131,6 +131,6 @@ impl DoRequest for ScScoreItemRequest {
         data.session_store.insert(&client.session)?;
 
         let score = get_score_detail(&html)?;
-        Ok(ResponsePayload::ScoreDetail(score))
+        Ok(ResponsePayload::ScScoreDetail(score))
     }
 }
