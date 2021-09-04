@@ -121,12 +121,12 @@ fn score_map_detail(item: ElementRef) -> Result<ScScoreItem> {
     let id: Option<i32> = item
         .select(&ID_DETAIL)
         .next()
-        .and_then(|x| Some(x.inner_html().parse().unwrap_or_default()));
+        .and_then(|x| Some(x.inner_html().trim().parse().unwrap_or_default()));
 
     let add_score: Option<f32> = item
         .select(&SCORE_DETAIL)
         .next()
-        .and_then(|x| Some(x.inner_html().parse().unwrap_or_default()));
+        .and_then(|x| Some(x.inner_html().trim().parse().unwrap_or_default()));
 
     // TODO: Add error handler.
     Ok(ScScoreItem {
