@@ -1,4 +1,4 @@
-use chrono::NaiveDateTime;
+use chrono::{DateTime, Duration, FixedOffset, Local, NaiveDateTime};
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
@@ -156,7 +156,7 @@ pub fn get_score_detail(html_page: &str) -> Result<Vec<ScScoreItem>> {
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ScActivityItem {
     pub activity_id: i32,
-    pub time: NaiveDateTime,
+    pub time: DateTime<Local>,
     pub status: String,
 }
 
@@ -173,8 +173,13 @@ fn activity_map_detail(item: ElementRef) -> Result<ScActivityItem> {
         })
     });
 
-    let time: Option<NaiveDateTime> = item.select(&TIME_DETAL).next().and_then(|x| {
-        Some(NaiveDateTime::parse_from_str(x.inner_html().as_str(), "%Y-%m-%d %H:%M:%S").unwrap())
+    let time: Option<DateTime<Local>> = item.select(&TIME_DETAL).next().and_then(|x| {
+        let native_time =
+            NaiveDateTime::parse_from_str(x.inner_html().trim(), "%Y-%m-%d %H:%M:%S").unwrap();
+        let mut time = DateTime::from_utc(native_time, FixedOffset::east(8 * 3600));
+        let eight_hour = Duration::hours(8);
+        time = time - eight_hour;
+        Some(time)
     });
 
     let status: Option<String> = item
