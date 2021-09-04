@@ -4,6 +4,7 @@ use scraper::{ElementRef, Html, Selector};
 
 use crate::error::Result;
 use crate::parser::Parse;
+use std::collections::HashMap;
 
 const CLASSIFICATION: &[&str] = &[
     "主题报告",
@@ -145,12 +146,27 @@ fn filter_zero_score(x: &Result<ScScoreItem>) -> bool {
 
 pub fn get_score_detail(html_page: &str) -> Result<Vec<ScScoreItem>> {
     let document = Html::parse_document(html_page);
-
-    document
+    let score_items = document
         .select(&SCORE_DETAIL_PAGE)
         .map(score_map_detail)
         .filter(filter_zero_score)
-        .collect()
+        .collect::<Result<Vec<ScScoreItem>>>()?;
+
+    // Group and accumulate score by activity id.
+    let map = score_items.into_iter().fold(HashMap::<i32, f32>::new(), |mut map, x| {
+        if let Some(mut old) = map.get_mut(&x.activity_id) {
+            *old += x.amount;
+        } else {
+            map.insert(x.activity_id, x.amount);
+        }
+        map
+    });
+
+    let result = map.into_iter().map(|(activity_id, amount)| ScScoreItem {
+        activity_id,
+        amount,
+    }).collect();
+    Ok(result)
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
