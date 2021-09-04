@@ -15,7 +15,7 @@ pub struct ClassRequest {
     pub school_year: SchoolYear,
     pub semester: Semester,
     pub account: String,
-    pub passwd: String,
+    pub password: String,
 }
 
 // #[async_trait]
@@ -24,7 +24,7 @@ pub struct ClassRequest {
 //         let session = data
 //             .session_store
 //             .query(&self.account)?
-//             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+//             .unwrap_or_else(|| Session::new(&self.account, &self.password));
 //         let mut client = UserClient::new(session, &data.client);
 //         client.set_response_hook(Some(default_response_hook));
 //
@@ -51,7 +51,7 @@ pub struct CourseRequest {
     pub school_year: SchoolYear,
     pub semester: Semester,
     pub account: String,
-    pub passwd: String,
+    pub password: String,
     pub major_id: String,
     pub class_id: String,
     pub entrance_year: Option<String>,
@@ -63,7 +63,7 @@ pub struct CourseRequest {
 //         let session = data
 //             .session_store
 //             .query(&self.account)?
-//             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+//             .unwrap_or_else(|| Session::new(&self.account, &self.password));
 //         let mut client = UserClient::new(session, &data.client);
 //         client.set_response_hook(Some(default_response_hook));
 //
@@ -115,7 +115,7 @@ pub struct CourseRequest {
 pub struct MajorRequest {
     pub entrance_year: SchoolYear,
     pub account: String,
-    pub passwd: String,
+    pub password: String,
 }
 
 #[async_trait]
@@ -124,7 +124,7 @@ impl DoRequest for MajorRequest {
         let session = data
             .session_store
             .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+            .unwrap_or_else(|| Session::new(&self.account, &self.password));
         let mut client = UserClient::new(session, &data.client);
         client.set_response_hook(Some(default_response_hook));
 

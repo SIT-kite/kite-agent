@@ -1,11 +1,14 @@
-use super::url;
-use crate::error::{Result, ZfError};
-use crate::net::UserClient;
+use std::ops::Deref;
+
 use base64::{decode, encode};
 use rand::rngs::OsRng;
 use rsa::{BigUint, PaddingScheme, PublicKey, RsaPublicKey};
 use scraper::{Html, Selector};
-use std::ops::Deref;
+
+use crate::error::{Result, ZfError};
+use crate::net::UserClient;
+
+use super::url;
 
 lazy_static::lazy_static! {
     static ref CSRF_TOKEN_REGEX: regex::Regex = regex::Regex::new(
@@ -74,12 +77,13 @@ pub async fn login(client: &mut UserClient) -> Result<String> {
     let token = get_csrf_token(&text)?;
 
     if let Ok((public_key, exponent)) = get_rsa_public_key(client).await {
-        let encrypted_passwd = encrypt_in_rsa(client.session.password.as_bytes(), public_key, exponent)?;
+        let encrypted_password =
+            encrypt_in_rsa(client.session.password.as_bytes(), public_key, exponent)?;
         let params = [
             ("csrftoken", token.as_str()),
             ("language", "zh_CN"),
             ("yhm", &client.session.account),
-            ("mm", &encrypted_passwd),
+            ("mm", &encrypted_password),
         ];
         let response_f = client.raw_client.post(url::LOGIN).form(&params).build()?;
         let final_response = client.send(response_f).await?;

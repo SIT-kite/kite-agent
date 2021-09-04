@@ -116,7 +116,7 @@ pub async fn portal_login(
                 ("username", user_name),
                 (
                     "password",
-                    &generate_passwd_string(&password.to_string(), &aes_key),
+                    &generate_password_string(&password.to_string(), &aes_key),
                 ),
                 ("dllt", "userNamePasswordLogin"),
                 ("execution", "e1s1"),
@@ -154,7 +154,7 @@ pub async fn portal_login(
 
 /// When submit password to `authserver.sit.edu.cn`, it's required to do AES and base64 algorithm with
 /// origin password. We use a key from HTML (generated and changed by `JSESSIONID`) to help with.
-pub fn generate_passwd_string(clear_password: &str, key: &str) -> String {
+pub fn generate_password_string(clear_password: &str, key: &str) -> String {
     use block_modes::block_padding::Pkcs7;
     use block_modes::{BlockMode, Cbc};
     type Aes128Cbc = Cbc<aes::Aes128, Pkcs7>;
@@ -167,6 +167,6 @@ pub fn generate_passwd_string(clear_password: &str, key: &str) -> String {
     content.extend_from_slice(clear_password.as_bytes());
 
     // Encrypt with AES and use do base64 encoding.
-    let encrypted_passwd = cipher.encrypt_vec(&content);
-    base64::encode(encrypted_passwd)
+    let encrypted_password = cipher.encrypt_vec(&content);
+    base64::encode(encrypted_password)
 }

@@ -1,10 +1,11 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Duration, FixedOffset, Local, NaiveDateTime};
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
 use crate::error::Result;
 use crate::parser::Parse;
-use std::collections::HashMap;
 
 const CLASSIFICATION: &[&str] = &[
     "主题报告",
@@ -153,19 +154,21 @@ pub fn get_score_detail(html_page: &str) -> Result<Vec<ScScoreItem>> {
         .collect::<Result<Vec<ScScoreItem>>>()?;
 
     // Group and accumulate score by activity id.
-    let map = score_items.into_iter().fold(HashMap::<i32, f32>::new(), |mut map, x| {
-        if let Some(mut old) = map.get_mut(&x.activity_id) {
-            *old += x.amount;
-        } else {
-            map.insert(x.activity_id, x.amount);
-        }
-        map
-    });
+    let map = score_items
+        .into_iter()
+        .fold(HashMap::<i32, f32>::new(), |mut map, x| {
+            if let Some(old) = map.get_mut(&x.activity_id) {
+                *old += x.amount;
+            } else {
+                map.insert(x.activity_id, x.amount);
+            }
+            map
+        });
 
-    let result = map.into_iter().map(|(activity_id, amount)| ScScoreItem {
-        activity_id,
-        amount,
-    }).collect();
+    let result = map
+        .into_iter()
+        .map(|(activity_id, amount)| ScScoreItem { activity_id, amount })
+        .collect();
     Ok(result)
 }
 

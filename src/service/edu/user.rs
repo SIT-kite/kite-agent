@@ -13,7 +13,7 @@ use super::url;
 #[derive(Debug, Deserialize)]
 pub struct ProfileRequest {
     pub account: String,
-    pub passwd: String,
+    pub password: String,
 }
 
 // #[async_trait]
@@ -22,7 +22,7 @@ pub struct ProfileRequest {
 //         let session = data
 //             .session_store
 //             .query(&self.account)?
-//             .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+//             .unwrap_or_else(|| Session::new(&self.account, &self.password));
 //         let mut client = UserClient::new(session, &data.client);
 //         client.set_response_hook(Some(default_response_hook));
 //
@@ -43,7 +43,7 @@ pub struct ProfileRequest {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TimeTableRequest {
     pub account: String,
-    pub passwd: String,
+    pub password: String,
     pub school_year: SchoolYear,
     pub semester: Semester,
 }
@@ -54,7 +54,7 @@ impl DoRequest for TimeTableRequest {
         let session = data
             .session_store
             .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+            .unwrap_or_else(|| Session::new(&self.account, &self.password));
         let mut client = UserClient::new(session, &data.client);
         client.set_response_hook(Some(default_response_hook));
 
@@ -79,7 +79,7 @@ impl DoRequest for TimeTableRequest {
 #[derive(Debug, Deserialize)]
 pub struct ScoreRequest {
     pub account: String,
-    pub passwd: String,
+    pub password: String,
     pub school_year: SchoolYear,
     pub semester: Semester,
 }
@@ -90,7 +90,7 @@ impl DoRequest for ScoreRequest {
         let session = data
             .session_store
             .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+            .unwrap_or_else(|| Session::new(&self.account, &self.password));
         let mut client = UserClient::new(session, &data.client);
         client.set_response_hook(Some(default_response_hook));
 

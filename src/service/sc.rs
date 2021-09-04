@@ -111,7 +111,7 @@ impl DoRequest for ActivityDetailRequest {
 #[derive(Debug, Deserialize)]
 pub struct ScScoreItemRequest {
     pub account: String,
-    pub passwd: String,
+    pub password: String,
 }
 
 #[async_trait::async_trait]
@@ -120,7 +120,7 @@ impl DoRequest for ScScoreItemRequest {
         let session = data
             .session_store
             .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+            .unwrap_or_else(|| Session::new(&self.account, &self.password));
         let mut client = UserClient::new(session, &data.client);
         client.set_response_hook(Some(default_response_hook));
 
@@ -141,7 +141,7 @@ impl DoRequest for ScScoreItemRequest {
 #[derive(Debug, Deserialize)]
 pub struct ScActivityRequest {
     pub account: String,
-    pub passwd: String,
+    pub password: String,
 }
 
 #[async_trait::async_trait]
@@ -150,7 +150,7 @@ impl DoRequest for ScActivityRequest {
         let session = data
             .session_store
             .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.passwd));
+            .unwrap_or_else(|| Session::new(&self.account, &self.password));
         let mut client = UserClient::new(session, &data.client);
         client.set_response_hook(Some(default_response_hook));
 
