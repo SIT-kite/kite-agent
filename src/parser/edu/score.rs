@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::parser::edu::{str_to_f32, str_to_semester, Semester};
+use crate::service::{ActionError, ErrorResponse};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -31,15 +32,17 @@ pub struct Score {
 pub fn parse_score_list_page(page: &str) -> Result<Vec<Score>> {
     let json_page: Value = serde_json::from_str(page)?;
 
-    let result = json_page["items"].as_array().map(|course_list| {
-        course_list
+    if let Some(course_list) = json_page["items"].as_array() {
+        let result = course_list
             .iter()
-            .map(|course| serde_json::from_value::<Score>(course.clone()).unwrap())
-            .collect()
-    });
-    match result {
-        Some(v) => Ok(v),
-        None => Ok(vec![]),
+            .map(|course| {
+                serde_json::from_value::<Score>(course.clone())
+                    .map_err(|_| ActionError::ParsingError.into())
+            })
+            .collect::<Result<Vec<Score>>>()?;
+        Ok(result)
+    } else {
+        Ok(vec![])
     }
 }
 

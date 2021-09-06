@@ -15,6 +15,8 @@ pub enum ActionError {
     FailToGetCaptcha = 53,
     #[error("验证码错误")]
     WrongCaptcha = 54,
+    #[error("解析错误")]
+    ParsingError = 55,
 }
 
 /// Error code and message to response
@@ -56,3 +58,6 @@ convert_error_type!(SledError);
 
 type E = anyhow::Error;
 convert_error_type!(E);
+
+use serde_json::Error as SerdeError;
+convert_error_type!(SerdeError);
