@@ -47,6 +47,19 @@ impl SessionStorage {
         Ok(None)
     }
 
+    /// Query session by user or create new one.
+    pub fn query_or(&self, account: &str, new_password: &str) -> Result<Session> {
+        if let Some(session) = self.query(account)? {
+            // Check if password changed.
+            if session.password == new_password {
+                return Ok(session);
+            }
+        }
+
+        // Create new session.
+        Ok(Session::new(account, new_password))
+    }
+
     /// Insert or update session data.
     pub fn insert(&mut self, session: &Session) -> Result<()> {
         let db_key = String::from(SESSION_KEY_FORMAT) + &session.account;

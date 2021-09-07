@@ -121,10 +121,7 @@ pub struct MajorRequest {
 #[async_trait]
 impl DoRequest for MajorRequest {
     async fn process(self, mut data: SharedData) -> ResponseResult {
-        let session = data
-            .session_store
-            .query(&self.account)?
-            .unwrap_or_else(|| Session::new(&self.account, &self.password));
+        let session = data.session_store.query_or(&self.account, &self.password)?;
         let mut client = UserClient::new(session, &data.client);
         client.set_response_hook(Some(default_response_hook));
 
