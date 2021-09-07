@@ -108,7 +108,6 @@ impl DoRequest for ActivityListRequest {
 pub struct ActivityDetailRequest {
     /// Activity id in sc.sit.edu.cn
     pub id: String,
-    // pub category: i32,
 }
 
 #[async_trait::async_trait]

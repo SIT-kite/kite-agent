@@ -9,6 +9,8 @@ use scraper::{ElementRef, Html, Selector};
 pub struct ActivityDetail {
     /// Activity id
     pub id: String,
+    /// Category id
+    pub category: i32,
     /// Activity title
     pub title: String,
     /// Activity start date time
@@ -82,6 +84,7 @@ impl Parse for ActivityDetail {
 
         Ok(ActivityDetail {
             id: regex_find_one(Regex::new(r"活动编号：(\d{7})")?, &banner)?,
+            category: 0,
             title,
             start_time: NaiveDateTime::parse_from_str(
                 &regex_find_one(
