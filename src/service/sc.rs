@@ -4,12 +4,29 @@ use crate::agent::SharedData;
 use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
-use crate::net::{Session, UserClient};
+use crate::net::UserClient;
 use crate::parser::{get_activity_detail, get_score_detail, Activity, ActivityDetail, Parse};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
 use super::edu::url;
 use super::ResponseResult;
+
+use std::collections::HashMap;
+
+const CATEGORY_MAPPING: &[&str] = &[
+    "",
+    "001",                              // Subject report.(主题报告)
+    "8ab17f543fe62d5d013fe62efd3a0002", // Social practice.(社会实践)
+    "ff8080814e241104014eb867e1481dc3", // Innovation, entrepreneurship and creativity.(创新创业创意)
+    "8F963F2A04013A66E0540021287E4866", // Campus safety and civilization.(校园安全文明)
+    "8ab17f543fe62d5d013fe62e6dc70001", // Charity and Volunteer.(公益志愿)
+    "8ab17f2a3fe6585e013fe6596c300001", // Campus culture.(校园文化)
+    "ff808081674ec4720167ce60dda77cea", // Theme education (主题教育)
+    "8ab17f543fe626a8013fe6278a880001", // Yiban Community (易班社区)
+    "402881de5d62ba57015d6320f1a7000c", // Safe Online Education (安全网络教育)
+    "8ab17f533ff05c27013ff06d10bf0001", // Paper Patent (论文专利)
+    "ff8080814e241104014fedbbf7fd329d", // Meeting (会议)
+];
 
 #[derive(Debug, Deserialize)]
 pub struct ActivityListRequest {
@@ -17,6 +34,8 @@ pub struct ActivityListRequest {
     pub count: u16,
     /// Page index.
     pub index: u16,
+    /// Category Id
+    pub category: i32,
 }
 
 const COOKIE_PAGE: &str =
@@ -38,6 +57,14 @@ async fn make_sure_active(client: &mut UserClient) -> Result<()> {
     Ok(())
 }
 
+async fn tran_category(category: i32) -> Result<String> {
+    if let Some(category_key) = CATEGORY_MAPPING.get(category as usize) {
+        Ok(category_key.to_string())
+    } else {
+        Err(ActionError::ParsingError.into())
+    }
+}
+
 #[async_trait::async_trait]
 impl DoRequest for ActivityListRequest {
     /// Fetch and parse activity list page.
@@ -50,14 +77,13 @@ impl DoRequest for ActivityListRequest {
         client.set_response_hook(Some(default_response_hook));
 
         make_sure_active(&mut client).await?;
-
+        let category_id = tran_category(self.category).await?;
         let request = client
             .raw_client
             .get(&format!(
                 "http://sc.sit.edu.cn/public/activity/activityList.action?{}",
                 make_parameter!("pageNo" => &self.index.to_string(),"pageSize" => &self.count.to_string(),
-                    "categoryId" => "",
-                    "activityName" => ""
+                    "categoryId" => category_id.as_str()
                 )
             ))
             .build()?;
@@ -66,8 +92,15 @@ impl DoRequest for ActivityListRequest {
         data.session_store.insert(&client.session)?;
 
         let html = response.text().await?;
-        let activities: Vec<Activity> = Parse::from_html(&html)?;
-        Ok(ResponsePayload::ActivityList(activities))
+        let mut activities: Vec<Activity> = Parse::from_html(&html)?;
+        let result: Vec<Activity> = activities
+            .into_iter()
+            .map(|mut s| {
+                s.category = self.category;
+                s
+            })
+            .collect();
+        Ok(ResponsePayload::ActivityList(result))
     }
 }
 
@@ -75,6 +108,7 @@ impl DoRequest for ActivityListRequest {
 pub struct ActivityDetailRequest {
     /// Activity id in sc.sit.edu.cn
     pub id: String,
+    // pub category: i32,
 }
 
 #[async_trait::async_trait]

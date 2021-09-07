@@ -1,6 +1,6 @@
 use crate::error::Result;
 use crate::parser::edu::{str_to_f32, str_to_semester, Semester};
-use crate::service::{ActionError, ErrorResponse};
+use crate::service::ActionError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 

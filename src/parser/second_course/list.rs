@@ -8,9 +8,8 @@ use serde::Serialize;
 /// Activity link, used for list recent activities.
 #[derive(Debug, Serialize)]
 pub struct Activity {
-    pub title: String,
     pub id: String,
-    pub link: String,
+    pub category: i32,
 }
 
 impl Parse for Vec<Activity> {
@@ -25,13 +24,12 @@ impl Parse for Vec<Activity> {
                 let link = each_line.value().attr("href").unwrap();
 
                 Activity {
-                    title: each_line.inner_html().trim().replace("·\n", ""),
                     id: String::from(if let Some(id) = re.find(link) {
                         id.as_str()
                     } else {
                         ""
                     }),
-                    link: String::from(link),
+                    category: 0,
                 }
             })
             .collect();

@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::agent::SharedData;
 use crate::net::client::default_response_hook;
-use crate::net::{Session, UserClient};
+use crate::net::UserClient;
 use crate::parser::*;
 use crate::service::edu::make_sure_active;
 use crate::service::{DoRequest, ResponsePayload, ResponseResult};

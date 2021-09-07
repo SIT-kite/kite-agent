@@ -1,6 +1,6 @@
 use crate::agent::SharedData;
 use crate::net::auth::portal_login;
-use crate::service::{ActionError, ResponsePayload, ResponseResult};
+use crate::service::{ResponsePayload, ResponseResult};
 
 use super::DoRequest;
 
