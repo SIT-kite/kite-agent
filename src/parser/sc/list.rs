@@ -1,9 +1,10 @@
-use crate::error::Result;
-use crate::parser::Parse;
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{Html, Selector};
 use serde::Serialize;
+
+use crate::error::Result;
+use crate::parser::Parse;
 
 /// Activity link, used for list recent activities.
 #[derive(Debug, Serialize)]

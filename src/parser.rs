@@ -1,19 +1,19 @@
-mod edu;
-mod expense;
-mod second_course;
-
-use crate::error::Result;
-
 pub use edu::{
     calculate_gpa, parse_available_course_page, parse_class_list_page, parse_major_list_page,
     parse_profile_page, parse_score_list_page, parse_timetable_page,
 };
 pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, SelectCourse, Semester};
 pub use expense::ExpenseRecord;
-pub use second_course::{
+pub use sc::{
     get_activity_detail, get_score_detail, Activity, ActivityDetail, JoinedActivity, ScActivityItem,
     ScScoreItem, ScScoreSummary,
 };
+
+use crate::error::Result;
+
+mod edu;
+mod expense;
+mod sc;
 
 pub trait Parse {
     fn from_html(html_page: &str) -> Result<Self>

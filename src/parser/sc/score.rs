@@ -254,7 +254,7 @@ mod test {
 
     #[test]
     fn test_score_detail() {
-        use crate::parser::second_course::score::get_score_detail;
+        use crate::parser::sc::score::get_score_detail;
         let html_page = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
         let detail = get_score_detail(&html_page);
         println!("{:?}", detail);
@@ -262,7 +262,7 @@ mod test {
 
     #[test]
     fn test_activity_detail() {
-        use crate::parser::second_course::score::get_activity_detail;
+        use crate::parser::sc::score::get_activity_detail;
         let html_page = std::fs::read_to_string("html/第二课堂得分活动页面.html").unwrap();
         let detail = get_activity_detail(&html_page);
         println!("{:?}", detail);
