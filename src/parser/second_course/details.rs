@@ -8,7 +8,7 @@ use scraper::{ElementRef, Html, Selector};
 #[derive(serde::Serialize, Debug)]
 pub struct ActivityDetail {
     /// Activity id
-    pub id: String,
+    pub id: i32,
     /// Category id
     pub category: i32,
     /// Activity title
@@ -81,9 +81,11 @@ impl Parse for ActivityDetail {
 
         let sign_end_time = Regex::new(r"刷卡时间段：(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+).*--至--.*(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+)").unwrap()
             .captures(banner.as_ref()).ok_or_else(|| ParserError::RegexErr(String::from("解析刷卡时间")))?;
-
+        let activity_id = regex_find_one(Regex::new(r"活动编号：(\d{7})")?, &banner)?
+            .parse()
+            .unwrap_or_default();
         Ok(ActivityDetail {
-            id: regex_find_one(Regex::new(r"活动编号：(\d{7})")?, &banner)?,
+            id: activity_id,
             category: 0,
             title,
             start_time: NaiveDateTime::parse_from_str(
