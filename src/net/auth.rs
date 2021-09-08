@@ -89,7 +89,7 @@ pub async fn portal_login(
     user_name: &str,
     password: &str,
 ) -> Result<Session> {
-    let mut try_count = 4;
+    let mut try_count = 8;
 
     let session = Session::new(user_name, password);
     let mut client = UserClient::new(session, raw_client);
@@ -105,9 +105,13 @@ pub async fn portal_login(
 
         let need_captcha = check_need_captcha(&mut client, user_name).await?;
         let mut captcha = String::new();
-        if need_captcha {
+        while need_captcha {
             let image = fetch_image(&mut client).await?;
             captcha = identify_captcha(image)?;
+            // Captcha code must be 4 chars. Continue if not.
+            if captcha.len() == 4 {
+                break;
+            }
         }
         let login_request = client
             .raw_client
