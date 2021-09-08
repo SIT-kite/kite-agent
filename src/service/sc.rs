@@ -8,10 +8,7 @@ use crate::net::UserClient;
 use crate::parser::{get_activity_detail, get_score_detail, Activity, ActivityDetail, Parse};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
-use super::edu::url;
 use super::ResponseResult;
-
-use std::collections::HashMap;
 
 const CATEGORY_MAPPING: &[&str] = &[
     "",
@@ -28,6 +25,16 @@ const CATEGORY_MAPPING: &[&str] = &[
     "ff8080814e241104014fedbbf7fd329d", // Meeting (会议)
 ];
 
+mod url {
+    pub const SSO_SC_REDIRECT: &str =
+        "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
+
+    pub const SCORE_DETAIL: &str = "http://sc.sit.edu.cn/public/pcenter/scoreDetail.action";
+
+    pub const ACTIVITY_DETAIL: &str =
+        "http://sc.sit.edu.cn/public/pcenter/activityOrderList.action?pageSize=200";
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ActivityListRequest {
     /// Count of activities per page.
@@ -38,20 +45,12 @@ pub struct ActivityListRequest {
     pub category: i32,
 }
 
-const COOKIE_PAGE: &str =
-    "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
-
-const SCORE_DETAIL: &str = "http://sc.sit.edu.cn/public/pcenter/scoreDetail.action";
-
-const ACTIVITY_DETAIL: &str =
-    "http://sc.sit.edu.cn/public/pcenter/activityOrderList.action?pageSize=200";
-
 async fn make_sure_active(client: &mut UserClient) -> Result<()> {
-    let home_request = client.raw_client.get(COOKIE_PAGE).build()?;
+    let home_request = client.raw_client.get(url::SSO_SC_REDIRECT).build()?;
     let response = client.send(home_request).await?;
-    if response.url().as_str() == COOKIE_PAGE {
+    if response.url().as_str() == url::SSO_SC_REDIRECT {
         client.login_with_session().await?;
-        let request = client.raw_client.get(url::SSO_REDIRECT).build()?;
+        let request = client.raw_client.get(url::SSO_SC_REDIRECT).build()?;
         let _ = client.send(request).await?;
     }
     Ok(())
@@ -131,7 +130,6 @@ impl DoRequest for ActivityDetailRequest {
             ))
             .build()?;
         let response = client.send(request).await?;
-
         let html = response.text().await?;
 
         data.session_store.insert(&client.session)?;
@@ -156,9 +154,8 @@ impl DoRequest for ScScoreItemRequest {
 
         make_sure_active(&mut client).await?;
 
-        let request = client.raw_client.get(SCORE_DETAIL).build()?;
+        let request = client.raw_client.get(url::SCORE_DETAIL).build()?;
         let response = client.send(request).await?;
-
         let html = response.text().await?;
 
         data.session_store.insert(&client.session)?;
@@ -183,9 +180,38 @@ impl DoRequest for ScActivityRequest {
 
         make_sure_active(&mut client).await?;
 
-        let request = client.raw_client.get(ACTIVITY_DETAIL).build()?;
+        let request = client.raw_client.get(url::ACTIVITY_DETAIL).build()?;
         let response = client.send(request).await?;
+        let html = response.text().await?;
 
+        data.session_store.insert(&client.session)?;
+
+        let activity = get_activity_detail(&html)?;
+        Ok(ResponsePayload::ScActivityDetail(activity))
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ScJoinRequest {
+    pub account: String,
+    pub password: String,
+    pub activity_id: i32,
+    pub force: bool,
+}
+
+#[async_trait::async_trait]
+impl DoRequest for ScJoinRequest {
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data.session_store.query_or(&self.account, &self.password)?;
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
+
+        make_sure_active(&mut client).await?;
+
+        // Expected page content
+        let _expected = "<script>alert('申请成功，下面将为您跳转至我的活动页面！');location.href='/public/pcenter/activityOrderList.action'</script>";
+        let request = client.raw_client.get(url::ACTIVITY_DETAIL).build()?;
+        let response = client.send(request).await?;
         let html = response.text().await?;
 
         data.session_store.insert(&client.session)?;

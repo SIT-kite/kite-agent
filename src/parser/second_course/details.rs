@@ -1,8 +1,10 @@
-use crate::error::Result;
-use crate::parser::{Parse, ParserError};
 use chrono::NaiveDateTime;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
+
+use crate::error::Result;
+use crate::parser::{Parse, ParserError};
+use crate::service::ActionError;
 
 /// Activity link, used for list recent activities.
 #[derive(serde::Serialize, Debug)]
@@ -120,5 +122,31 @@ impl Parse for ActivityDetail {
                 .filter(|x| !x.is_empty())
                 .collect(),
         })
+    }
+}
+
+pub enum ScJoinResult {
+    Ok,
+    Err(String),
+}
+
+impl Parse for ScJoinResult {
+    fn from_html(html_page: &str) -> Result<ScJoinResult> {
+        let code = html_page.parse::<i32>().map_err(|_| ActionError::ParsingError)?;
+        if code == 0 {
+            return Ok(ScJoinResult::Ok);
+        }
+        let message = match code {
+            1 => "您的个人信息不全，请补全您的信息！",
+            2 => "您已申请过该活动，不能重复申请！",
+            3 => "对不起，您今天的申请次数已达上限！",
+            4 => "对不起，该活动的申请人数已达上限！",
+            5 => "对不起，该活动已过期并停止申请！",
+            6 => "您已申请过该时间段的活动，不能重复申请！",
+            7 => "对不起，您不能申请该活动！",
+            8 => "对不起，您不在该活动的范围内！",
+            _ => "未知错误",
+        };
+        Ok(ScJoinResult::Err(message.to_string()))
     }
 }

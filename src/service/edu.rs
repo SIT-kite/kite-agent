@@ -9,7 +9,7 @@ mod env;
 mod user;
 
 /// URL probably used in the module.
-pub(crate) mod url {
+mod url {
     use const_format::concatcp;
 
     /// Server address for 正方教务系统
@@ -19,7 +19,7 @@ pub(crate) mod url {
 
     pub const LOGIN: &str = concatcp!(HOME, "/jwglxt/xtgl/login_slogin.html");
     pub const RSA_PUBLIC_KEY: &str = concatcp!(HOME, "/jwglxt/xtgl/login_getPublicKey.html");
-    pub const SSO_REDIRECT: &str = "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.sit.edu.cn%2Fsso%2Fjziotlogin";
+    pub const SSO_EDU_REDIRECT: &str = "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fjwxt.sit.edu.cn%2Fsso%2Fjziotlogin";
 
     /* function related */
 
@@ -52,7 +52,7 @@ async fn make_sure_active(client: &mut UserClient) -> Result<()> {
         client.login_with_session().await?;
 
         // Use SSO to Zhengfang system.
-        let request = client.raw_client.get(url::SSO_REDIRECT).build()?;
+        let request = client.raw_client.get(url::SSO_EDU_REDIRECT).build()?;
         let _ = client.send(request).await?;
     }
     Ok(())
