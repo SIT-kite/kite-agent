@@ -64,7 +64,7 @@ fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
         });
 
         println!("Trying to reconnect...");
-        std::thread::sleep(Duration::from_millis(30000));
+        std::thread::sleep(Duration::from_secs(10));
     }
 }
 

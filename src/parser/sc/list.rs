@@ -9,7 +9,7 @@ use crate::parser::Parse;
 /// Activity link, used for list recent activities.
 #[derive(Debug, Serialize)]
 pub struct Activity {
-    pub id: String,
+    pub id: i32,
     pub category: i32,
 }
 
@@ -23,15 +23,12 @@ impl Parse for Vec<Activity> {
             .select(&selector)
             .map(|each_line| {
                 let link = each_line.value().attr("href").unwrap();
+                let id = re
+                    .find(link)
+                    .map(|x| x.as_str().parse::<i32>().unwrap_or_default())
+                    .unwrap_or_default();
 
-                Activity {
-                    id: String::from(if let Some(id) = re.find(link) {
-                        id.as_str()
-                    } else {
-                        ""
-                    }),
-                    category: 0,
-                }
+                Activity { id, category: 0 }
             })
             .collect();
         Ok(activities)

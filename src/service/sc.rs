@@ -106,7 +106,7 @@ impl DoRequest for ActivityListRequest {
 #[derive(Debug, Deserialize)]
 pub struct ActivityDetailRequest {
     /// Activity id in sc.sit.edu.cn
-    pub id: String,
+    pub id: i32,
 }
 
 #[async_trait::async_trait]
