@@ -1,10 +1,23 @@
-use chrono::NaiveDateTime;
+use std::collections::HashMap;
+
+use chrono::{DateTime, FixedOffset, Local, TimeZone};
+use regex::internal::Input;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
 use crate::error::Result;
 use crate::parser::{Parse, ParserError};
 use crate::service::ActionError;
+
+lazy_static! {
+    static ref RE_SPACES: Regex = Regex::new(r"\s{2}\s+").unwrap();
+    static ref SELECTOR_FRAME: Selector = Selector::parse(".box-1").unwrap();
+    static ref SELECTOR_TITLE: Selector = Selector::parse("h1").unwrap();
+    static ref SELECTOR_BANNER: Selector =
+        Selector::parse("div[style=\" color:#7a7a7a; text-align:center\"]").unwrap();
+    static ref SELECTOR_DESCRIPTION: Selector =
+        Selector::parse("div[style=\"padding:30px 50px; font-size:14px;\"] p").unwrap();
+}
 
 /// Activity link, used for list recent activities.
 #[derive(serde::Serialize, Debug)]
@@ -16,11 +29,11 @@ pub struct ActivityDetail {
     /// Activity title
     pub title: String,
     /// Activity start date time
-    pub start_time: Option<NaiveDateTime>,
+    pub start_time: DateTime<Local>,
     /// Sign date time
-    pub sign_time: Option<NaiveDateTime>,
+    pub sign_start_time: DateTime<Local>,
     /// Activity end date time
-    pub end_time: Option<NaiveDateTime>,
+    pub sign_end_time: DateTime<Local>,
     /// Place
     pub place: Option<String>,
     /// Duration
@@ -38,11 +51,85 @@ pub struct ActivityDetail {
     // pub attachment
 }
 
-#[inline]
-fn regex_find_one(re: Regex, text: &str) -> Result<String> {
-    re.captures(text)
-        .map(|cap| cap.get(1).unwrap().as_str().trim().to_string())
-        .ok_or_else(|| ParserError::RegexErr(format!("表达式 {}", re.as_str())).into())
+fn clean_text(banner: &str) -> String {
+    let banner = banner.replace("&nbsp;", " ");
+    let banner = banner.replace("<br>", "");
+    RE_SPACES.replace_all(&banner, "\n").to_string()
+}
+
+fn split_key_value(line: &str) -> (String, String) {
+    let (key, value) = line.split_once("：").unwrap_or_default();
+
+    (key.to_string(), value.to_string())
+}
+
+fn split_activity_properties(banner: &str) -> HashMap<String, String> {
+    let clean_text = clean_text(banner);
+
+    clean_text
+        .lines()
+        .map(split_key_value)
+        .fold(HashMap::new(), |mut map, (k, v)| {
+            map.insert(k, v);
+            map
+        })
+}
+
+fn parse_date_time(date_time: &str) -> DateTime<Local> {
+    let tz = FixedOffset::east(8 * 3600);
+    let dt = tz.datetime_from_str(date_time, "%Y-%m-%d %H:%M:%S").unwrap();
+
+    DateTime::<Local>::from(dt)
+}
+
+fn parse_sign_time(value: &str) -> (DateTime<Local>, DateTime<Local>) {
+    let (start_s, end_s) = value.split_once("  --至--  ").unwrap();
+
+    (parse_date_time(start_s), parse_date_time(end_s))
+}
+
+fn parse_properties(banner: &str) -> ActivityDetail {
+    let properties = split_activity_properties(banner);
+    let to_o = |x: &String| if x.is_empty() { None } else { Some(x.to_string()) };
+
+    let sign_time = parse_sign_time(&properties["刷卡时间段"]);
+    ActivityDetail {
+        id: properties["活动编号"].parse().unwrap_or_default(),
+        category: 0,
+        title: "".to_string(),
+        start_time: parse_date_time(&properties["活动开始时间"]),
+        sign_start_time: sign_time.0,
+        sign_end_time: sign_time.1,
+        place: to_o(&properties["活动地点"]),
+        duration: to_o(&properties["活动时长"]),
+        manager: to_o(&properties["负责人"]),
+        contact: to_o(&properties["负责人电话"]),
+        organizer: to_o(&properties["主办方"]),
+        undertaker: to_o(&properties["承办方"]),
+        description: vec![],
+    }
+}
+
+fn select_text(e: ElementRef, selector: &Selector) -> String {
+    e.select(&selector)
+        .next()
+        .map(|x| x.inner_html())
+        .unwrap_or_default()
+}
+
+fn parse_description(frame: ElementRef) -> Vec<String> {
+    let description = frame
+        .select(&SELECTOR_DESCRIPTION)
+        .map(|x| {
+            // This code is ugly, but it works...
+            let base_text_vec = x.text().map(str::trim).collect::<Vec<&str>>();
+            let text = base_text_vec.join("").replace("\u{a0}", "");
+            text.trim().to_string()
+        })
+        .filter(|x| !x.is_empty())
+        .collect::<Vec<String>>();
+
+    description
 }
 
 impl Parse for ActivityDetail {
@@ -53,75 +140,17 @@ impl Parse for ActivityDetail {
         // The three elements in that div: title, banner(some details) and body(description)
         // So our goal is clear now.
         let frame: ElementRef = document
-            .select(&Selector::parse(".box-1").unwrap())
+            .select(&SELECTOR_FRAME)
             .next()
             .ok_or_else(|| ParserError::NoSuchElement(String::from(".box-1")))?;
 
-        // Title
-        let title = frame
-            .select(&Selector::parse("h1").unwrap())
-            .next()
-            .unwrap()
-            .inner_html();
-        // Banner
-        let banner = frame
-            .select(&Selector::parse("div[style=\" color:#7a7a7a; text-align:center\"]").unwrap())
-            .next()
-            .unwrap()
-            .inner_html()
-            .replace("&nbsp;", "")
-            .replace("<br>", "\n");
-        // Description
-        let body = frame
-            .select(&Selector::parse("div[style=\"padding:30px 50px; font-size:14px;\"]").unwrap())
-            .next()
-            .unwrap()
-            .text()
-            .collect::<Vec<&str>>()
-            .join("")
-            .replace("\u{a0}", "");
+        let title = select_text(frame, &SELECTOR_TITLE);
+        let banner = select_text(frame, &SELECTOR_BANNER);
 
-        let sign_end_time = Regex::new(r"刷卡时间段：(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+).*--至--.*(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+)").unwrap()
-            .captures(banner.as_ref()).ok_or_else(|| ParserError::RegexErr(String::from("解析刷卡时间")))?;
-        let activity_id = regex_find_one(Regex::new(r"活动编号：(\d{7})")?, &banner)?
-            .parse()
-            .unwrap_or_default();
-        Ok(ActivityDetail {
-            id: activity_id,
-            category: 0,
-            title,
-            start_time: NaiveDateTime::parse_from_str(
-                &regex_find_one(
-                    Regex::new(r"活动开始时间：(\d{4}-\d{1,2}-\d{1,2} \d+:\d+:\d+)")?,
-                    &banner,
-                )?,
-                "%Y-%m-%d %H:%M:%S",
-            )
-            .ok(),
-            sign_time: NaiveDateTime::parse_from_str(
-                sign_end_time.get(1).unwrap().as_str(),
-                "%Y-%m-%d %H:%M:%S",
-            )
-            .ok(),
-            end_time: NaiveDateTime::parse_from_str(
-                sign_end_time.get(2).unwrap().as_str(),
-                "%Y-%m-%d %H:%M:%S",
-            )
-            .ok(),
-            place: regex_find_one(Regex::new(r"活动地点：(.*)")?, &banner).ok(),
-            duration: regex_find_one(Regex::new(r"活动时长：(.*)")?, &banner).ok(),
-            manager: regex_find_one(Regex::new(r"负责人：(.*)")?, &banner).ok(),
-            contact: regex_find_one(Regex::new(r"负责人电话：(.*)")?, &banner).ok(),
-            organizer: regex_find_one(Regex::new(r"主办方：(.*)")?, &banner).ok(),
-            undertaker: regex_find_one(Regex::new(r"承办方：(.*)")?, &banner).ok(),
-            description: Regex::new("[\n\t ]*")
-                .unwrap()
-                .replace(body.as_ref(), "\n")
-                .split('\n')
-                .map(|x| x.trim().to_string())
-                .filter(|x| !x.is_empty())
-                .collect(),
-        })
+        let mut result = parse_properties(&banner);
+        result.title = title;
+        result.description = parse_description(frame);
+        Ok(result)
     }
 }
 
@@ -149,4 +178,11 @@ impl Parse for ScJoinResult {
         };
         Ok(ScJoinResult::Err(message.to_string()))
     }
+}
+
+#[test]
+fn test_activity_detail() {
+    let html_page = std::fs::read_to_string("html/第二课堂详情页面.html").unwrap();
+    let detail = ActivityDetail::from_html(&html_page);
+    println!("{:?}", detail);
 }
