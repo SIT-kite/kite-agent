@@ -122,11 +122,13 @@ pub struct ScScoreItem {
 fn score_map_detail(item: ElementRef) -> Result<ScScoreItem> {
     let id: Option<i32> = item
         .select(&ID_DETAIL)
-        .next().map(|x| x.inner_html().trim().parse().unwrap_or_default());
+        .next()
+        .map(|x| x.inner_html().trim().parse().unwrap_or_default());
 
     let add_score: Option<f32> = item
         .select(&SCORE_DETAIL)
-        .next().map(|x| x.inner_html().trim().parse().unwrap_or_default());
+        .next()
+        .map(|x| x.inner_html().trim().parse().unwrap_or_default());
 
     // TODO: Add error handler.
     Ok(ScScoreItem {
@@ -143,7 +145,7 @@ fn filter_zero_score(x: &Result<ScScoreItem>) -> bool {
     }
 }
 
-pub fn get_score_detail(html_page: &str) -> Result<Vec<ScScoreItem>> {
+pub fn get_my_score_list(html_page: &str) -> Result<Vec<ScScoreItem>> {
     let document = Html::parse_document(html_page);
     let score_items = document
         .select(&SCORE_DETAIL_PAGE)
@@ -201,7 +203,8 @@ fn activity_map_detail(item: ElementRef) -> Result<ScActivityItem> {
 
     let status: Option<String> = item
         .select(&STATUS_DETAIL)
-        .next().map(|x| String::from(x.inner_html().trim()));
+        .next()
+        .map(|x| String::from(x.inner_html().trim()));
 
     Ok(ScActivityItem {
         activity_id: activity_id.unwrap_or_default(),
@@ -218,7 +221,7 @@ fn filter_delete_activity(x: &Result<ScActivityItem>) -> bool {
     }
 }
 
-pub fn get_activity_detail(html_page: &str) -> Result<Vec<ScActivityItem>> {
+pub fn get_my_activity_list(html_page: &str) -> Result<Vec<ScActivityItem>> {
     let document = Html::parse_document(html_page);
 
     document
@@ -251,17 +254,17 @@ mod test {
 
     #[test]
     fn test_score_detail() {
-        use crate::parser::sc::score::get_score_detail;
+        use crate::parser::sc::score::get_my_score_list;
         let html_page = std::fs::read_to_string("html/第二课堂得分页面.html").unwrap();
-        let detail = get_score_detail(&html_page);
+        let detail = get_my_score_list(&html_page);
         println!("{:?}", detail);
     }
 
     #[test]
     fn test_activity_detail() {
-        use crate::parser::sc::score::get_activity_detail;
+        use crate::parser::sc::score::get_my_activity_list;
         let html_page = std::fs::read_to_string("html/第二课堂得分活动页面.html").unwrap();
-        let detail = get_activity_detail(&html_page);
+        let detail = get_my_activity_list(&html_page);
         println!("{:?}", detail);
     }
 }

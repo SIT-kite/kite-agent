@@ -1,6 +1,6 @@
 pub use detail::ActivityDetail;
 pub use list::{Activity, JoinedActivity};
-pub use score::{get_activity_detail, get_score_detail, ScActivityItem, ScScoreItem, ScScoreSummary};
+pub use score::{get_my_activity_list, get_my_score_list, ScActivityItem, ScScoreItem, ScScoreSummary};
 
 mod detail;
 mod list;

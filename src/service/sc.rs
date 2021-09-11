@@ -6,7 +6,7 @@ use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
 use crate::net::UserClient;
-use crate::parser::{get_activity_detail, get_score_detail, Activity, ActivityDetail, Parse};
+use crate::parser::{get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
 use super::ResponseResult;
@@ -179,8 +179,8 @@ impl DoRequest for ScScoreItemRequest {
 
         data.session_store.insert(&client.session)?;
 
-        let score = get_score_detail(&html)?;
-        Ok(ResponsePayload::ScScoreDetail(score))
+        let score = get_my_score_list(&html)?;
+        Ok(ResponsePayload::ScMyScore(score))
     }
 }
 
@@ -205,8 +205,8 @@ impl DoRequest for ScActivityRequest {
 
         data.session_store.insert(&client.session)?;
 
-        let activity = get_activity_detail(&html)?;
-        Ok(ResponsePayload::ScActivityDetail(activity))
+        let activity = get_my_activity_list(&html)?;
+        Ok(ResponsePayload::ScMyActivity(activity))
     }
 }
 
@@ -235,7 +235,7 @@ impl DoRequest for ScJoinRequest {
 
         data.session_store.insert(&client.session)?;
 
-        let activity = get_activity_detail(&html)?;
-        Ok(ResponsePayload::ScActivityDetail(activity))
+        let activity = get_my_activity_list(&html)?;
+        Ok(ResponsePayload::ScMyActivity(activity))
     }
 }

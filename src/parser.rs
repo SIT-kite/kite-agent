@@ -5,7 +5,7 @@ pub use edu::{
 pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, SelectCourse, Semester};
 pub use expense::ExpenseRecord;
 pub use sc::{
-    get_activity_detail, get_score_detail, Activity, ActivityDetail, JoinedActivity, ScActivityItem,
+    get_my_activity_list, get_my_score_list, Activity, ActivityDetail, JoinedActivity, ScActivityItem,
     ScScoreItem, ScScoreSummary,
 };
 
