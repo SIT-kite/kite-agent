@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, FixedOffset, Local, TimeZone};
-use regex::internal::Input;
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
 
@@ -11,12 +10,14 @@ use crate::service::ActionError;
 
 lazy_static! {
     static ref RE_SPACES: Regex = Regex::new(r"\s{2}\s+").unwrap();
+    // <img alt="" src="/js/kindeditor-4.1.7/attached/image/20200528/20200528101316_172.png">
+    static ref RE_IMAGES: Regex = Regex::new(r#"<img(?:.*)src="(.*)">"#).unwrap();
     static ref SELECTOR_FRAME: Selector = Selector::parse(".box-1").unwrap();
     static ref SELECTOR_TITLE: Selector = Selector::parse("h1").unwrap();
     static ref SELECTOR_BANNER: Selector =
         Selector::parse("div[style=\" color:#7a7a7a; text-align:center\"]").unwrap();
     static ref SELECTOR_DESCRIPTION: Selector =
-        Selector::parse("div[style=\"padding:30px 50px; font-size:14px;\"] p").unwrap();
+        Selector::parse("div[style=\"padding:30px 50px; font-size:14px;\"]").unwrap();
 }
 
 /// Activity link, used for list recent activities.
@@ -47,10 +48,17 @@ pub struct ActivityDetail {
     /// Activity undertaker
     pub undertaker: Option<String>,
     /// Description in text[]
-    pub description: Vec<String>,
-    // pub attachment
+    pub description: String,
+    /// Image attachment.
+    pub images: Vec<ScImages>,
 }
 
+#[derive(serde::Serialize, Debug)]
+pub struct ScImages {
+    pub new_name: String,
+    pub old_name: String,
+    pub content: Vec<u8>,
+}
 fn clean_text(banner: &str) -> String {
     let banner = banner.replace("&nbsp;", " ");
     let banner = banner.replace("<br>", "");
@@ -106,7 +114,8 @@ fn parse_properties(banner: &str) -> ActivityDetail {
         contact: to_o(&properties["负责人电话"]),
         organizer: to_o(&properties["主办方"]),
         undertaker: to_o(&properties["承办方"]),
-        description: vec![],
+        description: "".to_string(),
+        images: vec![],
     }
 }
 
@@ -117,19 +126,36 @@ fn select_text(e: ElementRef, selector: &Selector) -> String {
         .unwrap_or_default()
 }
 
-fn parse_description(frame: ElementRef) -> Vec<String> {
-    let description = frame
-        .select(&SELECTOR_DESCRIPTION)
-        .map(|x| {
-            // This code is ugly, but it works...
-            let base_text_vec = x.text().map(str::trim).collect::<Vec<&str>>();
-            let text = base_text_vec.join("").replace("\u{a0}", "");
-            text.trim().to_string()
+fn replace_images(html: &str) -> (String, Vec<ScImages>) {
+    // Find all images and generate uuid for each of them.
+    let images = RE_IMAGES
+        .captures_iter(html)
+        .map(|src| {
+            let old_name = src[1].to_string();
+            let (_, file_extension) = old_name.rsplit_once(".").unwrap_or_default();
+            let new_name = format!("{}.{}", uuid::Uuid::new_v4().to_string(), file_extension);
+            ScImages {
+                new_name,
+                old_name,
+                content: vec![],
+            }
         })
-        .filter(|x| !x.is_empty())
-        .collect::<Vec<String>>();
+        .collect::<Vec<_>>();
 
-    description
+    let mut html = html.to_string();
+    // Replace old image path to new one
+    for image in images.iter() {
+        html = html.replace(&image.old_name, &image.new_name);
+    }
+
+    (html, images)
+}
+
+fn parse_description(frame: ElementRef) -> (String, Vec<ScImages>) {
+    let description = select_text(frame, &SELECTOR_DESCRIPTION);
+    let (description, images) = replace_images(&description);
+
+    (description, images)
 }
 
 impl Parse for ActivityDetail {
@@ -146,10 +172,12 @@ impl Parse for ActivityDetail {
 
         let title = select_text(frame, &SELECTOR_TITLE);
         let banner = select_text(frame, &SELECTOR_BANNER);
+        let (description, images) = parse_description(frame);
 
         let mut result = parse_properties(&banner);
         result.title = title;
-        result.description = parse_description(frame);
+        result.description = description;
+        result.images = images;
         Ok(result)
     }
 }
@@ -182,7 +210,7 @@ impl Parse for ScJoinResult {
 
 #[test]
 fn test_activity_detail() {
-    let html_page = std::fs::read_to_string("html/第二课堂详情页面.html").unwrap();
+    let html_page = std::fs::read_to_string("html/第二课堂详情页面2.html").unwrap();
     let detail = ActivityDetail::from_html(&html_page);
     println!("{:?}", detail);
 }
