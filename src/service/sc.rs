@@ -1,3 +1,4 @@
+use reqwest::StatusCode;
 use serde::Deserialize;
 
 use crate::agent::SharedData;
@@ -29,9 +30,9 @@ mod url {
     pub const SSO_SC_REDIRECT: &str =
         "https://authserver.sit.edu.cn/authserver/login?service=http%3A%2F%2Fsc.sit.edu.cn%2F";
 
-    pub const SCORE_DETAIL: &str = "http://sc.sit.edu.cn/public/pcenter/scoreDetail.action";
+    pub const MY_SCORE: &str = "http://sc.sit.edu.cn/public/pcenter/scoreDetail.action";
 
-    pub const ACTIVITY_DETAIL: &str =
+    pub const MY_ACTIVITY: &str =
         "http://sc.sit.edu.cn/public/pcenter/activityOrderList.action?pageSize=200";
 }
 
@@ -56,11 +57,28 @@ async fn make_sure_active(client: &mut UserClient) -> Result<()> {
     Ok(())
 }
 
+// When we fetch activity detail page, it costs lot if we go to SSO_SC_REDIRECT to checkout whether
+// we can access the page. So it's better to fetch first, and then decide to redirect.
+async fn fetch_or_make_sure_active(
+    client: &mut UserClient,
+    url: &str,
+) -> Result<Option<reqwest::Response>> {
+    let home_request = client.raw_client.get(url).build()?;
+    let response = client.send(home_request).await?;
+
+    if response.status() == StatusCode::OK {
+        Ok(Some(response))
+    } else {
+        make_sure_active(client).await?;
+        Ok(None)
+    }
+}
+
 async fn tran_category(category: i32) -> Result<String> {
     if let Some(category_key) = CATEGORY_MAPPING.get(category as usize) {
         Ok(category_key.to_string())
     } else {
-        Err(ActionError::ParsingError.into())
+        Err(ActionError::BadParameter.into())
     }
 }
 
@@ -118,19 +136,20 @@ impl DoRequest for ActivityDetailRequest {
             .choose_randomly()?
             .ok_or(ActionError::NoSessionAvailable)?;
         let mut client = UserClient::new(session, &data.client);
-        client.set_response_hook(Some(default_response_hook));
 
-        make_sure_active(&mut client).await?;
+        let url = format!(
+            "http://sc.sit.edu.cn/public/activity/activityDetail.action?activityId={}",
+            self.id
+        );
+        let mut response = fetch_or_make_sure_active(&mut client, &url).await?;
+        if response.is_none() {
+            client.set_response_hook(Some(default_response_hook));
 
-        let request = client
-            .raw_client
-            .get(&format!(
-                "http://sc.sit.edu.cn/public/activity/activityDetail.action?activityId={}",
-                self.id
-            ))
-            .build()?;
-        let response = client.send(request).await?;
-        let html = response.text().await?;
+            let request = client.raw_client.get(&url).build()?;
+            response = Some(client.send(request).await?);
+        }
+
+        let html = response.unwrap().text().await?;
 
         data.session_store.insert(&client.session)?;
 
@@ -154,7 +173,7 @@ impl DoRequest for ScScoreItemRequest {
 
         make_sure_active(&mut client).await?;
 
-        let request = client.raw_client.get(url::SCORE_DETAIL).build()?;
+        let request = client.raw_client.get(url::MY_SCORE).build()?;
         let response = client.send(request).await?;
         let html = response.text().await?;
 
@@ -180,7 +199,7 @@ impl DoRequest for ScActivityRequest {
 
         make_sure_active(&mut client).await?;
 
-        let request = client.raw_client.get(url::ACTIVITY_DETAIL).build()?;
+        let request = client.raw_client.get(url::MY_ACTIVITY).build()?;
         let response = client.send(request).await?;
         let html = response.text().await?;
 
@@ -210,7 +229,7 @@ impl DoRequest for ScJoinRequest {
 
         // Expected page content
         let _expected = "<script>alert('申请成功，下面将为您跳转至我的活动页面！');location.href='/public/pcenter/activityOrderList.action'</script>";
-        let request = client.raw_client.get(url::ACTIVITY_DETAIL).build()?;
+        let request = client.raw_client.get(url::MY_ACTIVITY).build()?;
         let response = client.send(request).await?;
         let html = response.text().await?;
 

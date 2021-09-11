@@ -1,4 +1,7 @@
 use num_traits::ToPrimitive;
+use reqwest::Error as ReqwestError;
+use serde_json::Error as SerdeError;
+use sled::Error as SledError;
 
 #[derive(Debug, thiserror::Error, ToPrimitive)]
 /// ActionError, is used to transfer error in common, or not critical.
@@ -17,6 +20,8 @@ pub enum ActionError {
     WrongCaptcha = 54,
     #[error("解析错误")]
     ParsingError = 55,
+    #[error("参数错误")]
+    BadParameter = 56,
 }
 
 /// Error code and message to response
@@ -50,14 +55,11 @@ macro_rules! convert_error_type {
     };
 }
 
-use reqwest::Error as ReqwestError;
 convert_error_type!(ReqwestError);
 
-use sled::Error as SledError;
 convert_error_type!(SledError);
 
 type E = anyhow::Error;
 convert_error_type!(E);
 
-use serde_json::Error as SerdeError;
 convert_error_type!(SerdeError);
