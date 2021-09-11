@@ -21,7 +21,7 @@ lazy_static! {
         CLASSIFICATION
             .iter()
             .map(|c| format!("(\\d+\\.\\d{{0,2}})\\({}\\)", c))
-            .map(|pat| Regex::new(&pat).expect(&format!("Failed to generate pattern {}", pat)))
+            .map(|pat| Regex::new(&pat).unwrap_or_else(|_| panic!("Failed to generate pattern {}", pat)))
             .collect()
     };
     static ref ID_DETAIL: Selector = Selector::parse("td:nth-child(3)").unwrap();
@@ -122,13 +122,11 @@ pub struct ScScoreItem {
 fn score_map_detail(item: ElementRef) -> Result<ScScoreItem> {
     let id: Option<i32> = item
         .select(&ID_DETAIL)
-        .next()
-        .and_then(|x| Some(x.inner_html().trim().parse().unwrap_or_default()));
+        .next().map(|x| x.inner_html().trim().parse().unwrap_or_default());
 
     let add_score: Option<f32> = item
         .select(&SCORE_DETAIL)
-        .next()
-        .and_then(|x| Some(x.inner_html().trim().parse().unwrap_or_default()));
+        .next().map(|x| x.inner_html().trim().parse().unwrap_or_default());
 
     // TODO: Add error handler.
     Ok(ScScoreItem {
@@ -192,19 +190,18 @@ fn activity_map_detail(item: ElementRef) -> Result<ScActivityItem> {
         })
     });
 
-    let time: Option<DateTime<Local>> = item.select(&TIME_DETAL).next().and_then(|x| {
+    let time: Option<DateTime<Local>> = item.select(&TIME_DETAL).next().map(|x| {
         let native_time =
             NaiveDateTime::parse_from_str(x.inner_html().trim(), "%Y-%m-%d %H:%M:%S").unwrap();
         let mut time = DateTime::from_utc(native_time, FixedOffset::east(8 * 3600));
         let eight_hour = Duration::hours(8);
         time = time - eight_hour;
-        Some(time)
+        time
     });
 
     let status: Option<String> = item
         .select(&STATUS_DETAIL)
-        .next()
-        .and_then(|x| Some(String::from(x.inner_html().trim())));
+        .next().map(|x| String::from(x.inner_html().trim()));
 
     Ok(ScActivityItem {
         activity_id: activity_id.unwrap_or_default(),

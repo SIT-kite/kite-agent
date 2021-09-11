@@ -120,7 +120,7 @@ fn parse_properties(banner: &str) -> ActivityDetail {
 }
 
 fn select_text(e: ElementRef, selector: &Selector) -> String {
-    e.select(&selector)
+    e.select(selector)
         .next()
         .map(|x| x.inner_html())
         .unwrap_or_default()

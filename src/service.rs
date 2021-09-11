@@ -11,9 +11,7 @@ pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScSc
 
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
-use crate::parser::{
-    Activity, ActivityDetail, Class, Course, Major, Profile, ScActivityItem, ScScoreItem, Score,
-};
+use crate::parser::{Activity, ActivityDetail, Course, Major, ScActivityItem, ScScoreItem, Score};
 
 mod auth;
 mod edu;

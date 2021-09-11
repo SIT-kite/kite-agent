@@ -91,7 +91,7 @@ impl DoRequest for ActivityListRequest {
         data.session_store.insert(&client.session)?;
 
         let html = response.text().await?;
-        let mut activities: Vec<Activity> = Parse::from_html(&html)?;
+        let activities: Vec<Activity> = Parse::from_html(&html)?;
         let result: Vec<Activity> = activities
             .into_iter()
             .map(|mut s| {

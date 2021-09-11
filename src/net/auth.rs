@@ -105,12 +105,14 @@ pub async fn portal_login(
 
         let need_captcha = check_need_captcha(&mut client, user_name).await?;
         let mut captcha = String::new();
-        while need_captcha {
-            let image = fetch_image(&mut client).await?;
-            captcha = identify_captcha(image)?;
-            // Captcha code must be 4 chars. Continue if not.
-            if captcha.len() == 4 {
-                break;
+        if need_captcha {
+            loop {
+                let image = fetch_image(&mut client).await?;
+                captcha = identify_captcha(image)?;
+                // Captcha code must be 4 chars. Continue if not.
+                if captcha.len() == 4 {
+                    break;
+                }
             }
         }
         let login_request = client
@@ -153,7 +155,7 @@ pub async fn portal_login(
 
         try_count -= 1;
     }
-    return Err(ActionError::Unknown.into());
+    Err(ActionError::Unknown.into())
 }
 
 /// When submit password to `authserver.sit.edu.cn`, it's required to do AES and base64 algorithm with
