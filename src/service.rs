@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use auth::{PortalAuthRequest, PortalAuthResponse};
 pub use edu::{
-    ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreRequest, TimeTableRequest,
+    ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreDetailRequest, ScoreRequest,
+    TimeTableRequest,
 };
 pub use error::{ActionError, ErrorResponse};
 use report::AgentInfo;
@@ -11,7 +12,9 @@ pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScSc
 
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
-use crate::parser::{Activity, ActivityDetail, Course, Major, ScActivityItem, ScScoreItem, Score};
+use crate::parser::{
+    Activity, ActivityDetail, Course, Major, ScActivityItem, ScScoreItem, Score, ScoreDetail,
+};
 
 mod auth;
 mod edu;
@@ -36,6 +39,7 @@ pub enum RequestPayload {
     // Profile(ProfileRequest),
     TimeTable(TimeTableRequest),
     Score(ScoreRequest),
+    ScoreDetail(ScoreDetailRequest),
 }
 
 /// Response payload
@@ -55,6 +59,7 @@ pub enum ResponsePayload {
     // Profile(Profile),
     TimeTable(Vec<Course>),
     Score(Vec<Score>),
+    ScoreDetail(Vec<ScoreDetail>),
 }
 
 #[async_trait::async_trait]
@@ -94,6 +99,7 @@ impl RequestPayload {
             // RequestPayload::Profile(r) => r.process(data).await,
             RequestPayload::TimeTable(r) => r.process(data).await,
             RequestPayload::Score(r) => r.process(data).await,
+            RequestPayload::ScoreDetail(r) => r.process(data).await,
         }
     }
 }

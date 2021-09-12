@@ -7,6 +7,7 @@ pub use profile::parse_profile_page;
 pub use profile::Profile;
 pub use score::Score;
 pub use score::{calculate_gpa, parse_score_list_page};
+pub use score_detail::{get_score_detail, ScoreDetail};
 pub use select_course::parse_available_course_page;
 pub use select_course::SelectCourse;
 pub use timetable::parse_timetable_page;
@@ -17,6 +18,7 @@ use crate::parser::ParserError;
 mod classes;
 mod profile;
 mod score;
+mod score_detail;
 mod select_course;
 mod timetable;
 

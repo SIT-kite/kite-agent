@@ -106,3 +106,38 @@ impl DoRequest for ScoreRequest {
         Ok(ResponsePayload::Score(parse_score_list_page(&text)?))
     }
 }
+
+#[derive(Debug, Deserialize)]
+pub struct ScoreDetailRequest {
+    pub account: String,
+    pub password: String,
+    pub school_year: SchoolYear,
+    pub semester: Semester,
+    pub class_id: String,
+}
+
+#[async_trait]
+impl DoRequest for ScoreDetailRequest {
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data.session_store.query_or(&self.account, &self.password)?;
+        let mut client = UserClient::new(session, &data.client);
+        client.set_response_hook(Some(default_response_hook));
+
+        make_sure_active(&mut client).await?;
+
+        let params = [
+            ("jxb_id", self.class_id),
+            ("xnm", self.school_year.to_string()),
+            ("xqm", self.semester.to_raw().to_string()),
+        ];
+
+        let request = data.client.post(url::SCORE_DETAIL).form(&params).build()?;
+        let response = client.send(request).await?;
+        let html = response.text().await?;
+
+        data.session_store.insert(&client.session)?;
+
+        let score_detail = get_score_detail(&html)?;
+        Ok(ResponsePayload::ScoreDetail(score_detail))
+    }
+}

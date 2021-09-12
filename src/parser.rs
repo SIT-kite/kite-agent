@@ -1,8 +1,8 @@
 pub use edu::{
-    calculate_gpa, parse_available_course_page, parse_class_list_page, parse_major_list_page,
-    parse_profile_page, parse_score_list_page, parse_timetable_page,
+    calculate_gpa, get_score_detail, parse_available_course_page, parse_class_list_page,
+    parse_major_list_page, parse_profile_page, parse_score_list_page, parse_timetable_page,
 };
-pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, SelectCourse, Semester};
+pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, ScoreDetail, SelectCourse, Semester};
 pub use expense::ExpenseRecord;
 pub use sc::{
     get_my_activity_list, get_my_score_list, Activity, ActivityDetail, JoinedActivity, ScActivityItem,

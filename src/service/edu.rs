@@ -1,5 +1,5 @@
 pub use env::{ClassRequest, CourseRequest, MajorRequest};
-pub use user::{ProfileRequest, ScoreRequest, TimeTableRequest};
+pub use user::{ProfileRequest, ScoreDetailRequest, ScoreRequest, TimeTableRequest};
 
 use crate::error::Result;
 use crate::net::UserClient;
@@ -28,6 +28,8 @@ mod url {
         HOME,
         "/jwglxt/cjcx/cjcx_cxDgXscj.html?doType=query&gnmkdm=N305005"
     );
+    /// Score detail page
+    pub const SCORE_DETAIL: &str = concatcp!(HOME, "/jwglxt/cjcx/cjcx_cxCjxqGjh.html?gnmkdm=N305005");
     /// Time tanle page
     pub const TIME_TABLE: &str = concatcp!(HOME, "/jwglxt/kbcx/xskbcx_cxXsKb.html?gnmkdm=N253508");
     /// Personal profile page
