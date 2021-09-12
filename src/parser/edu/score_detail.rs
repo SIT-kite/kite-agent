@@ -64,7 +64,7 @@ pub fn get_score_detail(html_page: &str) -> Result<Vec<ScoreDetail>> {
 
 #[cfg(test)]
 mod test {
-    use crate::parser::edu::score_detail::{get_score_detail, parse_html, ScoreDetail};
+    use crate::parser::edu::score_detail::{get_score_detail, ScoreDetail};
     #[test]
     fn test_score_detail_parser() {
         let html_page = std::fs::read_to_string("html/成绩详情.html").unwrap();

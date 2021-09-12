@@ -9,7 +9,7 @@ pub struct Score {
     #[serde(rename(deserialize = "cj"), deserialize_with = "str_to_f32")]
     /// 成绩
     score: f32,
-    #[serde(rename(deserialize = "kcmc"))]
+    #[serde(rename(deserialize = "kcmc"), default)]
     /// 课程
     course: String,
     #[serde(rename(deserialize = "kch"))]
