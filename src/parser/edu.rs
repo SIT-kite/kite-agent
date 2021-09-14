@@ -64,15 +64,15 @@ impl Semester {
             _ => Err(ParserError::SemesterError),
         }
     }
-}
 
-pub fn get_str(x: Option<&Value>) -> String {
-    String::from(x.map(|m| m.as_str().unwrap().trim()).unwrap_or_default())
-}
-
-pub fn get_f32(x: Option<&Value>) -> f32 {
-    // Some value may be '无', use default if the parse() could not be done properly.
-    get_str(x).parse().unwrap_or_default()
+    fn to_show(&self) -> String {
+        match self {
+            Semester::All => "0".to_string(),
+            Semester::FirstTerm => "1".to_string(),
+            Semester::SecondTerm => "2".to_string(),
+            Semester::MidTerm => "3".to_string(),
+        }
+    }
 }
 
 pub fn vec_to_i32(s: Vec<i32>) -> i32 {
@@ -101,11 +101,12 @@ where
     Ok(i)
 }
 
-pub fn str_to_semester<'de, D>(deserializer: D) -> Result<Semester, D::Error>
+pub fn str_to_semester<'de, D>(deserializer: D) -> Result<String, D::Error>
 where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
     let i = Semester::from_raw(&s).unwrap();
-    Ok(i)
+    let r = i.to_show();
+    Ok(r)
 }

@@ -23,7 +23,7 @@ pub struct Score {
     school_year: String,
     #[serde(rename(deserialize = "xqm"), deserialize_with = "str_to_semester")]
     /// 学期
-    semester: Semester,
+    semester: String,
     #[serde(rename(deserialize = "xf"), deserialize_with = "str_to_f32")]
     /// 学分
     credit: f32,
