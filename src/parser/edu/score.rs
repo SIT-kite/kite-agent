@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::parser::edu::{str_to_f32, str_to_semester, Semester};
+use crate::parser::edu::{str_to_f32, str_to_semester};
 use crate::service::ActionError;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -23,7 +23,7 @@ pub struct Score {
     school_year: String,
     #[serde(rename(deserialize = "xqm"), deserialize_with = "str_to_semester")]
     /// 学期
-    semester: Semester,
+    semester: i32,
     #[serde(rename(deserialize = "xf"), deserialize_with = "str_to_f32")]
     /// 学分
     credit: f32,
