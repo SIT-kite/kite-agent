@@ -6,25 +6,25 @@ use serde_json::Value;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Score {
-    #[serde(rename(deserialize = "cj"), deserialize_with = "str_to_f32")]
+    #[serde(rename(deserialize = "cj"), deserialize_with = "str_to_f32", default)]
     /// 成绩
     score: f32,
     #[serde(rename(deserialize = "kcmc"), default)]
     /// 课程
     course: String,
-    #[serde(rename(deserialize = "kch"))]
+    #[serde(rename(deserialize = "kch"), default)]
     /// 课程代码
     course_id: String,
-    #[serde(rename(deserialize = "jxb_id"))]
+    #[serde(rename(deserialize = "jxb_id"), default)]
     /// 班级
     class_id: String,
-    #[serde(rename(deserialize = "xnmmc"))]
+    #[serde(rename(deserialize = "xnmmc"), default)]
     /// 学年
     school_year: String,
-    #[serde(rename(deserialize = "xqm"), deserialize_with = "str_to_semester")]
+    #[serde(rename(deserialize = "xqm"), deserialize_with = "str_to_semester", default)]
     /// 学期
     semester: i32,
-    #[serde(rename(deserialize = "xf"), deserialize_with = "str_to_f32")]
+    #[serde(rename(deserialize = "xf"), deserialize_with = "str_to_f32", default)]
     /// 学分
     credit: f32,
 }
