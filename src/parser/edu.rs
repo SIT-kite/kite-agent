@@ -109,3 +109,9 @@ where
     let r = i.to_show();
     Ok(r)
 }
+
+pub fn str_to_none() -> Vec<String> {
+    let mut s = Vec::new();
+    s.push(String::from("空"));
+    s
+}

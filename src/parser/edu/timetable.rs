@@ -3,7 +3,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
 use crate::error::Result;
-use crate::parser::edu::{str_to_f32, str_to_i32, vec_to_i32};
+use crate::parser::edu::{str_to_f32, str_to_i32, str_to_none, vec_to_i32};
 
 lazy_static::lazy_static! {
     static ref WEEK_REGEX: Regex = Regex::new(r"(\d{1,2})(:?-(\d{1,2}))?").unwrap();
@@ -26,7 +26,11 @@ pub struct Course {
     #[serde(rename(deserialize = "cdmc"))]
     /// 教室
     place: String,
-    #[serde(rename(deserialize = "xm"), deserialize_with = "str_to_vec_string", default)]
+    #[serde(
+        rename(deserialize = "xm"),
+        deserialize_with = "str_to_vec_string",
+        default = "str_to_none"
+    )]
     /// 教师
     teacher: Vec<String>,
     #[serde(rename(deserialize = "xqmc"))]
