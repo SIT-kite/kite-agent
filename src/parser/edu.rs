@@ -87,7 +87,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    let i = s.parse::<f32>().unwrap_or_default();
+    let i = s.parse::<f32>().unwrap_or(-1.0);
     Ok(i)
 }
 
