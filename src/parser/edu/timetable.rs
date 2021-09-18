@@ -26,7 +26,7 @@ pub struct Course {
     #[serde(rename(deserialize = "cdmc"))]
     /// 教室
     place: String,
-    #[serde(rename(deserialize = "xm"), deserialize_with = "str_to_vec_string")]
+    #[serde(rename(deserialize = "xm"), deserialize_with = "str_to_vec_string"), default]
     /// 教师
     teacher: Vec<String>,
     #[serde(rename(deserialize = "xqmc"))]
