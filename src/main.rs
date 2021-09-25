@@ -5,18 +5,12 @@ extern crate lazy_static;
 #[macro_use]
 extern crate num_derive;
 
-// Jemallocator support.
-#[cfg(not(target_env = "msvc"))]
-use jemallocator::Jemalloc;
 use tokio::time::Duration;
 
 use agent::{run, SharedData};
 use config::CONFIG;
 use net::SessionStorage;
 
-#[cfg(not(target_env = "msvc"))]
-#[global_allocator]
-static GLOBAL: Jemalloc = Jemalloc;
 
 mod agent;
 mod config;
