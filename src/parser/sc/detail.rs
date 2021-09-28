@@ -11,7 +11,8 @@ use crate::service::ActionError;
 lazy_static! {
     static ref RE_SPACES: Regex = Regex::new(r"\s{2}\s+").unwrap();
     // <img alt="" src="/js/kindeditor-4.1.7/attached/image/20200528/20200528101316_172.png">
-    static ref RE_IMAGES: Regex = Regex::new(r#"<img(?:.*)src="(.*)">"#).unwrap();
+    static ref RE_DESCRIPTION_SPACES: Regex = Regex::new(r"\s+").unwrap();
+    static ref RE_IMAGES: Regex = Regex::new(r#"<img(.*?)src="(.*?)""#).unwrap();
     static ref SELECTOR_FRAME: Selector = Selector::parse(".box-1").unwrap();
     static ref SELECTOR_TITLE: Selector = Selector::parse("h1").unwrap();
     static ref SELECTOR_BANNER: Selector =
@@ -131,7 +132,7 @@ fn replace_images(html: &str) -> (String, Vec<ScImages>) {
     let images = RE_IMAGES
         .captures_iter(html)
         .map(|src| {
-            let old_name = src[1].to_string();
+            let old_name = src[2].to_string();
             let (_, file_extension) = old_name.rsplit_once(".").unwrap_or_default();
             let new_name = format!("{}.{}", uuid::Uuid::new_v4().to_string(), file_extension);
             ScImages {
@@ -153,7 +154,12 @@ fn replace_images(html: &str) -> (String, Vec<ScImages>) {
 
 fn parse_description(frame: ElementRef) -> (String, Vec<ScImages>) {
     let description = select_text(frame, &SELECTOR_DESCRIPTION);
+    let description = RE_DESCRIPTION_SPACES.replace_all(&description, " ").to_string();
+
+    // To filter application button
     let (description, images) = replace_images(&description);
+    let (description, _) = description.split_once("<div class=\"BlankLine5\">").unwrap_or_default();
+    let description = description.to_string();
 
     (description, images)
 }
@@ -208,9 +214,18 @@ impl Parse for ScJoinResult {
     }
 }
 
-#[test]
-fn test_activity_detail() {
+#[tokio::test]
+async fn test_activity_detail() -> Result<()>{
     let html_page = std::fs::read_to_string("html/第二课堂详情页面2.html").unwrap();
-    let detail = ActivityDetail::from_html(&html_page);
-    println!("{:?}", detail);
+    let detail = ActivityDetail::from_html(&html_page).unwrap();
+    let client = reqwest::Client::default();
+    for mut image in detail.images {
+        let image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
+        let response = client.get(image_url).send().await?;
+        let image_byte = response.bytes().await?;
+        let result = image_byte.to_vec();
+        image.content = result;
+        println!("{:?}", image);
+    }
+    Ok(())
 }

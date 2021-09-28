@@ -6,7 +6,7 @@ use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
 use crate::net::UserClient;
-use crate::parser::{get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse};
+use crate::parser::{get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse, ScImages};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
 use super::ResponseResult;
@@ -82,6 +82,18 @@ async fn tran_category(category: i32) -> Result<String> {
     }
 }
 
+
+async fn fetch_image(images: &mut Vec<ScImages>, client: UserClient) -> Result<()> {
+    for image in images {
+        let image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
+        let response = client.raw_client.get(image_url).send().await?;
+        let image_byte = response.bytes().await?;
+        let result = image_byte.to_vec();
+        image.content = result;
+    }
+    Ok(())
+}
+
 #[async_trait::async_trait]
 impl DoRequest for ActivityListRequest {
     /// Fetch and parse activity list page.
@@ -153,7 +165,9 @@ impl DoRequest for ActivityDetailRequest {
 
         data.session_store.insert(&client.session)?;
 
-        let activity: ActivityDetail = Parse::from_html(&html)?;
+        let mut activity: ActivityDetail = Parse::from_html(&html)?;
+        fetch_image(&mut activity.images, client).await?;
+
         Ok(ResponsePayload::ActivityDetail(Box::from(activity)))
     }
 }
@@ -239,3 +253,4 @@ impl DoRequest for ScJoinRequest {
         Ok(ResponsePayload::ScMyActivity(activity))
     }
 }
+

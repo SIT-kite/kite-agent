@@ -11,7 +11,6 @@ use agent::{run, SharedData};
 use config::CONFIG;
 use net::SessionStorage;
 
-
 mod agent;
 mod config;
 mod error;

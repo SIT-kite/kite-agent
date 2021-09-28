@@ -6,7 +6,7 @@ pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, ScoreDetail, Sel
 pub use expense::ExpenseRecord;
 pub use sc::{
     get_my_activity_list, get_my_score_list, Activity, ActivityDetail, JoinedActivity, ScActivityItem,
-    ScScoreItem, ScScoreSummary,
+    ScScoreItem, ScScoreSummary, ScImages
 };
 
 use crate::error::Result;
