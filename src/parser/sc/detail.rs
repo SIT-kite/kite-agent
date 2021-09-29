@@ -86,13 +86,15 @@ fn split_activity_properties(banner: &str) -> HashMap<String, String> {
 
 fn parse_date_time(date_time: &str) -> DateTime<Local> {
     let tz = FixedOffset::east(8 * 3600);
-    let dt = tz.datetime_from_str(date_time, "%Y-%m-%d %H:%M:%S").unwrap();
+    let dt = tz
+        .datetime_from_str(date_time, "%Y-%m-%d %H:%M:%S")
+        .unwrap_or_else(|_| tz.timestamp_nanos(0));
 
     DateTime::<Local>::from(dt)
 }
 
 fn parse_sign_time(value: &str) -> (DateTime<Local>, DateTime<Local>) {
-    let (start_s, end_s) = value.split_once("  --至--  ").unwrap();
+    let (start_s, end_s) = value.split_once("  --至--  ").unwrap_or_default();
 
     (parse_date_time(start_s), parse_date_time(end_s))
 }
@@ -158,7 +160,9 @@ fn parse_description(frame: ElementRef) -> (String, Vec<ScImages>) {
 
     // To filter application button
     let (description, images) = replace_images(&description);
-    let (description, _) = description.split_once("<div class=\"BlankLine5\">").unwrap_or_default();
+    let (description, _) = description
+        .split_once("<div class=\"BlankLine5\">")
+        .unwrap_or_default();
     let description = description.to_string();
 
     (description, images)
@@ -215,10 +219,11 @@ impl Parse for ScJoinResult {
 }
 
 #[tokio::test]
-async fn test_activity_detail() -> Result<()>{
+async fn test_activity_detail() -> Result<()> {
     let html_page = std::fs::read_to_string("html/第二课堂详情页面2.html").unwrap();
     let detail = ActivityDetail::from_html(&html_page).unwrap();
     let client = reqwest::Client::default();
+    println!("{:?}", detail);
     for mut image in detail.images {
         let image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
         let response = client.get(image_url).send().await?;

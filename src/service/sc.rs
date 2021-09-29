@@ -6,7 +6,9 @@ use crate::error::Result;
 use crate::make_parameter;
 use crate::net::client::default_response_hook;
 use crate::net::UserClient;
-use crate::parser::{get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse, ScImages};
+use crate::parser::{
+    get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse, ScImages,
+};
 use crate::service::{ActionError, DoRequest, ResponsePayload};
 
 use super::ResponseResult;
@@ -81,7 +83,6 @@ async fn tran_category(category: i32) -> Result<String> {
         Err(ActionError::BadParameter.into())
     }
 }
-
 
 async fn fetch_image(images: &mut Vec<ScImages>, client: UserClient) -> Result<()> {
     for image in images {
@@ -253,4 +254,3 @@ impl DoRequest for ScJoinRequest {
         Ok(ResponsePayload::ScMyActivity(activity))
     }
 }
-
