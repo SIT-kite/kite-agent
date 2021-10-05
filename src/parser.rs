@@ -9,11 +9,14 @@ pub use sc::{
     ScImages, ScScoreItem, ScScoreSummary,
 };
 
+pub use library::{SearchLibraryResult,HoldingPreviews};
+
 use crate::error::Result;
 
 mod edu;
 mod expense;
 mod sc;
+mod library;
 
 pub trait Parse {
     fn from_html(html_page: &str) -> Result<Self>
