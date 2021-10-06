@@ -1,11 +1,11 @@
-use strum_macros::{EnumString, EnumVariantNames, Display};
 use serde::{Deserialize, Serialize};
+use strum_macros::{Display, EnumString, EnumVariantNames};
 
+use crate::agent::SharedData;
+use crate::parser::{HoldingPreviews, Parse, SearchLibraryResult};
+use crate::service::{DoRequest, ResponsePayload, ResponseResult};
 use anyhow::Result;
 use reqwest::Url;
-use crate::service::{DoRequest, ResponseResult, ResponsePayload};
-use crate::agent::SharedData;
-use crate::parser::{Parse, SearchLibraryResult, HoldingPreviews};
 
 mod url {
     use const_format::concatcp;
@@ -14,16 +14,16 @@ mod url {
     pub const HOME: &str = "http://210.35.66.106";
 
     /// 图书馆馆藏检索页面
-    pub const OPAC: &str = concatcp!(HOME,"/opac");
+    pub const OPAC: &str = concatcp!(HOME, "/opac");
 
     /// 搜索结果页
-    pub const SEARCH: &str = concatcp!(OPAC,"/search");
+    pub const SEARCH: &str = concatcp!(OPAC, "/search");
 
     /// 图书信息页
-    pub const BOOK: &str = concatcp!(OPAC,"/book");
+    pub const BOOK: &str = concatcp!(OPAC, "/book");
 
     /// 借阅信息查询
-    pub const HOLDING_PREVIEW: &str = concatcp!(BOOK,"/holdingPreviews");
+    pub const HOLDING_PREVIEW: &str = concatcp!(BOOK, "/holdingPreviews");
 }
 
 /// 搜索方式
@@ -63,7 +63,6 @@ pub enum SearchWay {
     #[strum(serialize = "callno")]
     CallNo,
 }
-
 
 /// 排序规则
 #[derive(EnumVariantNames, Debug, Display, Serialize, Deserialize)]
@@ -115,7 +114,6 @@ pub enum SortOrder {
     #[strum(serialize = "desc")]
     Desc,
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SearchLibraryRequest {
@@ -180,113 +178,113 @@ impl SearchLibraryRequest {
         self
     }
     pub fn build_url(&self) -> Url {
-        Url::parse_with_params(url::SEARCH, [
-            ("q", self.keyword.as_str()),
-            ("searchType", "standard"),
-            ("isFacet", "true"),
-            ("view", "standard"),
-            ("searchWay", self.search_way.to_string().as_str()),
-            ("rows", self.rows.to_string().as_str()),
-            ("sortWay", self.sort_way.to_string().as_str()),
-            ("sortOrder", self.sort_order.to_string().as_str()),
-            ("hasholding", "1"),
-            ("searchWay0", "marc"),
-            ("logical0", "AND"),
-            ("page", self.page.to_string().as_str()),
-        ]).unwrap()
+        Url::parse_with_params(
+            url::SEARCH,
+            [
+                ("q", self.keyword.as_str()),
+                ("searchType", "standard"),
+                ("isFacet", "true"),
+                ("view", "standard"),
+                ("searchWay", self.search_way.to_string().as_str()),
+                ("rows", self.rows.to_string().as_str()),
+                ("sortWay", self.sort_way.to_string().as_str()),
+                ("sortOrder", self.sort_order.to_string().as_str()),
+                ("hasholding", "1"),
+                ("searchWay0", "marc"),
+                ("logical0", "AND"),
+                ("page", self.page.to_string().as_str()),
+            ],
+        )
+        .unwrap()
     }
 }
 
 #[async_trait::async_trait]
 impl DoRequest for SearchLibraryRequest {
     async fn process(self, data: SharedData) -> ResponseResult {
-        let request = data
-            .client
-            .get(self.build_url())
-            .build()?;
-        let response = data
-            .client
-            .execute(request)
-            .await?;
+        let request = data.client.get(self.build_url()).build()?;
+        let response = data.client.execute(request).await?;
         let html = response.text().await?;
         let mut books: SearchLibraryResult = Parse::from_html(&html)?;
 
-        let book_id_list = books.book_list
-            .iter()
-            .map(|x| x.book_id.clone())
-            .collect::<Vec<String>>();
+        // let book_id_list = books.book_list
+        //     .iter()
+        //     .map(|x| x.book_id.clone())
+        //     .collect::<Vec<String>>();
 
         // 获取馆藏表
-        let holding_previews = get_holding_previews(book_id_list, &data).await?;
+        // let holding_previews = get_holding_previews(book_id_list, &data).await?;
 
         // 为book_list添加preview信息
-        books.book_list
-            .iter_mut()
-            .for_each(|x| {
-                x.holding_preview = holding_previews
-                    .holding_previews
-                    .get(x.book_id.as_str())
-                    .unwrap()
-                    .clone();
-            });
-        Ok(ResponsePayload::SearchLibraryResult(books))
+        // books.book_list
+        //     .iter_mut()
+        //     .for_each(|x| {
+        //         x.holding_preview = holding_previews
+        //             .holding_previews
+        //             .get(x.book_id.as_str())
+        //             .unwrap()
+        //             .clone();
+        //     });
+        Ok(ResponsePayload::SearchLibrary(books))
+    }
+}
+
+/// 馆藏信息检索
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BookHoldingRequest {
+    book_id_list: Vec<String>,
+}
+
+impl Default for BookHoldingRequest {
+    fn default() -> Self {
+        BookHoldingRequest { book_id_list: vec![] }
     }
 }
 
 async fn get_holding_previews(book_id_list: Vec<String>, data: &SharedData) -> Result<HoldingPreviews> {
-    let mut bookrecnos = "".to_string();
-    book_id_list.iter()
-        .for_each(|x| {
-            bookrecnos.push_str(x.as_str());
-            bookrecnos.push_str(",");
-        });
-    let url = Url::parse_with_params(url::HOLDING_PREVIEW, [
-        ("bookrecnos", bookrecnos),
-        ("curLibcodes", "".to_string()),
-        ("return_fmt", "json".to_string()),
-    ]).unwrap();
+    let mut book_id_list_str = "".to_string();
+    book_id_list.iter().for_each(|x| {
+        book_id_list_str.push_str(x.as_str());
+        book_id_list_str.push_str(",");
+    });
+    let url = Url::parse_with_params(
+        url::HOLDING_PREVIEW,
+        [
+            ("bookrecnos", book_id_list_str),
+            ("curLibcodes", "".to_string()),
+            ("return_fmt", "json".to_string()),
+        ],
+    )
+    .unwrap();
 
-    let request = data
-        .client
-        .get(url)
-        .build()?;
-    let response = data
-        .client
-        .execute(request)
-        .await?;
-    let holding_preview = response
-        .json::<HoldingPreviews>()
-        .await?;
+    let request = data.client.get(url).build()?;
+    let response = data.client.execute(request).await?;
+    let holding_preview = response.json::<HoldingPreviews>().await?;
     Ok(holding_preview)
 }
 
+/// 馆藏信息请求
+#[async_trait::async_trait]
+impl DoRequest for BookHoldingRequest {
+    async fn process(self, data: SharedData) -> ResponseResult {
+        let mut book_id_list_str = "".to_string();
+        self.book_id_list.iter().for_each(|x| {
+            book_id_list_str.push_str(x.as_str());
+            book_id_list_str.push_str(",");
+        });
+        let url = Url::parse_with_params(
+            url::HOLDING_PREVIEW,
+            [
+                ("bookrecnos", book_id_list_str),
+                ("curLibcodes", "".to_string()),
+                ("return_fmt", "json".to_string()),
+            ],
+        )
+        .unwrap();
 
-// #[cfg(test)]
-// mod test {
-//     use reqwest;
-//     use crate::parser::{SearchLibraryResult, Parse};
-//     use anyhow::Result;
-//     use tokio;
-//     use crate::service::{SearchLibraryRequest, SortWay, SortOrder, DoRequest, ResponsePayload};
-//     use crate::agent::SharedData;
-//     use crate::net::SessionStorage;
-//
-//     #[tokio::test]
-//     async fn test() -> Result<()> {
-//         let data = SharedData {
-//             node: "Test".to_string(),
-//             session_store: SessionStorage::new().unwrap(),
-//             client: reqwest::Client::new(),
-//         };
-//         let search_request = SearchLibraryRequest::new()
-//             .keyword("")
-//             .sort_way(SortWay::PublishDate)
-//             .sort_order(SortOrder::Desc);
-//         if let ResponsePayload::SearchLibraryResult(r) = search_request
-//             .process(data)
-//             .await? {
-//             println!("{:#?}", r);
-//         }
-//         Ok(())
-//     }
-// }
+        let request = data.client.get(url).build()?;
+        let response = data.client.execute(request).await?;
+        let holding_previews = response.json::<HoldingPreviews>().await?;
+        Ok(ResponsePayload::BookHoldingInfo(holding_previews))
+    }
+}

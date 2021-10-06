@@ -1,13 +1,12 @@
-use std::fmt::Debug;
 use std::collections::HashMap;
+use std::fmt::Debug;
 
-use serde::{Serialize, Deserialize};
-use scraper::{ElementRef, Html, Selector};
 use regex::Regex;
+use scraper::{ElementRef, Html, Selector};
+use serde::{Deserialize, Serialize};
 
-use crate::parser::Parse;
 use crate::error::Result;
-
+use crate::parser::Parse;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct HoldingPreview {
@@ -91,9 +90,9 @@ pub struct HoldingPreviews {
     /// 馆藏信息预览
     #[serde(rename(deserialize = "previews"), default)]
     pub holding_previews: HashMap<String, Vec<HoldingPreview>>,
-    /// 全局配置(不知道这是干啥的)
-    #[serde(rename(deserialize = "globalConfig"), default)]
-    pub global_config: GlobalConfig,
+    // /// 全局配置(不知道这是干啥的)
+    // #[serde(rename(deserialize = "globalConfig"), default)]
+    // pub global_config: GlobalConfig,
 }
 
 /// 图书信息
@@ -101,6 +100,8 @@ pub struct HoldingPreviews {
 pub struct Book {
     /// 图书号
     pub book_id: String,
+    /// ISBN号
+    pub isbn: String,
     /// 图书标题
     pub title: String,
     /// 图书作者
@@ -111,8 +112,8 @@ pub struct Book {
     pub publish_date: String,
     /// 索书号
     pub call_no: String,
-    /// 馆藏信息
-    pub holding_preview: Vec<HoldingPreview>,
+    // /// 馆藏信息
+    // pub holding_preview: Vec<HoldingPreview>,
 }
 
 /// 检索结果
@@ -131,27 +132,27 @@ pub struct SearchLibraryResult {
 }
 
 lazy_static! {
-    static ref NUM_WITH_COMMA:Regex = Regex::new(r"(\d+,?)+").unwrap();
-    static ref FLOAT_NUM:Regex = Regex::new(r"\d*\.\d*").unwrap();
-    static ref CURRENT_PAGE:Selector = Selector::parse("div.meneame:nth-child(4) > b:nth-child(4)").unwrap();
-    static ref TOTAL_PAGES:Selector = Selector::parse("div.meneame:nth-child(4) > span:nth-child(1)").unwrap();
-    static ref RESULT_NUM_AND_TIME:Selector = Selector::parse("#search_meta > div:nth-child(1)").unwrap();
-    static ref BOOK_LIST:Selector = Selector::parse(".resultTable > tbody:nth-child(1) > tr").unwrap();
-    static ref BOOK_COVER_IMG:Selector = Selector::parse(".bookcover_img").unwrap();
-    static ref BOOK_PUBLISH_DATE:Selector = Selector::parse("td:nth-child(4) > div:nth-child(1) > div:nth-child(3)").unwrap();
-    static ref TITLE:Selector = Selector::parse(".title-link").unwrap();
-    static ref AUTHOR:Selector = Selector::parse(".author-link").unwrap();
-    static ref PUBLISHER:Selector = Selector::parse(".publisher-link").unwrap();
-    static ref CALL_NO:Selector = Selector::parse(".callnosSpan").unwrap();
+    static ref NUM_WITH_COMMA: Regex = Regex::new(r"(\d+,?)+").unwrap();
+    static ref FLOAT_NUM: Regex = Regex::new(r"检索时间: (\d+(?:\.\d+)?)").unwrap();
+    static ref CURRENT_PAGE: Selector =
+        Selector::parse("div.meneame:nth-child(4) > b:nth-child(4)").unwrap();
+    static ref TOTAL_PAGES: Selector =
+        Selector::parse("div.meneame:nth-child(4) > span:nth-child(1)").unwrap();
+    static ref RESULT_NUM_AND_TIME: Selector =
+        Selector::parse("#search_meta > div:nth-child(1)").unwrap();
+    static ref BOOK_LIST: Selector = Selector::parse(".resultTable > tbody:nth-child(1) > tr").unwrap();
+    static ref BOOK_COVER_IMG: Selector = Selector::parse(".bookcover_img").unwrap();
+    static ref BOOK_PUBLISH_DATE: Selector =
+        Selector::parse("td:nth-child(4) > div:nth-child(1) > div:nth-child(3)").unwrap();
+    static ref TITLE: Selector = Selector::parse(".title-link").unwrap();
+    static ref AUTHOR: Selector = Selector::parse(".author-link").unwrap();
+    static ref PUBLISHER: Selector = Selector::parse(".publisher-link").unwrap();
+    static ref CALL_NO: Selector = Selector::parse(".callnosSpan").unwrap();
 }
 
 /// 页面元素解析为Book结构体
 fn book_map_detail(item: ElementRef) -> Result<Book> {
-    let bookcover_img = item
-        .select(&BOOK_COVER_IMG)
-        .next()
-        .unwrap()
-        .value();
+    let bookcover_img = item.select(&BOOK_COVER_IMG).next().unwrap().value();
     let get_info_from_element = |selector: &Selector| {
         item.select(selector)
             .next()
@@ -163,19 +164,16 @@ fn book_map_detail(item: ElementRef) -> Result<Book> {
     let publish_date = get_info_from_element(&BOOK_PUBLISH_DATE);
     let mut publish_date = publish_date.split("出版日期:");
     publish_date.next();
-    let publish_date = publish_date
-        .next()
-        .unwrap()
-        .trim()
-        .to_string();
+    let publish_date = publish_date.next().unwrap().trim().to_string();
     Ok(Book {
         book_id: bookcover_img.attr("bookrecno").unwrap().to_string(),
+        isbn: bookcover_img.attr("isbn").unwrap().to_string(),
         title: get_info_from_element(&TITLE),
         author: get_info_from_element(&AUTHOR),
         publisher: get_info_from_element(&PUBLISHER),
         publish_date,
         call_no: get_info_from_element(&CALL_NO),
-        holding_preview: vec![],
+        // holding_preview: vec![],
     })
 }
 
@@ -193,21 +191,27 @@ fn test_parse_number_with_comma() {
     assert_eq!(parse_number_with_comma("55,720").unwrap(), 55720);
 }
 
-
-fn regex_find<'a>(regex: &'a Regex, src: &'a str) -> &'a str  {
-    regex.captures_iter(src)
+/// 提取符合正则式的第一个字符串
+fn regex_find<'a>(regex: &'a Regex, src: &'a str, index: usize) -> &'a str {
+    regex
+        .captures_iter(src)
         .next()
         .unwrap()
-        .get(0)
+        .get(index)
         .unwrap()
         .as_str()
 }
 
 /// 从搜索页解析总页数
 fn get_total_pages(document: &Html) -> Result<u32> {
-    let content = document.select(&TOTAL_PAGES)
-        .next().unwrap().text().next().unwrap();
-    let content = regex_find(&NUM_WITH_COMMA, content);
+    let content = document
+        .select(&TOTAL_PAGES)
+        .next()
+        .unwrap()
+        .text()
+        .next()
+        .unwrap();
+    let content = regex_find(&NUM_WITH_COMMA, content, 0);
 
     let content = parse_number_with_comma(content).unwrap();
 
@@ -221,13 +225,12 @@ fn get_result_num_and_time(document: &Html) -> Result<(u32, f32)> {
     content.next();
     content.next();
     let content = content.next().unwrap();
-    let result_count = regex_find(&NUM_WITH_COMMA, content);
+    let result_count = regex_find(&NUM_WITH_COMMA, content, 0);
     let result_count = parse_number_with_comma(result_count).unwrap();
-    let use_time = regex_find(&FLOAT_NUM, content);
+    let use_time = regex_find(&FLOAT_NUM, content, 1);
     let use_time = use_time.parse::<f32>().unwrap();
     Ok((result_count, use_time))
 }
-
 
 impl Parse for SearchLibraryResult {
     fn from_html(html_page: &str) -> Result<Self> {
@@ -238,7 +241,13 @@ impl Parse for SearchLibraryResult {
             .collect::<Vec<Book>>();
         let current_page = document
             .select(&CURRENT_PAGE)
-            .next().unwrap().text().next().unwrap().parse::<u32>().unwrap();
+            .next()
+            .unwrap()
+            .text()
+            .next()
+            .unwrap()
+            .parse::<u32>()
+            .unwrap();
         let (result_count, use_time) = get_result_num_and_time(&document)?;
         Ok(SearchLibraryResult {
             result_count,
@@ -252,11 +261,11 @@ impl Parse for SearchLibraryResult {
 
 #[cfg(test)]
 mod test {
-    use reqwest;
-    use crate::parser::{SearchLibraryResult, Parse};
+    use crate::parser::{Parse, SearchLibraryResult};
+    use crate::service::{SearchLibraryRequest, SortOrder, SortWay};
     use anyhow::Result;
+    use reqwest;
     use tokio;
-    use crate::service::{SearchLibraryRequest, SortWay, SortOrder};
 
     #[tokio::test]
     async fn test() -> Result<()> {
@@ -265,10 +274,7 @@ mod test {
             .sort_way(SortWay::PublishDate)
             .sort_order(SortOrder::Desc)
             .build_url();
-        let response = reqwest::get(url)
-            .await?
-            .text()
-            .await?;
+        let response = reqwest::get(url).await?.text().await?;
 
         let s: SearchLibraryResult = Parse::from_html(&response.as_str()).unwrap();
         println!("{:#?}", s);
