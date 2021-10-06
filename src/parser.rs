@@ -9,10 +9,13 @@ pub use sc::{
     ScImages, ScScoreItem, ScScoreSummary,
 };
 
+pub use library::{HoldingPreviews, SearchLibraryResult};
+
 use crate::error::Result;
 
 mod edu;
 mod expense;
+mod library;
 mod sc;
 
 pub trait Parse {

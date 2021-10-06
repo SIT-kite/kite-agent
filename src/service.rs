@@ -6,6 +6,7 @@ pub use edu::{
     TimeTableRequest,
 };
 pub use error::{ActionError, ErrorResponse};
+pub use library::{BookHoldingRequest, SearchLibraryRequest, SearchWay, SortOrder, SortWay};
 use report::AgentInfo;
 pub use report::AgentInfoRequest;
 pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScScoreItemRequest};
@@ -13,12 +14,14 @@ pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScSc
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
 use crate::parser::{
-    Activity, ActivityDetail, Course, Major, ScActivityItem, ScScoreItem, Score, ScoreDetail,
+    Activity, ActivityDetail, Course, HoldingPreviews, Major, ScActivityItem, ScScoreItem, Score,
+    ScoreDetail, SearchLibraryResult,
 };
 
 mod auth;
 mod edu;
 mod error;
+mod library;
 pub mod report;
 mod sc;
 
@@ -40,6 +43,8 @@ pub enum RequestPayload {
     TimeTable(TimeTableRequest),
     Score(ScoreRequest),
     ScoreDetail(ScoreDetailRequest),
+    SearchLibrary(SearchLibraryRequest),
+    BookHoldingInfo(BookHoldingRequest),
 }
 
 /// Response payload
@@ -60,6 +65,8 @@ pub enum ResponsePayload {
     TimeTable(Vec<Course>),
     Score(Vec<Score>),
     ScoreDetail(Vec<ScoreDetail>),
+    SearchLibrary(SearchLibraryResult),
+    BookHoldingInfo(HoldingPreviews),
 }
 
 #[async_trait::async_trait]
@@ -100,6 +107,8 @@ impl RequestPayload {
             RequestPayload::TimeTable(r) => r.process(data).await,
             RequestPayload::Score(r) => r.process(data).await,
             RequestPayload::ScoreDetail(r) => r.process(data).await,
+            RequestPayload::SearchLibrary(r) => r.process(data).await,
+            RequestPayload::BookHoldingInfo(r) => r.process(data).await,
         }
     }
 }
