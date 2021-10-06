@@ -1,74 +1,68 @@
 # 上应小风筝数据收集模块
 
- ## 项目概要
-  本项目旨在为上海应用技术大学的学生提供校园信息整合与管理服务。  
-  数据收集模块与公网中核心节点保持连接，负责接收命令、数据爬取，并整合转发给公网核心节点。  
-  后端代码见 [kite-server](https://github.com/sunnysab/kite-server) ，项目使用 [Rust](https://www.rust-lang.org/) 语言编写。
+## 项目概要
 
- ## 功能
+本项目旨在为上海应用技术大学的学生提供校园信息整合与管理服务。  
+数据收集模块与公网中核心节点保持连接，负责接收命令、数据爬取，并整合转发给公网核心节点。  
+后端代码见 [kite-server](https://github.com/sunnysab/kite-server) ，项目使用 [Rust](https://www.rust-lang.org/) 语言编写。
+
+## 功能
+
+### 通用
+
+- [x] 校园网登录
+
+### 信息门户
  
- ### 通用
- 
- - [x] 校园网登录
- 
- ### 信息门户
- 
- - [ ] 最新通知
- 
- ### 教务系统
- 
- - [x] 获取最新课程列表
- - [x] 获取个人教学计划
- - [x] 获取各专业教学计划
- - [ ] 选课
- - [ ] 退选课 
- 
- ### 第二课堂系统
- 
- - [x] 获取最近活动列表
- - [x] 获取并计算我的得分
- - [x] 获取我参加的活动
- - [ ] 申请活动
- - [x] 获取活动详情
- 
- ### 校园卡业务
- 
- - [x] 获取消费记录
- - [x] 电费查询
- 
- ## 目标平台
- 
- - Linux x86_64
- - Linux on Arm
- 
+- [ ] 最新通知
+
+### 教务系统
+
+- [x] 获取最新课程列表
+- [x] 获取个人教学计划
+- [x] 获取各专业教学计划
+- [ ] 选课
+- [ ] 退选课
+
+### 第二课堂系统
+
+- [x] 获取最近活动列表
+- [x] 获取并计算我的得分
+- [x] 获取我参加的活动
+- [ ] 申请活动
+- [x] 获取活动详情
+
+### 校园卡业务
+
+- [x] 获取消费记录
+- [x] 电费查询
+
+### 图书馆
+
+- [x] 图书查询
+- [x] 馆藏信息查询
+- [ ] 图书信息查询
+- [ ] 图书馆登录
+- [ ] 借阅查询与续订
+
+## 目标平台
+
+- Linux x86_64
+- Linux on Arm
+
 ## 运行
- 
- 请先确保系统中已预装有 rust 编程环境（rustc、cargo等），并已连接上互联网。
+
+请先确保系统中已预装有 rust 编程环境（rustc、cargo等），并已连接上互联网。
+
  ```bash
 cargo run 
 ```
 
-### 运行命令行工具
-
-命令行工具在项目中作为 examples 发布，你可以在 `examples/console` 中找到它。
-
-使用方法：
-```shell
-# 编译
-cargo build --examples
-
-cd target/debug/examples
-# 查看缓存的 OA 账户
-./console session list
-# 添加账户
-./console session insert --account 学号 --credential 密码
-# 查看最近的第二课堂活动
-./console page get-recent-activities
-```
 
 如果提示找不到配置文件, 你可以将项目根目录下的 `kite.toml` 拷贝过去。在配置文件中你可以控制程序使用的代理，以便调试。
 
 查看使用方式：
+
 ```shell
 ./console help
 # 或对子命令查看帮助：
@@ -79,8 +73,7 @@ cd target/debug/examples
 
 - [sunnysab](https://github.com/sunnysab)
 - [peanut996](https://github.com/peanut996)
-
-
+- [Zhangzqs](https://github.com/Zhangzqs)
 
 ## 开源协议
 
