@@ -84,10 +84,18 @@ async fn tran_category(category: i32) -> Result<String> {
     }
 }
 
-async fn fetch_image(images: &mut Vec<ScImages>, client: UserClient) -> Result<()> {
+async fn fetch_image(images: &mut Vec<ScImages>, mut client: UserClient) -> Result<()> {
     for image in images {
-        let image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
-        let response = client.raw_client.get(image_url).send().await?;
+        let image_url;
+        if image.old_name.contains("sc.sit.edu.cn") {
+            image_url = image.old_name.clone();
+        } else {
+            image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
+        }
+
+        client.set_response_hook(Some(default_response_hook));
+        let request = client.raw_client.get(image_url).build()?;
+        let response = client.send(request).await?;
         let image_byte = response.bytes().await?;
         let result = image_byte.to_vec();
         image.content = result;
