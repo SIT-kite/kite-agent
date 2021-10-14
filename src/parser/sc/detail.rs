@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use base64::decode;
 use chrono::{DateTime, FixedOffset, Local, TimeZone};
 use regex::Regex;
 use scraper::{ElementRef, Html, Selector};
@@ -13,6 +14,8 @@ lazy_static! {
     // <img alt="" src="/js/kindeditor-4.1.7/attached/image/20200528/20200528101316_172.png">
     static ref RE_DESCRIPTION_SPACES: Regex = Regex::new(r"\s+").unwrap();
     static ref RE_IMAGES: Regex = Regex::new(r#"<img(.*?)src="(.*?)""#).unwrap();
+    static ref RE_IMAGES_BASE64: Regex = Regex::new(r"([^,]+)$").unwrap();
+    static ref RE_IMAGES_FILE: Regex = Regex::new(r"(image/)\S+;").unwrap();
     static ref SELECTOR_FRAME: Selector = Selector::parse(".box-1").unwrap();
     static ref SELECTOR_TITLE: Selector = Selector::parse("h1").unwrap();
     static ref SELECTOR_BANNER: Selector =
@@ -135,13 +138,7 @@ fn replace_images(html: &str) -> (String, Vec<ScImages>) {
         .captures_iter(html)
         .map(|src| {
             let old_name = src[2].to_string();
-            let (_, file_extension) = old_name.rsplit_once(".").unwrap_or_default();
-            let new_name = format!("{}.{}", uuid::Uuid::new_v4().to_string(), file_extension);
-            ScImages {
-                new_name,
-                old_name,
-                content: vec![],
-            }
+            match_image_url(old_name)
         })
         .collect::<Vec<_>>();
 
@@ -152,6 +149,46 @@ fn replace_images(html: &str) -> (String, Vec<ScImages>) {
     }
 
     (html, images)
+}
+
+fn match_image_url(image_url: String) -> ScImages {
+    if image_url.contains("data:") {
+        replace_image_by_base64(image_url)
+    } else {
+        default_replace_image(image_url)
+    }
+}
+
+fn replace_image_by_base64(old_name: String) -> ScImages {
+    // There use image/ to get image extension
+    let image_file = old_name.strip_prefix("data:image/").unwrap();
+    let (file_extension, file_image) = image_file.split_once(";base64,").unwrap_or_default();
+    // let file_extension = RE_IMAGES_FILE
+    //     .captures(&old_name)
+    //     .map(|s| s[0].replace("image/", "").replace(";", ""))
+    //     .unwrap();
+    //
+    // let file_image = RE_IMAGES_BASE64
+    //     .captures(&old_name)
+    //     .map(|s| s[1].to_string())
+    //     .unwrap();
+    let image = decode(file_image).unwrap();
+    let new_name = format!("{}.{}", uuid::Uuid::new_v4().to_string(), file_extension);
+    ScImages {
+        new_name,
+        old_name,
+        content: image,
+    }
+}
+
+fn default_replace_image(old_name: String) -> ScImages {
+    let (_, file_extension) = old_name.rsplit_once(".").unwrap_or_default();
+    let new_name = format!("{}.{}", uuid::Uuid::new_v4().to_string(), file_extension);
+    ScImages {
+        new_name,
+        old_name,
+        content: vec![],
+    }
 }
 
 fn parse_description(frame: ElementRef) -> (String, Vec<ScImages>) {
@@ -222,15 +259,21 @@ impl Parse for ScJoinResult {
 async fn test_activity_detail() -> Result<()> {
     let html_page = std::fs::read_to_string("html/第二课堂详情页面2.html").unwrap();
     let detail = ActivityDetail::from_html(&html_page).unwrap();
-    let client = reqwest::Client::default();
     println!("{:?}", detail);
-    for mut image in detail.images {
-        let image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
-        let response = client.get(image_url).send().await?;
-        let image_byte = response.bytes().await?;
-        let result = image_byte.to_vec();
-        image.content = result;
-        println!("{:?}", image);
-    }
+    Ok(())
+}
+
+#[test]
+fn test_image_file() -> Result<()> {
+    let image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkJDQzA1MTVGNkE2MjExRTRBRjEzODVCM0Q0NEVFMjFBIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkJDQzA1MTYwNkE2MjExRTRBRjEzODVCM0Q0NEVFMjFBIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QkNDMDUxNUQ2QTYyMTFFNEFGMTM4NUIzRDQ0RUUyMUEiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QkNDMDUxNUU2QTYyMTFFNEFGMTM4NUIzRDQ0RUUyMUEiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6p+a6fAAAAD0lEQVR42mJ89/Y1QIABAAWXAsgVS/hWAAAAAElFTkSuQmCC";
+
+    let result = image.strip_prefix("data:image/").unwrap();
+    let (result, x) = result.split_once(";base64,").unwrap_or_default();
+    // let result = RE_IMAGES_BASE64
+    //     .captures(image)
+    //     .map(|s| s[1].to_string())
+    //     .unwrap();
+    // let result = decode(result)?;
+    println!("{:?}: {:?}", result, x);
     Ok(())
 }

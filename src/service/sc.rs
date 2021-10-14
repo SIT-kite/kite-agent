@@ -86,21 +86,41 @@ async fn tran_category(category: i32) -> Result<String> {
 
 async fn fetch_image(images: &mut Vec<ScImages>, mut client: UserClient) -> Result<()> {
     for image in images {
-        let image_url;
-        if image.old_name.contains("sc.sit.edu.cn") {
-            image_url = image.old_name.clone();
-        } else {
-            image_url = format!("http://sc.sit.edu.cn{}", image.old_name);
-        }
+        if image.content.is_empty() {
+            let image_url = match_image_url(&image.old_name);
 
-        client.set_response_hook(Some(default_response_hook));
-        let request = client.raw_client.get(image_url).build()?;
-        let response = client.send(request).await?;
-        let image_byte = response.bytes().await?;
-        let result = image_byte.to_vec();
-        image.content = result;
+            let content = download_image(image_url, &mut client).await;
+            match content {
+                Ok(result) => image.content = result,
+                Err(e) => {
+                    println!("{:?}", e);
+                }
+            }
+        }
     }
     Ok(())
+}
+
+async fn download_image(image_url: String, client: &mut UserClient) -> Result<Vec<u8>> {
+    client.set_response_hook(Some(default_response_hook));
+
+    let request = client.raw_client.get(image_url).build()?;
+    let response = client.send(request).await?;
+
+    let image_byte = response.bytes().await?;
+    let result = image_byte.to_vec();
+
+    Ok(result)
+}
+
+fn match_image_url(old_name: &str) -> String {
+    let image_url;
+    if old_name.contains("sc.sit.edu.cn") || old_name.contains("job.sit.edu.cn") {
+        image_url = old_name.to_string();
+    } else {
+        image_url = format!("http://sc.sit.edu.cn{}", old_name);
+    }
+    image_url
 }
 
 #[async_trait::async_trait]
