@@ -25,6 +25,7 @@ lazy_static! {
             .collect()
     };
     static ref ID_DETAIL: Selector = Selector::parse("td:nth-child(3)").unwrap();
+    static ref CATEGORY_DETAIL: Selector = Selector::parse("td:nth-child(2)").unwrap();
     static ref SCORE_DETAIL: Selector = Selector::parse("td:nth-child(5) > span").unwrap();
     static ref SCORE_DETAIL_PAGE: Selector =
         Selector::parse("#div1 > div.table_style_4 > form > table:nth-child(4) > tbody > tr").unwrap();
@@ -116,6 +117,7 @@ impl Parse for ScScoreSummary {
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct ScScoreItem {
     pub activity_id: i32,
+    pub category: i32,
     pub amount: f32,
 }
 
@@ -125,6 +127,11 @@ fn score_map_detail(item: ElementRef) -> Result<ScScoreItem> {
         .next()
         .map(|x| x.inner_html().trim().parse().unwrap_or_default());
 
+    let category: Option<i32> = item
+        .select(&CATEGORY_DETAIL)
+        .next()
+        .map(|x| trans_category_to_i32(x.inner_html().trim()));
+
     let add_score: Option<f32> = item
         .select(&SCORE_DETAIL)
         .next()
@@ -133,8 +140,24 @@ fn score_map_detail(item: ElementRef) -> Result<ScScoreItem> {
     // TODO: Add error handler.
     Ok(ScScoreItem {
         activity_id: id.unwrap_or_default(),
+        category: category.unwrap_or_default(),
         amount: add_score.unwrap_or_default(),
     })
+}
+
+fn trans_category_to_i32(x: &str) -> i32 {
+    match x {
+        "校园文化活动" => 8,
+        "创新创业创意" => 3,
+        "主题教育" => 7,
+        "讲座报告" => 1,
+        "志愿公益" => 5,
+        "安全教育网络教学" => 9,
+        "社会实践" => 2,
+        "校园文明" => 4,
+        "社团社区易班、学院活动" => 8,
+        _ => 0,
+    }
 }
 
 fn filter_zero_score(x: &Result<ScScoreItem>) -> bool {
@@ -156,18 +179,22 @@ pub fn get_my_score_list(html_page: &str) -> Result<Vec<ScScoreItem>> {
     // Group and accumulate score by activity id.
     let map = score_items
         .into_iter()
-        .fold(HashMap::<i32, f32>::new(), |mut map, x| {
-            if let Some(old) = map.get_mut(&x.activity_id) {
+        .fold(HashMap::<(i32, i32), f32>::new(), |mut map, x| {
+            if let Some(old) = map.get_mut(&(x.activity_id, x.category)) {
                 *old += x.amount;
             } else {
-                map.insert(x.activity_id, x.amount);
+                map.insert((x.activity_id, x.category), x.amount);
             }
             map
         });
 
     let result = map
         .into_iter()
-        .map(|(activity_id, amount)| ScScoreItem { activity_id, amount })
+        .map(|((activity_id, category), amount)| ScScoreItem {
+            activity_id,
+            category,
+            amount,
+        })
         .collect();
     Ok(result)
 }
