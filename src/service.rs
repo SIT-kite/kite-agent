@@ -13,10 +13,8 @@ pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScSc
 
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
-use crate::parser::{
-    Activity, ActivityDetail, Course, HoldingPreviews, Major, ScActivityItem, ScScoreItem, Score,
-    ScoreDetail, SearchLibraryResult,
-};
+use crate::parser::{Activity, ActivityDetail, Course, HoldingPreviews, Major, ScActivityItem, ScScoreItem, Score, ScoreDetail, SearchLibraryResult, ExpensePage};
+use crate::service::expense::ExpenseRequest;
 
 mod auth;
 mod edu;
@@ -24,6 +22,7 @@ mod error;
 mod library;
 pub mod report;
 mod sc;
+mod expense;
 
 /// Response payload
 #[derive(Debug, Deserialize)]
@@ -45,6 +44,7 @@ pub enum RequestPayload {
     ScoreDetail(ScoreDetailRequest),
     SearchLibrary(SearchLibraryRequest),
     BookHoldingInfo(BookHoldingRequest),
+    CardExpense(ExpenseRequest),
 }
 
 /// Response payload
@@ -67,6 +67,7 @@ pub enum ResponsePayload {
     ScoreDetail(Vec<ScoreDetail>),
     SearchLibrary(SearchLibraryResult),
     BookHoldingInfo(HoldingPreviews),
+    CardExpense(ExpensePage),
 }
 
 #[async_trait::async_trait]
@@ -109,6 +110,7 @@ impl RequestPayload {
             RequestPayload::ScoreDetail(r) => r.process(data).await,
             RequestPayload::SearchLibrary(r) => r.process(data).await,
             RequestPayload::BookHoldingInfo(r) => r.process(data).await,
+            RequestPayload::CardExpense(r)=>r.process(data).await,
         }
     }
 }
