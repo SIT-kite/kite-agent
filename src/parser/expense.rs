@@ -1,37 +1,37 @@
 use crate::error::Result;
 use crate::parser::Parse;
-use chrono::{NaiveDate, NaiveTime};
+use chrono::{DateTime, FixedOffset, Local, TimeZone};
 use regex::Regex;
 use scraper::{Html, Selector};
+use serde::{Deserialize, Serialize};
 
 /// Campus card consumption records
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExpenseRecord {
-    /// User unique identifier.
-    pub code: String,
-    /// User name.
-    pub name: String,
     /// Record date.
-    pub date: NaiveDate,
-    /// Record time.
-    pub time: NaiveTime,
+    pub ts: DateTime<Local>,
     /// Expense amount.
     pub amount: f32,
     /// Expense address.
     pub address: String,
-    /// Page information for current record.
-    pub page_info: PageInfo,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct PageInfo {
     /// current page number.
-    pub current_page: u32,
+    pub current: u16,
     /// total pages number.
-    pub total_pages: u32,
+    pub total: u16,
 }
 
-impl Parse for Vec<ExpenseRecord> {
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExpensePage {
+    pub records: Vec<ExpenseRecord>,
+    /// Page information for current record.
+    pub page: PageInfo,
+}
+
+impl Parse for ExpensePage {
     fn from_html(html_page: &str) -> Result<Self> {
         let document = Html::parse_document(html_page);
 
@@ -48,12 +48,16 @@ impl Parse for Vec<ExpenseRecord> {
             .captures_iter(pages_information.as_str())
             .next()
             .map(|c| c.get(1).unwrap().as_str().to_string())
+            .unwrap_or_default()
+            .parse::<u16>()
             .unwrap_or_default();
 
         let total_pages = total_pages_pages_re
             .captures_iter(pages_information.as_str())
             .next()
             .map(|c| c.get(1).unwrap().as_str().to_string())
+            .unwrap_or_default()
+            .parse::<u16>()
             .unwrap_or_default();
 
         // Expense record.
@@ -63,7 +67,7 @@ impl Parse for Vec<ExpenseRecord> {
             .unwrap();
 
         // Records
-        let mut items = frame
+        let items = frame
             .select(&Selector::parse("tr").unwrap())
             .map(|e| {
                 e.select(&Selector::parse("td>div[align=center]").unwrap())
@@ -74,43 +78,39 @@ impl Parse for Vec<ExpenseRecord> {
             .drain(1..)
             .collect::<Vec<Vec<String>>>();
 
-        // Add page info.
-        items.iter_mut().for_each(|v| {
-            v.push(current_page.clone());
-            v.push(total_pages.clone());
-        });
-
         // Vec<ExpenseRecord>.
         let res = items
             .iter()
             .map(|v| ExpenseRecord::from(v.clone()))
             .collect::<Vec<ExpenseRecord>>();
 
-        Ok(res)
+        Ok(Self {
+            records: res,
+            page: PageInfo {
+                current: current_page,
+                total: total_pages,
+            },
+        })
     }
 }
 
 impl From<Vec<String>> for ExpenseRecord {
     fn from(fields: Vec<String>) -> Self {
+        let dt = format!("{} {}", fields[2], fields[3]);
+        let dt = FixedOffset::east(8 * 3600)
+            .datetime_from_str(&dt, "%Y-%m-%d %H:%M:%S")
+            .unwrap();
         Self {
-            code: fields[0].parse().unwrap_or_default(),
-            name: fields[1].parse().unwrap_or_default(),
-            date: NaiveDate::parse_from_str(fields[2].as_str(), "%Y-%m-%d")
-                .unwrap_or_else(|_| NaiveDate::parse_from_str("1970-01-01", "%Y-%m-%d").unwrap()),
-            time: NaiveTime::parse_from_str(fields[3].as_str(), "%H:%M:%S")
-                .unwrap_or_else(|_| NaiveTime::parse_from_str("00:00:00", "%H:%M:%S").unwrap()),
+            ts: DateTime::<Local>::from(dt),
             amount: fields[4].parse().unwrap_or_default(),
             address: fields[5].parse().unwrap_or_default(),
-            page_info: PageInfo {
-                current_page: fields[6].parse().unwrap(),
-                total_pages: fields[7].parse().unwrap(),
-            },
         }
     }
 }
 
 #[cfg(test)]
 mod test {
+    use crate::parser::expense::ExpensePage;
 
     #[test]
     fn test_expense_record_parser() {
@@ -118,20 +118,21 @@ mod test {
         use super::{ExpenseRecord, PageInfo};
         let html_page = std::fs::read_to_string("html/消费记录页面.html").unwrap();
 
-        let origin: Vec<ExpenseRecord> = Parse::from_html(html_page.as_str()).unwrap();
+        let origin: ExpensePage = Parse::from_html(html_page.as_str()).unwrap();
 
-        let target = ExpenseRecord {
-            code: "学号位置".to_string(),
-            name: "姓名位置".to_string(),
-            date: chrono::NaiveDate::parse_from_str("1970-01-01", "%Y-%m-%d").unwrap(),
-            time: chrono::NaiveTime::parse_from_str("00:00:00", "%H:%M:%S").unwrap(),
-            amount: 9.9,
-            address: "奉贤某食堂一层7#".to_string(),
-            page_info: PageInfo {
-                current_page: 1,
-                total_pages: 2,
-            },
-        };
-        assert_eq!(origin[0], target);
+        println!("{:#?}", origin);
+        // let target = ExpenseRecord {
+        //     code: "学号位置".to_string(),
+        //     name: "姓名位置".to_string(),
+        //     date_time: chrono::NaiveDate::parse_from_str("1970-01-01", "%Y-%m-%d").unwrap(),
+        //     time: chrono::NaiveTime::parse_from_str("00:00:00", "%H:%M:%S").unwrap(),
+        //     amount: 9.9,
+        //     address: "奉贤某食堂一层7#".to_string(),
+        //     page_info: PageInfo {
+        //         current_page: 1,
+        //         total_pages: 2,
+        //     },
+        // };
+        // assert_eq!(origin[0], target);
     }
 }
