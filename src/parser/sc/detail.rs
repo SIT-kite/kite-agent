@@ -183,7 +183,11 @@ fn replace_image_by_base64(old_name: String) -> ScImages {
 
 fn default_replace_image(old_name: String) -> ScImages {
     let (_, file_extension) = old_name.rsplit_once(".").unwrap_or_default();
-    let new_name = format!("{}.{}", uuid::Uuid::new_v4().to_string(), file_extension);
+    let new_name = format!(
+        "https://kite.sunnysab.cn/static/event/image/{}.{}",
+        uuid::Uuid::new_v4().to_string(),
+        file_extension
+    );
     ScImages {
         new_name,
         old_name,
