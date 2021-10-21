@@ -7,7 +7,7 @@ use crate::make_parameter;
 use crate::net::client::default_response_hook;
 use crate::net::UserClient;
 use crate::parser::{
-    get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse, ScImages, ScJoinResult,
+    Activity, ActivityDetail, get_my_activity_list, get_my_score_list, Parse, ScImages, ScJoinResult,
 };
 use crate::service::{ActionError, DoRequest, ErrorResponse, ResponsePayload};
 
@@ -315,9 +315,3 @@ impl DoRequest for ScJoinRequest {
     }
 }
 
-#[test]
-fn test() {
-    let s = "<script>alert('申请成功，下面将为您跳转至我的活动页面！');location.href='/public/pcenter/activityOrderList.action'</script>".to_string();
-    let x = s.split("('");
-    println!("{:?}", x);
-}
