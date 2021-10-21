@@ -7,9 +7,9 @@ use crate::make_parameter;
 use crate::net::client::default_response_hook;
 use crate::net::UserClient;
 use crate::parser::{
-    get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse, ScImages,
+    get_my_activity_list, get_my_score_list, Activity, ActivityDetail, Parse, ScImages, ScJoinResult,
 };
-use crate::service::{ActionError, DoRequest, ResponsePayload};
+use crate::service::{ActionError, DoRequest, ErrorResponse, ResponsePayload};
 
 use super::ResponseResult;
 
@@ -36,6 +36,11 @@ mod url {
 
     pub const MY_ACTIVITY: &str =
         "http://sc.sit.edu.cn/public/pcenter/activityOrderList.action?pageSize=200";
+
+    pub const APPLY_ACTIVITY: &str = "http://sc.sit.edu.cn/public/pcenter/checkUser.action?activityId=";
+
+    pub const APPLY_SUCCESS: &str =
+        "http://sc.sit.edu.cn/public/pcenter/applyActivity.action?activityId=";
 }
 
 #[derive(Debug, Deserialize)]
@@ -269,16 +274,50 @@ impl DoRequest for ScJoinRequest {
         client.set_response_hook(Some(default_response_hook));
 
         make_sure_active(&mut client).await?;
+        if self.force {
+            let apply_url = format!("{}{}", url::APPLY_SUCCESS, self.activity_id);
 
-        // Expected page content
-        let _expected = "<script>alert('申请成功，下面将为您跳转至我的活动页面！');location.href='/public/pcenter/activityOrderList.action'</script>";
-        let request = client.raw_client.get(url::MY_ACTIVITY).build()?;
-        let response = client.send(request).await?;
-        let html = response.text().await?;
+            let request = client.raw_client.get(apply_url).build()?;
+            let response = client.send(request).await?;
 
-        data.session_store.insert(&client.session)?;
+            let result = response.text().await?;
 
-        let activity = get_my_activity_list(&html)?;
-        Ok(ResponsePayload::ScMyActivity(activity))
+            data.session_store.insert(&client.session)?;
+
+            Ok(ResponsePayload::ScActivityJoin(result))
+        } else {
+            let apply_url = format!("{}{}", url::APPLY_ACTIVITY, self.activity_id);
+
+            let request = client.raw_client.post(apply_url).build()?;
+            let response = client.send(request).await?;
+
+            let html_page = response.text().await?;
+
+            data.session_store.insert(&client.session)?;
+
+            let message = ScJoinResult::from_html(&html_page)?;
+            match message {
+                ScJoinResult::Ok => {
+                    let apply_url = format!("{}{}", url::APPLY_SUCCESS, self.activity_id);
+
+                    let request = client.raw_client.get(apply_url).build()?;
+                    client.send(request).await?;
+
+                    let result = String::from("申请成功");
+
+                    data.session_store.insert(&client.session)?;
+
+                    Ok(ResponsePayload::ScActivityJoin(result))
+                }
+                ScJoinResult::Err(e) => Ok(ResponsePayload::ScActivityJoin(e)),
+            }
+        }
     }
+}
+
+#[test]
+fn test() {
+    let s = "<script>alert('申请成功，下面将为您跳转至我的活动页面！');location.href='/public/pcenter/activityOrderList.action'</script>".to_string();
+    let x = s.split("('");
+    println!("{:?}", x);
 }

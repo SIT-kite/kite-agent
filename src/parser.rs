@@ -3,10 +3,10 @@ pub use edu::{
     parse_major_list_page, parse_profile_page, parse_score_list_page, parse_timetable_page,
 };
 pub use edu::{Class, Course, Major, Profile, SchoolYear, Score, ScoreDetail, SelectCourse, Semester};
-pub use expense::{ExpensePage,ExpenseRecord,PageInfo};
+pub use expense::{ExpensePage, ExpenseRecord, PageInfo};
 pub use sc::{
     get_my_activity_list, get_my_score_list, Activity, ActivityDetail, JoinedActivity, ScActivityItem,
-    ScImages, ScScoreItem, ScScoreSummary,
+    ScImages, ScJoinResult, ScScoreItem, ScScoreSummary,
 };
 
 pub use library::{HoldingPreviews, SearchLibraryResult};
