@@ -9,20 +9,25 @@ pub use error::{ActionError, ErrorResponse};
 pub use library::{BookHoldingRequest, SearchLibraryRequest, SearchWay, SortOrder, SortWay};
 use report::AgentInfo;
 pub use report::AgentInfoRequest;
-pub use sc::{ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScScoreItemRequest};
+pub use sc::{
+    ActivityDetailRequest, ActivityListRequest, ScActivityRequest, ScJoinRequest, ScScoreItemRequest,
+};
 
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
-use crate::parser::{Activity, ActivityDetail, Course, HoldingPreviews, Major, ScActivityItem, ScScoreItem, Score, ScoreDetail, SearchLibraryResult, ExpensePage};
+use crate::parser::{
+    Activity, ActivityDetail, Course, ExpensePage, HoldingPreviews, Major, ScActivityItem, ScScoreItem,
+    Score, ScoreDetail, SearchLibraryResult,
+};
 use crate::service::expense::ExpenseRequest;
 
 mod auth;
 mod edu;
 mod error;
+mod expense;
 mod library;
 pub mod report;
 mod sc;
-mod expense;
 
 /// Response payload
 #[derive(Debug, Deserialize)]
@@ -35,6 +40,7 @@ pub enum RequestPayload {
     ActivityDetail(ActivityDetailRequest),
     ScMyScore(ScScoreItemRequest),
     ScMyActivity(ScActivityRequest),
+    ScActivityJoin(ScJoinRequest),
     MajorList(MajorRequest),
     // ClassList(ClassRequest),
     // CourseList(CourseRequest),
@@ -58,6 +64,7 @@ pub enum ResponsePayload {
     ActivityDetail(Box<ActivityDetail>),
     ScMyScore(Vec<ScScoreItem>),
     ScMyActivity(Vec<ScActivityItem>),
+    ScActivityJoin(String),
     MajorList(Vec<Major>),
     // ClassList(Vec<Class>),
     // CourseList(Vec<Course>),
@@ -101,6 +108,7 @@ impl RequestPayload {
             RequestPayload::ActivityDetail(r) => r.process(data).await,
             RequestPayload::ScMyScore(r) => r.process(data).await,
             RequestPayload::ScMyActivity(r) => r.process(data).await,
+            RequestPayload::ScActivityJoin(r) => r.process(data).await,
             RequestPayload::MajorList(r) => r.process(data).await,
             // RequestPayload::ClassList(r) => r.process(data).await,
             // RequestPayload::CourseList(r) => r.process(data).await,
@@ -110,7 +118,7 @@ impl RequestPayload {
             RequestPayload::ScoreDetail(r) => r.process(data).await,
             RequestPayload::SearchLibrary(r) => r.process(data).await,
             RequestPayload::BookHoldingInfo(r) => r.process(data).await,
-            RequestPayload::CardExpense(r)=>r.process(data).await,
+            RequestPayload::CardExpense(r) => r.process(data).await,
         }
     }
 }
