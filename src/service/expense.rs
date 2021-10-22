@@ -1,15 +1,17 @@
 use serde::{Deserialize, Serialize};
 
-use reqwest::Url;
+use reqwest::{StatusCode, Url};
 use crate::agent::SharedData;
 use crate::net::{UserClient};
+use crate::net::client::default_response_hook;
 use crate::parser::{ExpensePage, Parse};
 use crate::service::{DoRequest, ResponsePayload, ResponseResult};
-
+use crate::error::Result;
 
 mod url {
     use const_format::concatcp;
 
+    pub const OA_HOME: &str = "https://myportal.sit.edu.cn/";
     pub const CARD_HOME: &str = "http://card.sit.edu.cn";
     pub const EXPENSE_PAGE: &str = concatcp!(CARD_HOME, "/personalxiaofei.jsp");
 }
@@ -50,18 +52,33 @@ impl ExpenseRequest {
     }
 }
 
-#[async_trait::async_trait]
-impl DoRequest for ExpenseRequest {
-    async fn process(self, data: SharedData) -> ResponseResult {
-        // 查询本地的登录缓存，没有就构造登录缓存
-        let session = data.session_store.query_or(&self.account, &self.password)?;
+async fn make_sure_active(client: &mut UserClient) -> Result<()> {
+    // If OA home is accessible, card home is ensured to be accessed.
+    let home_request = client.raw_client.get(url::OA_HOME).build()?;
+    let response = client.send(home_request).await?;
 
-        // 创建client
-        let mut client = UserClient::new(session, &data.client);
-
+    if response.url().path() != "/" {
+        // The session is already expired, re-login now.
         client.login_with_session().await?;
 
-        // client.set_response_hook(Some(default_response_hook));
+        let home_request = client.raw_client.get(url::OA_HOME).build()?;
+        let _ = client.send(home_request).await?;
+    }
+    Ok(())
+}
+
+
+#[async_trait::async_trait]
+impl DoRequest for ExpenseRequest {
+    async fn process(self, mut data: SharedData) -> ResponseResult {
+        let session = data.session_store.query_or(&self.account, &self.password)?;
+        let mut client = UserClient::new(session, &data.client);
+
+        client.set_response_hook(Some(default_response_hook));
+        make_sure_active(&mut client).await?;
+
+        data.session_store.insert(&client.session)?;
+
         let request = client
             .raw_client
             .get(self.build_url())
