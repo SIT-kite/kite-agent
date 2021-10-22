@@ -86,7 +86,7 @@ impl DoRequest for ExpenseRequest {
         let response = client.send(request).await?;
         let html = response.text().await?;
 
-        let expense_page = ExpensePage::from_html(&html).unwrap();
+        let expense_page = ExpensePage::from_html(&html)?;
         Ok(ResponsePayload::CardExpense(expense_page))
     }
 }

@@ -1,5 +1,5 @@
 use crate::error::Result;
-use crate::parser::Parse;
+use crate::parser::{Parse, ParserError};
 use chrono::{DateTime, FixedOffset, Local, TimeZone};
 use regex::Regex;
 use scraper::{Html, Selector};
@@ -38,7 +38,7 @@ impl Parse for ExpensePage {
         let pages_information: String = document
             .select(&Selector::parse("#listContent[align=right]").unwrap())
             .next()
-            .unwrap()
+            .ok_or_else(|| ParserError::NoSuchElement("No \"#listContent[align=right]\" found.".to_string()))?
             .inner_html();
 
         let current_page_re = Regex::new(r"第(\d+)页")?;
