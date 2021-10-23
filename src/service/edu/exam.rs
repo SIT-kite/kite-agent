@@ -40,13 +40,13 @@ pub struct ExamArrangement {
     #[serde(rename(deserialize = "ksmc"))]
     pub exam_name: String,
     /// 考试备注
-    #[serde(rename(deserialize = "ksbz"))]
-    pub exam_tip: Option<String>,
+    #[serde(default, rename(deserialize = "ksbz"))]
+    pub exam_tip: String,
     /// 教学班名称
     #[serde(rename(deserialize = "jxbmc"))]
     pub dyn_class_id: String,
     /// 考试方式
-    #[serde(rename(deserialize = "ksfs"))]
+    #[serde(default, rename(deserialize = "ksfs"))]
     pub exam_method: String,
     /// 座位号
     #[serde(rename(deserialize = "zwh"))]
