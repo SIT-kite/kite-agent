@@ -7,13 +7,14 @@ use crate::service::{DoRequest, ResponsePayload, ResponseResult};
 use crate::service::edu::{make_sure_active, url};
 use crate::error::Result;
 use serde_json::value::Value;
+use crate::parser::Semester;
 
 #[derive(Debug, Deserialize)]
 pub struct ExamArrangeRequest {
     pub account: String,
     pub password: String,
     pub academic_year: u32,
-    pub semester: u32,
+    pub semester: Semester,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -63,8 +64,8 @@ impl DoRequest for ExamArrangeRequest {
         make_sure_active(&mut client).await?;
 
         let params = [
-            ("xnm", self.academic_year),
-            ("xqm", self.semester),
+            ("xnm", self.academic_year.to_string()),
+            ("xqm", self.semester.to_raw().to_string()),
         ];
 
         let request = client.raw_client.post(url::EXAM_ARRANGEMENT).form(&params).build()?;
