@@ -1,5 +1,6 @@
 pub use env::{ClassRequest, CourseRequest, MajorRequest};
 pub use user::{ProfileRequest, ScoreDetailRequest, ScoreRequest, TimeTableRequest};
+pub use exam::{ExamArrangement, ExamArrangeRequest};
 
 use crate::error::Result;
 use crate::net::UserClient;
@@ -7,6 +8,7 @@ use crate::net::UserClient;
 mod auth;
 mod env;
 mod user;
+mod exam;
 
 /// URL probably used in the module.
 mod url {
@@ -43,6 +45,9 @@ mod url {
     pub const CLASS_LIST: &str = concatcp!(HOME, "/jwglxt/xtgl/comm_cxBjdmList.html?gnmkdm=N214505");
     /// Suggested course and time table
     pub const SUGGESTED_COURSE: &str = concatcp!(HOME, "/jwglxt/kbdy/bjkbdy_cxBjKb.html?gnmkdm=N214505");
+
+    /// Exam arrangement
+    pub const EXAM_ARRANGEMENT: &str = concatcp!(HOME, "/jwglxt/kwgl/kscx_cxXsksxxIndex.html?doType=query&gnmkdm=N358105");
 }
 
 async fn make_sure_active(client: &mut UserClient) -> Result<()> {

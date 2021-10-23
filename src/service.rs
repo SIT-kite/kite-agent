@@ -4,6 +4,7 @@ use auth::{PortalAuthRequest, PortalAuthResponse};
 pub use edu::{
     ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreDetailRequest, ScoreRequest,
     TimeTableRequest,
+    ExamArrangement, ExamArrangeRequest
 };
 pub use error::{ActionError, ErrorResponse};
 pub use library::{BookHoldingRequest, SearchLibraryRequest, SearchWay, SortOrder, SortWay};
@@ -51,6 +52,7 @@ pub enum RequestPayload {
     SearchLibrary(SearchLibraryRequest),
     BookHoldingInfo(BookHoldingRequest),
     CardExpense(ExpenseRequest),
+    ExamArrange(ExamArrangeRequest),
 }
 
 /// Response payload
@@ -75,6 +77,7 @@ pub enum ResponsePayload {
     SearchLibrary(SearchLibraryResult),
     BookHoldingInfo(HoldingPreviews),
     CardExpense(ExpensePage),
+    ExamArrange(Vec<ExamArrangement>),
 }
 
 #[async_trait::async_trait]
@@ -119,6 +122,7 @@ impl RequestPayload {
             RequestPayload::SearchLibrary(r) => r.process(data).await,
             RequestPayload::BookHoldingInfo(r) => r.process(data).await,
             RequestPayload::CardExpense(r) => r.process(data).await,
+            RequestPayload::ExamArrange(r) => r.process(data).await,
         }
     }
 }
