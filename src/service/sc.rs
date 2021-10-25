@@ -9,7 +9,7 @@ use crate::net::UserClient;
 use crate::parser::{
     Activity, ActivityDetail, get_my_activity_list, get_my_score_list, Parse, ScImages, ScJoinResult,
 };
-use crate::service::{ActionError, DoRequest, ErrorResponse, ResponsePayload};
+use crate::service::{ActionError, DoRequest, ResponsePayload};
 
 use super::ResponseResult;
 
@@ -314,4 +314,3 @@ impl DoRequest for ScJoinRequest {
         }
     }
 }
-

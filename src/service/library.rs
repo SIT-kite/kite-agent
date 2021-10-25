@@ -1,11 +1,11 @@
+use anyhow::Result;
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use strum_macros::{Display, EnumString, EnumVariantNames};
+use strum_macros::{Display, EnumVariantNames};
 
 use crate::agent::SharedData;
 use crate::parser::{HoldingPreviews, Parse, SearchLibraryResult};
 use crate::service::{DoRequest, ResponsePayload, ResponseResult};
-use anyhow::Result;
-use reqwest::Url;
 
 mod url {
     use const_format::concatcp;

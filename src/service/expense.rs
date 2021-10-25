@@ -1,12 +1,12 @@
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
-use reqwest::{StatusCode, Url};
 use crate::agent::SharedData;
-use crate::net::{UserClient};
+use crate::error::Result;
 use crate::net::client::default_response_hook;
+use crate::net::UserClient;
 use crate::parser::{ExpensePage, Parse};
 use crate::service::{DoRequest, ResponsePayload, ResponseResult};
-use crate::error::Result;
 
 mod url {
     use const_format::concatcp;
@@ -45,10 +45,7 @@ impl ExpenseRequest {
             params.push(("to", et));
         }
 
-        Url::parse_with_params(
-            url::EXPENSE_PAGE,
-            params.iter(),
-        ).unwrap()
+        Url::parse_with_params(url::EXPENSE_PAGE, params.iter()).unwrap()
     }
 }
 
@@ -67,7 +64,6 @@ async fn make_sure_active(client: &mut UserClient) -> Result<()> {
     Ok(())
 }
 
-
 #[async_trait::async_trait]
 impl DoRequest for ExpenseRequest {
     async fn process(self, mut data: SharedData) -> ResponseResult {
@@ -79,10 +75,7 @@ impl DoRequest for ExpenseRequest {
 
         data.session_store.insert(&client.session)?;
 
-        let request = client
-            .raw_client
-            .get(self.build_url())
-            .build()?;
+        let request = client.raw_client.get(self.build_url()).build()?;
         let response = client.send(request).await?;
         let html = response.text().await?;
 

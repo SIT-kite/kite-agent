@@ -1,13 +1,14 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use serde_json::value::Value;
+
 use crate::agent::SharedData;
+use crate::error::Result;
 use crate::net::client::default_response_hook;
 use crate::net::UserClient;
+use crate::parser::Semester;
 use crate::service::{DoRequest, ResponsePayload, ResponseResult};
 use crate::service::edu::{make_sure_active, url};
-use crate::error::Result;
-use serde_json::value::Value;
-use crate::parser::Semester;
 
 #[derive(Debug, Deserialize)]
 pub struct ExamArrangeRequest {
@@ -68,7 +69,11 @@ impl DoRequest for ExamArrangeRequest {
             ("xqm", self.semester.to_raw().to_string()),
         ];
 
-        let request = client.raw_client.post(url::EXAM_ARRANGEMENT).form(&params).build()?;
+        let request = client
+            .raw_client
+            .post(url::EXAM_ARRANGEMENT)
+            .form(&params)
+            .build()?;
         let response = client.send(request).await?;
 
         data.session_store.insert(&client.session)?;

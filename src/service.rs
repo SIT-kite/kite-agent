@@ -2,9 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use auth::{PortalAuthRequest, PortalAuthResponse};
 pub use edu::{
-    ClassRequest, CourseRequest, MajorRequest, ProfileRequest, ScoreDetailRequest, ScoreRequest,
-    TimeTableRequest,
-    ExamArrangement, ExamArrangeRequest
+    ClassRequest, CourseRequest, ExamArrangement, ExamArrangeRequest, MajorRequest, ProfileRequest,
+    ScoreDetailRequest, ScoreRequest, TimeTableRequest,
 };
 pub use error::{ActionError, ErrorResponse};
 pub use library::{BookHoldingRequest, SearchLibraryRequest, SearchWay, SortOrder, SortWay};
@@ -17,8 +16,8 @@ pub use sc::{
 use crate::agent::SharedData;
 pub use crate::net::auth::portal_login;
 use crate::parser::{
-    Activity, ActivityDetail, Course, ExpensePage, HoldingPreviews, Major, ScActivityItem, ScScoreItem,
-    Score, ScoreDetail, SearchLibraryResult,
+    Activity, ActivityDetail, Course, ExpensePage, HoldingPreviews, Major, ScActivityItem, Score,
+    ScoreDetail, ScScoreItem, SearchLibraryResult,
 };
 use crate::service::expense::ExpenseRequest;
 
