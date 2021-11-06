@@ -52,7 +52,7 @@ fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
                     })
                     .await;
                     match run_result {
-                        Ok(_) => todo!(),
+                        Ok(_) => (),
                         Err(e) => println!("Tokio local set run until fails: {}", e),
                     }
                 })
