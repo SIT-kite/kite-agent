@@ -65,7 +65,7 @@ fn identify_captcha(image_content: Vec<u8>) -> Result<String> {
     use imageproc::contrast::threshold;
 
     let image = image::load_from_memory_with_format(&image_content, image::ImageFormat::Jpeg)?;
-    let image_luma = image.into_luma();
+    let image_luma = image.into_luma8();
     let dimension = image_luma.dimensions();
 
     threshold(&image_luma, 130);

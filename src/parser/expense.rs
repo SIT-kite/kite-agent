@@ -118,7 +118,6 @@ mod test {
     #[test]
     fn test_expense_record_parser() {
         use super::Parse;
-        use super::{ExpenseRecord, PageInfo};
         let html_page = std::fs::read_to_string("html/消费记录页面.html").unwrap();
 
         let origin: ExpensePage = Parse::from_html(html_page.as_str()).unwrap();

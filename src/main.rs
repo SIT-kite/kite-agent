@@ -38,7 +38,7 @@ fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
             // Run the local task set.
             local
                 .run_until(async move {
-                    tokio::task::spawn_local(async move {
+                    let run_result = tokio::task::spawn_local(async move {
                         run(
                             remote_server.clone(),
                             SharedData {
@@ -51,6 +51,10 @@ fn worker_thread(storage: SessionStorage, client: reqwest::Client) {
                         .unwrap_or_else(|e| eprintln!("{}", e));
                     })
                     .await;
+                    match run_result {
+                        Ok(_) => todo!(),
+                        Err(e) => println!("Tokio local set run until fails: {}", e),
+                    }
                 })
                 .await;
             /* KiteService has been aborted now.*/

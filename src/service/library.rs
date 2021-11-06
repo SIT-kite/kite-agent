@@ -205,7 +205,7 @@ impl DoRequest for SearchLibraryRequest {
         let request = data.client.get(self.build_url()).build()?;
         let response = data.client.execute(request).await?;
         let html = response.text().await?;
-        let mut books: SearchLibraryResult = Parse::from_html(&html)?;
+        let books: SearchLibraryResult = Parse::from_html(&html)?;
 
         // let book_id_list = books.book_list
         //     .iter()
